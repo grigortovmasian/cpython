@@ -1,11 +1,56 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_bitutils.h"      // _Py_bswap32()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <ffi.h>
-#ifdef MS_WIN32
-#include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
 #endif
+
+#ifdef MS_WIN32
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
+#include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#endif
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "ctypes.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 
 #define CTYPES_CFIELD_CAPSULE_NAME_PYMEM "_ctypes/cfield.c pymem"

@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /*[clinic input]
 preserve
 [clinic start generated code]*/

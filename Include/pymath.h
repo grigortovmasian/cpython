@@ -1,7 +1,9 @@
 #ifndef Py_PYMATH_H
 #define Py_PYMATH_H
 
+
 #include "pyconfig.h" /* include for defines */
+
 
 /**************************************************************************
 Symbols and macros to supply platform-independent interfaces to mathematical
@@ -29,11 +31,22 @@ extern double hypot(double, double);
 /* extra declarations */
 #ifndef _MSC_VER
 #ifndef __STDC__
+
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 extern double fmod (double, double);
 extern double frexp (double, int *);
 extern double ldexp (double, int);
 extern double modf (double, double *);
 extern double pow(double, double);
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #endif /* __STDC__ */
 #endif /* _MSC_VER */
 

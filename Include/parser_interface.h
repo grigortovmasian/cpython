@@ -1,10 +1,11 @@
 #ifndef Py_PEGENINTERFACE
 #define Py_PEGENINTERFACE
+
+#include "Python.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "Python.h"
 
 #ifndef Py_LIMITED_API
 PyAPI_FUNC(struct _mod *) PyParser_ASTFromString(

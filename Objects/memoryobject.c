@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /*
  * Memoryview object implementation
  * --------------------------------
@@ -10,18 +15,66 @@
  *
  */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_abstract.h"   // _PyIndex_Check()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pystrhex.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stddef.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 class memoryview "PyMemoryViewObject *" "&PyMemoryView_Type"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=e2e49d2192835219]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/memoryobject.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /****************************************************************************/
 /*                           ManagedBuffer Object                           */

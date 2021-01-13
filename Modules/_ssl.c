@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* SSL socket module
 
    SSL support based on patches by Brian E Gallew and Laszlo Kovacs.
@@ -16,9 +21,25 @@
 
 #define PY_SSIZE_T_CLEAN
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 /* Redefined below for Windows debug builds after important #includes */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #define _PySSL_FIX_ERRNO
 
 #define PySSL_BEGIN_ALLOW_THREADS_S(save) \
@@ -33,14 +54,38 @@
 #define PySSL_END_ALLOW_THREADS PySSL_END_ALLOW_THREADS_S(_save); }
 
 /* Include symbols from _socket module */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "socketmodule.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PySocketModule_APIObject PySocketModule;
 
 #if defined(HAVE_POLL_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <poll.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #elif defined(HAVE_SYS_POLL_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/poll.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 /* Don't warn about deprecated functions */
@@ -52,16 +97,96 @@ static PySocketModule_APIObject PySocketModule;
 #endif
 
 /* Include OpenSSL header files */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/rsa.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/crypto.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/x509.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/x509v3.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/pem.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/ssl.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/err.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/rand.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/bio.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "openssl/dh.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifndef HAVE_X509_VERIFY_PARAM_SET1_HOST
 #  ifdef LIBRESSL_VERSION_NUMBER
@@ -135,7 +260,15 @@ static void _PySSLFixErrno(void) {
 #endif
 
 /* Include generated data (error codes) */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "_ssl_data.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && !defined(LIBRESSL_VERSION_NUMBER)
 #  define OPENSSL_VERSION_1_1 1
@@ -515,7 +648,15 @@ class _ssl.SSLSession "PySSLSession *" "PySSLSession_Type"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=cc4883756da17954]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_ssl.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static int PySSL_select(PySocketSockObject *s, int writing, _PyTime_t timeout);
 
@@ -546,7 +687,15 @@ typedef enum {
 #define GET_SOCKET_TIMEOUT(sock) \
     ((sock != NULL) ? (sock)->sock_timeout : 0)
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "_ssl/debughelpers.c"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*
  * SSL errors.

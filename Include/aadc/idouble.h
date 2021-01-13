@@ -240,6 +240,10 @@ public:
     idouble(const double& c) : val(c) {
 //        if(AADC_UNLIKELY(recording)) CAAD_iVarConstructorConstant(&val, &c);
     }
+
+     operator double () { //Conversion operator to gen magnitude
+         return val;
+      }
     idouble(idouble&& other) {
 #ifdef AADC_IDOUBLE_ACTIVE        
         if(AADC_UNLIKELY(recording)) CAAD_iVarAssign(&(other.val), &val, true);
@@ -249,7 +253,7 @@ public:
     idouble() : val(0.0) { 
 //        if(AADC_UNLIKELY(recording)) CAAD_iVarConstructorUninitialized(&val); 
     }
-    idouble(const idouble& other) 
+idouble(const idouble& other)  
         : val(other.val) 
     { 
 #ifdef AADC_IDOUBLE_ACTIVE        
@@ -269,6 +273,7 @@ public:
         val = other.val;
         return *this;
     }
+
     idouble& operator = (const idouble&& other) {
 #ifdef AADC_IDOUBLE_ACTIVE        
         if(AADC_UNLIKELY(recording)) CAAD_iVarAssign(&(other.val), &val, true);
@@ -409,7 +414,30 @@ private:
     }
 public:
     double val;
-};
+}; 	
+
+inline bool operator< (const idouble& lhs, const idouble& rhs){ return lhs.val < rhs.val; }
+inline bool operator> (const idouble& lhs, const idouble& rhs){ return lhs.val > rhs.val; }
+inline bool operator<=(const idouble& lhs, const idouble& rhs){ return lhs.val <= rhs.val; }
+inline bool operator>=(const idouble& lhs, const idouble& rhs){ return lhs.val >= rhs.val; }
+inline bool operator==(const idouble& lhs, const idouble& rhs){ return lhs.val == rhs.val; }
+inline bool operator!=(const idouble& lhs, const idouble& rhs){ return !(lhs.val == rhs.val); }
+
+inline bool operator< (const idouble& lhs, const int& rhs){ return lhs.val < double(rhs); }
+inline bool operator> (const idouble& lhs, const int& rhs){ return lhs.val > double(rhs); }
+inline bool operator<=(const idouble& lhs, const int& rhs){ return lhs.val <= double(rhs); }
+inline bool operator>=(const idouble& lhs, const int& rhs){ return lhs.val >= double(rhs); }
+inline bool operator==(const idouble& lhs, const int& rhs){ return lhs.val == double(rhs); }
+inline bool operator!=(const idouble& lhs, const int& rhs){ return !(lhs == double(rhs)); }
+
+inline bool operator< (const double& lhs, const idouble& rhs){ return lhs < rhs.val; }
+inline bool operator> (const double& lhs, const idouble& rhs){ return lhs > rhs.val; }
+inline bool operator<=(const double& lhs, const idouble& rhs){ return lhs <= rhs.val; }
+inline bool operator>=(const double& lhs, const idouble& rhs){ return lhs >= rhs.val; }
+inline bool operator==(const double& lhs, const idouble& rhs){ return lhs == rhs.val; }
+inline bool operator!=(const double& lhs, const idouble& rhs){ return !(lhs == rhs); }
+
+
 
 inline idouble operator + (const idouble& a, const idouble& b) {
     idouble c;

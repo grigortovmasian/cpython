@@ -1,10 +1,39 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* implements the unicode (as opposed to string) version of the
    built-in formatters for string, int, float.  that is, the versions
    of int.__float__, etc., that take and return unicode objects */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_fileutils.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <locale.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* Raises an exception about an unknown presentation type for this
  * type. */

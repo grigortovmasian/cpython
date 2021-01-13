@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /****************************************************************
  *
  * The author of this software is David M. Gay.
@@ -81,7 +86,15 @@
  *      _control87(PC_53, MCW_PC);
  * does this with many compilers.  Whether this or another call is
  * appropriate depends on the compiler; for this to work, it may be
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
  * necessary to #include "float.h" or another system-dependent header
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
  * file.
  */
 
@@ -117,14 +130,38 @@
 
 /* Linking of Python's #defines to Gay's #defines starts here. */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_dtoa.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* if PY_NO_SHORT_FLOAT_REPR is defined, then don't even try to compile
    the following code */
 #ifndef PY_NO_SHORT_FLOAT_REPR
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "float.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define MALLOC PyMem_Malloc
 #define FREE PyMem_Free
@@ -180,7 +217,16 @@ static double private_mem[PRIVATE_mem], *pmem_next = private_mem;
 extern "C" {
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 typedef union { double d; ULong L[2]; } U;
+
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef IEEE_8087
 #define word0(x) (x)->L[1]
@@ -1646,7 +1692,7 @@ _Py_dg_strtod(const char *s00, char **se)
             goto ret;
         if (e > 0) {
             if (e <= Ten_pmax) {
-                dval(&rv) *= tens[e];
+                dval(&rv) *= (double)tens[e];
                 goto ret;
             }
             i = DBL_DIG - nd;
@@ -1655,13 +1701,13 @@ _Py_dg_strtod(const char *s00, char **se)
                  * this for larger i values.
                  */
                 e -= i;
-                dval(&rv) *= tens[i];
-                dval(&rv) *= tens[e];
+                dval(&rv) *= (double)tens[i];
+                dval(&rv) *= (double)tens[e];
                 goto ret;
             }
         }
         else if (e >= -Ten_pmax) {
-            dval(&rv) /= tens[-e];
+            dval(&rv) /= (double)tens[-e];
             goto ret;
         }
     }
@@ -1673,17 +1719,17 @@ _Py_dg_strtod(const char *s00, char **se)
 
     if (e1 > 0) {
         if ((i = e1 & 15))
-            dval(&rv) *= tens[i];
+            dval(&rv) *= (double)tens[i];
         if (e1 &= ~15) {
             if (e1 > DBL_MAX_10_EXP)
                 goto ovfl;
             e1 >>= 4;
             for(j = 0; e1 > 1; j++, e1 >>= 1)
                 if (e1 & 1)
-                    dval(&rv) *= bigtens[j];
+                    dval(&rv) *= (double)bigtens[j];
             /* The last multiplication could overflow. */
             word0(&rv) -= P*Exp_msk1;
-            dval(&rv) *= bigtens[j];
+            dval(&rv) *= (double)bigtens[j];
             if ((z = word0(&rv) & Exp_mask)
                 > Exp_msk1*(DBL_MAX_EXP+Bias-P))
                 goto ovfl;
@@ -1710,7 +1756,7 @@ _Py_dg_strtod(const char *s00, char **se)
 
         e1 = -e1;
         if ((i = e1 & 15))
-            dval(&rv) /= tens[i];
+            dval(&rv) /= (double)tens[i];
         if (e1 >>= 4) {
             if (e1 >= 1 << n_bigtens)
                 goto undfl;
@@ -1718,7 +1764,7 @@ _Py_dg_strtod(const char *s00, char **se)
                 bc.scale = 2*P;
             for(j = 0; e1 > 0; j++, e1 >>= 1)
                 if (e1 & 1)
-                    dval(&rv) *= tinytens[j];
+                    dval(&rv) *= (double)tinytens[j];
             if (bc.scale && (j = 2*P + 1 - ((word0(&rv) & Exp_mask)
                                             >> Exp_shift)) > 0) {
                 /* scaled rv is denormal; clear j low bits */
@@ -2453,7 +2499,7 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
             if (j & Bletch) {
                 /* prevent overflows */
                 j &= Bletch - 1;
-                dval(&u) /= bigtens[n_bigtens-1];
+                dval(&u) /= (double)bigtens[n_bigtens-1];
                 ieps++;
             }
             for(; j; j >>= 1, i++)
@@ -2464,11 +2510,11 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
             dval(&u) /= ds;
         }
         else if ((j1 = -k)) {
-            dval(&u) *= tens[j1 & 0xf];
+            dval(&u) *= (double)tens[j1 & 0xf];
             for(j = j1 >> 4; j; j >>= 1, i++)
                 if (j & 1) {
                     ieps++;
-                    dval(&u) *= bigtens[i];
+                    dval(&u) *= (double)bigtens[i];
                 }
         }
         if (k_check && dval(&u) < 1. && ilim > 0) {
@@ -2511,7 +2557,7 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
         }
         else {
             /* Generate ilim digits, then fix them up. */
-            dval(&eps) *= tens[ilim-1];
+            dval(&eps) *= (double)tens[ilim-1];
             for(i = 1;; i++, dval(&u) *= 10.) {
                 L = (Long)(dval(&u));
                 if (!(dval(&u) -= L))

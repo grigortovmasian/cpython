@@ -1,9 +1,22 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Set of hash utility functions to help maintaining the invariant that
     if a==b then hash(a)==hash(b)
 
    All the utility functions (_Py_Hash*()) return "-1" to signify an error.
 */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef __APPLE__
 #  include <libkern/OSByteOrder.h>

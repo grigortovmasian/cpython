@@ -1,18 +1,63 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Array object implementation */
 
 /* An array is a uniform list -- all items have the same type.
    The item type is restricted to simple C types like int or float */
 
 #define PY_SSIZE_T_CLEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"         // PyMemberDef
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stddef.h>               // offsetof()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef STDC_HEADERS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stddef.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else /* !STDC_HEADERS */
 #ifdef HAVE_SYS_TYPES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>          /* For size_t */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_SYS_TYPES_H */
 #endif /* !STDC_HEADERS */
 
@@ -117,7 +162,15 @@ enum machine_format_code {
  * Must come after arrayobject, arrayiterobject,
  * and enum machine_code_type definitions.
  */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/arraymodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define array_Check(op, state) PyObject_TypeCheck(op, state->ArrayType)
 

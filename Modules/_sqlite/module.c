@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* module.c - the module itself
  *
  * Copyright (C) 2004-2010 Gerhard Häring <gh@ghaering.de>
@@ -21,19 +26,83 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "connection.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "statement.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "cursor.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "cache.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "prepare_protocol.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "microprotocols.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "row.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #if SQLITE_VERSION_NUMBER < 3007015
 #error "SQLite 3.7.15 or higher required"
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/module.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 /*[clinic input]
 module _sqlite3
 [clinic start generated code]*/

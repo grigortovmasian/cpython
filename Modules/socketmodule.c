@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Socket module */
 
 /*
@@ -86,7 +91,15 @@ Local naming conventions:
 */
 
 #ifdef __APPLE__
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <AvailabilityMacros.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 /* for getaddrinfo thread safety test on old versions of OS X */
 #ifndef MAC_OS_X_VERSION_10_5
 #define MAC_OS_X_VERSION_10_5 1050
@@ -100,8 +113,24 @@ Local naming conventions:
 #endif
 
 #define PY_SSIZE_T_CLEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"         // PyMemberDef
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef _Py_MEMORY_SANITIZER
 # include <sanitizer/msan_interface.h>
@@ -213,16 +242,48 @@ if_indextoname(index) -- return the corresponding interface name\n\
 #define _SGIAPI 1
 
 #undef _XOPEN_SOURCE
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/socket.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <netinet/in.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifdef _SS_ALIGNSIZE
 #define HAVE_GETADDRINFO 1
 #define HAVE_GETNAMEINFO 1
 #endif
 
 #define HAVE_INET_PTON
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <netdb.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 /* Solaris fails to define this variable at all. */
@@ -232,20 +293,52 @@ if_indextoname(index) -- return the corresponding interface name\n\
 
 /* Generic includes */
 #ifdef HAVE_SYS_TYPES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SYS_SOCKET_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/socket.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_NET_IF_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <net/if.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 /* Generic socket object definitions and includes */
 #define PySocket_BUILDING_SOCKET
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "socketmodule.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* Addressing includes */
 
@@ -302,9 +395,25 @@ if_indextoname(index) -- return the corresponding interface name\n\
 #endif /* MS_WINDOWS */
 
 /* Provides the IsWindows7SP1OrGreater() function */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <versionhelpers.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 // For if_nametoindex() and if_indextoname()
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <iphlpapi.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* remove some flags on older version Windows during run-time.
    https://msdn.microsoft.com/en-us/library/windows/desktop/ms738596.aspx */
@@ -376,7 +485,15 @@ remove_unusable_flags(PyObject *m)
 
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stddef.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifndef O_NONBLOCK
 # define O_NONBLOCK O_NDELAY
@@ -424,11 +541,27 @@ remove_unusable_flags(PyObject *m)
 #define getaddrinfo fake_getaddrinfo
 #define gai_strerror fake_gai_strerror
 #define freeaddrinfo fake_freeaddrinfo
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "getaddrinfo.c"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #if !defined(HAVE_GETNAMEINFO)
 #define getnameinfo fake_getnameinfo
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "getnameinfo.c"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef MS_WINDOWS
@@ -524,9 +657,25 @@ extern PyTypeObject sock_type;
 }
 
 #if defined(HAVE_POLL_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <poll.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #elif defined(HAVE_SYS_POLL_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/poll.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 /* Largest value to try to store in a socklen_t (used when handling

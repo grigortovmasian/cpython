@@ -1,24 +1,101 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Float object implementation */
 
 /* XXX There should be overflow checks here, but it's hard to check
    for any kind of float exception without losing portability. */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_dtoa.h"          // _Py_dg_dtoa()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_interp.h"        // _PyInterpreterState.float_state
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_long.h"          // _PyLong_GetOne()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"        // _PyObject_Init()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"       // _PyInterpreterState_GET()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <float.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 class float "PyObject *" "&PyFloat_Type"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=dd0003f68f144284]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/floatobject.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifndef PyFloat_MAXFREELIST
 #  define PyFloat_MAXFREELIST   100
@@ -481,8 +558,14 @@ float_richcompare(PyObject *v, PyObject *w, int op)
             }
             else
                 Py_INCREF(ww);
-
+#ifdef USE_IDOUBLE
+            intpart = (int)((double)i);
+            fracpart = i - intpart;
+#else
             fracpart = modf(i, &intpart);
+#endif
+
+
             vv = PyLong_FromDouble(intpart);
             if (vv == NULL)
                 goto Error;
@@ -727,7 +810,11 @@ float_pow(PyObject *v, PyObject *w, PyObject *z)
         return PyFloat_FromDouble(iv);
     }
     if (Py_IS_NAN(iw)) {        /* v**nan = nan, unless v == 1; 1**nan = 1 */
+#ifdef USE_IDOUBLE
+	return PyFloat_FromDouble(iv == 1.0 ? (double)1.0 : iw);
+#else
         return PyFloat_FromDouble(iv == 1.0 ? 1.0 : iw);
+#endif
     }
     if (Py_IS_INFINITY(iw)) {
         /* v**inf is: 0.0 if abs(v) < 1; 1.0 if abs(v) == 1; inf if
@@ -750,9 +837,13 @@ float_pow(PyObject *v, PyObject *w, PyObject *z)
          *     an odd integer.
          */
         int iw_is_odd = DOUBLE_IS_ODD_INTEGER(iw);
-        if (iw > 0.0)
+        if (iw > 0.0) {
+#ifdef USE_IDOUBLE
+            return PyFloat_FromDouble(iw_is_odd ? iv : (idouble)fabs(iv));
+#else
             return PyFloat_FromDouble(iw_is_odd ? iv : fabs(iv));
-        else
+#endif
+        } else
             return PyFloat_FromDouble(iw_is_odd ?
                                       copysign(0.0, iv) : 0.0);
     }
@@ -767,7 +858,11 @@ float_pow(PyObject *v, PyObject *w, PyObject *z)
             return NULL;
         }
         /* use correct sign if iw is odd */
+#ifdef USE_IDOUBLE
+	return PyFloat_FromDouble(iw_is_odd ? iv : (idouble)0.0);
+#else
         return PyFloat_FromDouble(iw_is_odd ? iv : 0.0);
+#endif
     }
 
     if (iv < 0.0) {

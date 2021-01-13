@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 #ifndef PY_NO_SHORT_FLOAT_REPR
 #ifdef __cplusplus
 extern "C" {

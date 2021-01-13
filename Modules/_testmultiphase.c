@@ -1,8 +1,21 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 
 /* Testing module for multi-phase initialization of extension modules (PEP 489)
  */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* State for testing module state access from methods */
 
@@ -59,7 +72,15 @@ Example_demo(ExampleObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_testmultiphase.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyMethodDef Example_methods[] = {
     {"demo",            (PyCFunction)Example_demo,  METH_VARARGS,

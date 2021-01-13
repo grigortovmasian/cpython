@@ -1,5 +1,26 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "rotatingtree.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /************************************************************/
 /* Written by Brett Rosen and Ted Czotter */
@@ -56,7 +77,15 @@ class _lsprof.Profiler "ProfilerObject *" "&ProfilerType"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=e349ac952152f336]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_lsprof.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 typedef struct {
     PyTypeObject *profiler_type;

@@ -1,13 +1,74 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Built-in functions */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "ast.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #undef Yield   /* undefine macro conflicting with <winbase.h> */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"        // _Py_AddToAllObjects()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pyerrors.h"      // _PyErr_NoMemory()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"       // _PyThreadState_GET()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_tuple.h"         // _PyTuple_FromArray()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 _Py_IDENTIFIER(__builtins__);
 _Py_IDENTIFIER(__dict__);
@@ -24,7 +85,15 @@ _Py_IDENTIFIER(stdin);
 _Py_IDENTIFIER(stdout);
 _Py_IDENTIFIER(stderr);
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/bltinmodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyObject*
 update_bases(PyObject *bases, PyObject *const *args, Py_ssize_t nargs)

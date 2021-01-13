@@ -1,24 +1,109 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Author: Daniel Stutzbach */
 
 #define PY_SSIZE_T_CLEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"         // PyMemberDef
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdbool.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifdef HAVE_SYS_TYPES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_SYS_STAT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/stat.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_IO_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <io.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_FCNTL_H
-#include <fcntl.h>
+#ifdef USE_IDOUBLE
+#undef double
 #endif
+
+#include <fcntl.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#endif
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stddef.h> /* For offsetof */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "_iomodule.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*
  * Known likely problems:
@@ -37,7 +122,15 @@
 /* can simulate truncate with Win32 API functions; see file_truncate */
 #define HAVE_FTRUNCATE
 #define WIN32_LEAN_AND_MEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if BUFSIZ < (8*1024)
@@ -1133,7 +1226,15 @@ _io_FileIO_isatty_impl(fileio *self)
     return PyBool_FromLong(res);
 }
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/fileio.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyMethodDef fileio_methods[] = {
     _IO_FILEIO_READ_METHODDEF

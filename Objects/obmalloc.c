@@ -1,7 +1,36 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pymem.h"         // _PyTraceMalloc_Config
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <stdbool.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 
 /* Defined in tracemalloc.c */
@@ -723,7 +752,15 @@ PyObject_Free(void *ptr)
 #ifdef WITH_PYMALLOC
 
 #ifdef WITH_VALGRIND
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <valgrind/valgrind.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* -1 indicates that we haven't checked that we're running on valgrind yet. */
 static int running_on_valgrind = -1;

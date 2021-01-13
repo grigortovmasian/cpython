@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 
 /* Complex object implementation */
 
@@ -5,10 +10,42 @@
 
 /* Submitted by Jim Hugunin */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_long.h"          // _PyLong_GetZero()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"        // _PyObject_Init()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"         // PyMemberDef
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 
 /*[clinic input]
@@ -16,7 +53,15 @@ class complex "PyComplexObject *" "&PyComplex_Type"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=819e057d2d10f5ec]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/complexobject.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* elementary operations on complex numbers */
 

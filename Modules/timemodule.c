@@ -1,23 +1,76 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Time module */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef HAVE_SYS_TIMES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/times.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SYS_TYPES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(HAVE_SYS_RESOURCE_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/resource.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef QUICKWIN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <io.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(HAVE_PTHREAD_H)

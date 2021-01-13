@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* struct module -- pack values into and (out of) bytes objects */
 
 /* New version supporting byte order, alignment and size options,
@@ -5,9 +10,33 @@
 
 #define PY_SSIZE_T_CLEAN
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"         // PyMemberDef
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 class Struct "PyStructObject *" "&PyStructType"
@@ -120,7 +149,15 @@ class cache_struct_converter(CConverter):
 
 static int cache_struct_converter(PyObject *, PyObject *, PyStructObject **);
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_struct.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* Helper for integer format codes: converts an arbitrary Python object to a
    PyLongObject if possible, otherwise fails.  Caller should decref. */

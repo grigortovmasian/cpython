@@ -1,10 +1,47 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
 #ifdef MS_WINDOWS
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
+
 #include <winsock2.h>         /* struct timeval */
+
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(__APPLE__)
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
+
 #include <mach/mach_time.h>   /* mach_absolute_time(), mach_timebase_info() */
+
+
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
 
 #if defined(__APPLE__) && defined(__has_builtin)
 #  if __has_builtin(__builtin_available)
@@ -115,7 +152,11 @@ static double
 _PyTime_Round(double x, _PyTime_round_t round)
 {
     /* volatile avoids optimization changing how numbers are rounded */
+#ifdef USE_IDOUBLE
+    double d;
+#else
     volatile double d;
+#endif
 
     d = x;
     if (round == _PyTime_ROUND_HALF_EVEN) {
@@ -141,9 +182,18 @@ _PyTime_DoubleToDenominator(double d, time_t *sec, long *numerator,
     double denominator = (double)idenominator;
     double intpart;
     /* volatile avoids optimization changing how numbers are rounded */
+#ifdef USE_IDOUBLE
+             double floatpart;
+#else
     volatile double floatpart;
+#endif
 
-    floatpart = modf(d, &intpart);
+#ifdef USE_IDOUBLE
+            intpart = (int)((double)d);
+            floatpart= d - intpart;
+#else
+            floatpart= modf(i, &intpart);
+#endif
 
     floatpart *= denominator;
     floatpart = _PyTime_Round(floatpart, round);
@@ -199,8 +249,11 @@ _PyTime_ObjectToTime_t(PyObject *obj, time_t *sec, _PyTime_round_t round)
     if (PyFloat_Check(obj)) {
         double intpart;
         /* volatile avoids optimization changing how numbers are rounded */
+#ifdef USE_IDOUBLE
+                  double d;
+#else
         volatile double d;
-
+#endif
         d = PyFloat_AsDouble(obj);
         if (Py_IS_NAN(d)) {
             PyErr_SetString(PyExc_ValueError, "Invalid value NaN (not a number)");
@@ -208,7 +261,12 @@ _PyTime_ObjectToTime_t(PyObject *obj, time_t *sec, _PyTime_round_t round)
         }
 
         d = _PyTime_Round(d, round);
-        (void)modf(d, &intpart);
+
+#ifdef USE_IDOUBLE
+            intpart = (int)((double)d);
+#else
+           (void)modf(d, &intpart);
+#endif
 
         if (!_Py_InIntegralTypeRange(time_t, intpart)) {
             error_time_t_overflow();
@@ -388,7 +446,11 @@ _PyTime_FromDouble(_PyTime_t *t, double value, _PyTime_round_t round,
                    long unit_to_ns)
 {
     /* volatile avoids optimization changing how numbers are rounded */
+#ifdef USE_IDOUBLE
+             double d;
+#else
     volatile double d;
+#endif
 
     /* convert to a number of nanoseconds */
     d = value;
@@ -453,7 +515,11 @@ double
 _PyTime_AsSecondsDouble(_PyTime_t t)
 {
     /* volatile avoids optimization changing how numbers are rounded */
+#ifdef USE_IDOUBLE
+             double d;
+#else
     volatile double d;
+#endif
 
     if (t % SEC_TO_NS == 0) {
         _PyTime_t secs;

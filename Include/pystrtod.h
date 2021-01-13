@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 #ifndef Py_STRTOD_H
 #define Py_STRTOD_H
 

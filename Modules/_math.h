@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 #ifdef HAVE_ACOSH
 #  define m_acosh acosh
 #else

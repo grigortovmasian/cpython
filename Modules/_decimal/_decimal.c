@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /*
  * Copyright (c) 2008-2020 Stefan Krah. All rights reserved.
  *
@@ -26,16 +31,72 @@
  */
 
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <Python.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "longintrepr.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "complexobject.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "mpdecimal.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <stdlib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define CPYTHON_DECIMAL_MODULE
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pydecimal.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "docstrings.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 
 #if !defined(MPD_VERSION_HEX) || MPD_VERSION_HEX < 0x02050000

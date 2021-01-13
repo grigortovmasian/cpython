@@ -3,6 +3,7 @@
 #define Py_ASDL_H
 
 typedef PyObject * identifier;
+typedef PyObject * str;
 typedef PyObject * string;
 typedef PyObject * object;
 typedef PyObject * constant;

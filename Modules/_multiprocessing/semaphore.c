@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /*
  * A type which wraps a semaphore
  *
@@ -7,7 +12,15 @@
  * Licensed to PSF under a Contributor Agreement.
  */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "multiprocessing.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 enum { RECURSIVE_MUTEX, SEMAPHORE };
 
@@ -35,7 +48,15 @@ class _multiprocessing.SemLock "SemLockObject *" "&_PyMp_SemLockType"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=935fb41b7d032599]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/semaphore.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define ISMINE(o) (o->count > 0 && PyThread_get_thread_ident() == o->last_tid)
 

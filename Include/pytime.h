@@ -1,9 +1,30 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 #ifndef Py_LIMITED_API
 #ifndef Py_PYTIME_H
 #define Py_PYTIME_H
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pyconfig.h" /* include for defines */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "object.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /**************************************************************************
 Symbols and macros to supply platform-independent interfaces to time related

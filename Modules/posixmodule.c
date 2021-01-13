@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* POSIX module implementation */
 
 /* This file is also used for Windows NT/MS-Win.  In that case the
@@ -9,13 +14,37 @@
 
 #define PY_SSIZE_T_CLEAN
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_fileutils.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifdef MS_WINDOWS
    /* include <windows.h> early to avoid conflict with pycore_condvar.h:
 
         #define WIN32_LEAN_AND_MEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
         #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
       FSCTL_GET_REPARSE_POINT is not exported with WIN32_LEAN_AND_MEAN. */
 #  include <windows.h>
@@ -24,11 +53,51 @@
 #ifdef __VXWORKS__
 #  include "pycore_bitutils.h"    // _Py_popcount32()
 #endif
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_ceval.h"         // _PyEval_ReInitThreads()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_import.h"        // _PyImport_ReInitLock()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_initconfig.h"    // _PyStatus_EXCEPTION()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"       // _PyInterpreterState_GET()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"         // PyMemberDef
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifndef MS_WINDOWS
 #  include "posixmodule.h"
 #else
@@ -41,7 +110,15 @@
 #  undef HAVE_FACCESSAT
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdio.h>  /* needed for ctermid() */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*
  * A number of APIs are available on macOS from a certain macOS version.
@@ -1585,7 +1662,15 @@ win32_get_reparse_tag(HANDLE reparse_point_handle, ULONG *reparse_tag)
 ** environ directly, we must obtain it with _NSGetEnviron(). See also
 ** man environ(7).
 */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <crt_externs.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #elif !defined(_MSC_VER) && (!defined(__WATCOMC__) || defined(__QNX__) || defined(__VXWORKS__))
 extern char **environ;
 #endif /* !_MSC_VER */
@@ -4472,7 +4557,15 @@ os_mkdir_impl(PyObject *module, path_t *path, int mode, int dir_fd)
 
 /* sys/resource.h is needed for at least: wait3(), wait4(), broken nice. */
 #if defined(HAVE_SYS_RESOURCE_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/resource.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 
@@ -7127,18 +7220,50 @@ error:
 
 #if defined(HAVE_OPENPTY) || defined(HAVE_FORKPTY) || defined(HAVE_DEV_PTMX)
 #ifdef HAVE_PTY_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <pty.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
 #ifdef HAVE_LIBUTIL_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <libutil.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
 #ifdef HAVE_UTIL_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <util.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_UTIL_H */
 #endif /* HAVE_LIBUTIL_H */
 #endif /* HAVE_PTY_H */
 #ifdef HAVE_STROPTS_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stropts.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #endif /* defined(HAVE_OPENPTY) || defined(HAVE_FORKPTY) || defined(HAVE_DEV_PTMX) */
 
@@ -7692,7 +7817,15 @@ os_setpgrp_impl(PyObject *module)
 #ifdef HAVE_GETPPID
 
 #ifdef MS_WINDOWS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <tlhelp32.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyObject*
 win32_getppid()
@@ -7912,7 +8045,15 @@ os_killpg_impl(PyObject *module, pid_t pgid, int signal)
 
 #ifdef HAVE_PLOCK
 #ifdef HAVE_SYS_LOCK_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/lock.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 /*[clinic input]
@@ -11142,7 +11283,15 @@ os_WSTOPSIG_impl(PyObject *module, int status)
    needed definitions in sys/statvfs.h */
 #define _SVID3
 #endif
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/statvfs.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyObject*
 _pystatvfs_fromstructstatvfs(PyObject *module, struct statvfs st) {
@@ -11229,7 +11378,15 @@ os_fstatvfs_impl(PyObject *module, int fd)
 
 
 #if defined(HAVE_STATVFS) && defined(HAVE_SYS_STATVFS_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/statvfs.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 /*[clinic input]
 os.statvfs
 
@@ -12480,10 +12637,15 @@ the last 1, 5, and 15 minutes as a tuple of three floats.
 Raises OSError if the load average was unobtainable.
 [clinic start generated code]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 static PyObject *
 os_getloadavg_impl(PyObject *module)
 /*[clinic end generated code: output=9ad3a11bfb4f4bd2 input=3d6d826b76d8a34e]*/
 {
+
     double loadavg[3];
     if (getloadavg(loadavg, 3)!=3) {
         PyErr_SetString(PyExc_OSError, "Load averages are unobtainable");
@@ -12491,6 +12653,11 @@ os_getloadavg_impl(PyObject *module)
     } else
         return Py_BuildValue("ddd", loadavg[0], loadavg[1], loadavg[2]);
 }
+
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_GETLOADAVG */
 
 
@@ -13682,7 +13849,15 @@ static PyMemberDef DirEntry_members[] = {
     {NULL}
 };
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/posixmodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyMethodDef DirEntry_methods[] = {
     OS_DIRENTRY_IS_DIR_METHODDEF

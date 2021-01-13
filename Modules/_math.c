@@ -1,9 +1,38 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* Definitions of some C99 math library functions, for those platforms
    that don't implement these functions already. */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <float.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "_math.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* The following copyright notice applies to the original
    implementations of acosh, asinh and atanh. */

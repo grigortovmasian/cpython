@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 /* connection.c - the connection type
  *
  * Copyright (C) 2004-2010 Gerhard Häring <gh@ghaering.de>
@@ -21,14 +26,78 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "cache.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "module.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"         // PyMemberDef
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "connection.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "statement.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "cursor.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "prepare_protocol.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "util.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define ACTION_FINALIZE 1
 #define ACTION_RESET 2
@@ -37,7 +106,15 @@
 #define HAVE_TRACE_V2
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/connection.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 /*[clinic input]
 module _sqlite3
 class _sqlite3.Connection "pysqlite_Connection *" "pysqlite_ConnectionType"

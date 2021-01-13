@@ -2029,7 +2029,7 @@ FunctionType(asdl_expr_seq * argtypes, expr_ty returns, PyArena *arena)
 
 stmt_ty
 FunctionDef(identifier name, arguments_ty args, asdl_stmt_seq * body,
-            asdl_expr_seq * decorator_list, expr_ty returns, string
+            asdl_expr_seq * decorator_list, expr_ty returns, str
             type_comment, int lineno, int col_offset, int end_lineno, int
             end_col_offset, PyArena *arena)
 {
@@ -2063,7 +2063,7 @@ FunctionDef(identifier name, arguments_ty args, asdl_stmt_seq * body,
 
 stmt_ty
 AsyncFunctionDef(identifier name, arguments_ty args, asdl_stmt_seq * body,
-                 asdl_expr_seq * decorator_list, expr_ty returns, string
+                 asdl_expr_seq * decorator_list, expr_ty returns, str
                  type_comment, int lineno, int col_offset, int end_lineno, int
                  end_col_offset, PyArena *arena)
 {
@@ -2157,7 +2157,7 @@ Delete(asdl_expr_seq * targets, int lineno, int col_offset, int end_lineno, int
 }
 
 stmt_ty
-Assign(asdl_expr_seq * targets, expr_ty value, string type_comment, int lineno,
+Assign(asdl_expr_seq * targets, expr_ty value, str type_comment, int lineno,
        int col_offset, int end_lineno, int end_col_offset, PyArena *arena)
 {
     stmt_ty p;
@@ -2247,7 +2247,7 @@ AnnAssign(expr_ty target, expr_ty annotation, expr_ty value, int simple, int
 
 stmt_ty
 For(expr_ty target, expr_ty iter, asdl_stmt_seq * body, asdl_stmt_seq * orelse,
-    string type_comment, int lineno, int col_offset, int end_lineno, int
+    str type_comment, int lineno, int col_offset, int end_lineno, int
     end_col_offset, PyArena *arena)
 {
     stmt_ty p;
@@ -2279,7 +2279,7 @@ For(expr_ty target, expr_ty iter, asdl_stmt_seq * body, asdl_stmt_seq * orelse,
 
 stmt_ty
 AsyncFor(expr_ty target, expr_ty iter, asdl_stmt_seq * body, asdl_stmt_seq *
-         orelse, string type_comment, int lineno, int col_offset, int
+         orelse, str type_comment, int lineno, int col_offset, int
          end_lineno, int end_col_offset, PyArena *arena)
 {
     stmt_ty p;
@@ -2358,7 +2358,7 @@ If(expr_ty test, asdl_stmt_seq * body, asdl_stmt_seq * orelse, int lineno, int
 }
 
 stmt_ty
-With(asdl_withitem_seq * items, asdl_stmt_seq * body, string type_comment, int
+With(asdl_withitem_seq * items, asdl_stmt_seq * body, str type_comment, int
      lineno, int col_offset, int end_lineno, int end_col_offset, PyArena *arena)
 {
     stmt_ty p;
@@ -2377,7 +2377,7 @@ With(asdl_withitem_seq * items, asdl_stmt_seq * body, string type_comment, int
 }
 
 stmt_ty
-AsyncWith(asdl_withitem_seq * items, asdl_stmt_seq * body, string type_comment,
+AsyncWith(asdl_withitem_seq * items, asdl_stmt_seq * body, str type_comment,
           int lineno, int col_offset, int end_lineno, int end_col_offset,
           PyArena *arena)
 {
@@ -3060,7 +3060,7 @@ JoinedStr(asdl_expr_seq * values, int lineno, int col_offset, int end_lineno,
 }
 
 expr_ty
-Constant(constant value, string kind, int lineno, int col_offset, int
+Constant(constant value, str kind, int lineno, int col_offset, int
          end_lineno, int end_col_offset, PyArena *arena)
 {
     expr_ty p;
@@ -3336,7 +3336,7 @@ arguments(asdl_arg_seq * posonlyargs, asdl_arg_seq * args, arg_ty vararg,
 }
 
 arg_ty
-arg(identifier arg, expr_ty annotation, string type_comment, int lineno, int
+arg(identifier arg, expr_ty annotation, str type_comment, int lineno, int
     col_offset, int end_lineno, int end_col_offset, PyArena *arena)
 {
     arg_ty p;
@@ -3415,7 +3415,7 @@ withitem(expr_ty context_expr, expr_ty optional_vars, PyArena *arena)
 }
 
 type_ignore_ty
-TypeIgnore(int lineno, string tag, PyArena *arena)
+TypeIgnore(int lineno, str tag, PyArena *arena)
 {
     type_ignore_ty p;
     if (!tag) {
@@ -5276,7 +5276,7 @@ obj2ast_stmt(struct ast_state *state, PyObject* obj, stmt_ty* out, PyArena*
         asdl_stmt_seq* body;
         asdl_expr_seq* decorator_list;
         expr_ty returns;
-        string type_comment;
+        str type_comment;
 
         if (_PyObject_LookupAttr(obj, state->name, &tmp) < 0) {
             return 1;
@@ -5413,7 +5413,7 @@ obj2ast_stmt(struct ast_state *state, PyObject* obj, stmt_ty* out, PyArena*
         asdl_stmt_seq* body;
         asdl_expr_seq* decorator_list;
         expr_ty returns;
-        string type_comment;
+        str type_comment;
 
         if (_PyObject_LookupAttr(obj, state->name, &tmp) < 0) {
             return 1;
@@ -5781,7 +5781,7 @@ obj2ast_stmt(struct ast_state *state, PyObject* obj, stmt_ty* out, PyArena*
     if (isinstance) {
         asdl_expr_seq* targets;
         expr_ty value;
-        string type_comment;
+        str type_comment;
 
         if (_PyObject_LookupAttr(obj, state->targets, &tmp) < 0) {
             return 1;
@@ -5979,7 +5979,7 @@ obj2ast_stmt(struct ast_state *state, PyObject* obj, stmt_ty* out, PyArena*
         expr_ty iter;
         asdl_stmt_seq* body;
         asdl_stmt_seq* orelse;
-        string type_comment;
+        str type_comment;
 
         if (_PyObject_LookupAttr(obj, state->target, &tmp) < 0) {
             return 1;
@@ -6101,7 +6101,7 @@ obj2ast_stmt(struct ast_state *state, PyObject* obj, stmt_ty* out, PyArena*
         expr_ty iter;
         asdl_stmt_seq* body;
         asdl_stmt_seq* orelse;
-        string type_comment;
+        str type_comment;
 
         if (_PyObject_LookupAttr(obj, state->target, &tmp) < 0) {
             return 1;
@@ -6409,7 +6409,7 @@ obj2ast_stmt(struct ast_state *state, PyObject* obj, stmt_ty* out, PyArena*
     if (isinstance) {
         asdl_withitem_seq* items;
         asdl_stmt_seq* body;
-        string type_comment;
+        str type_comment;
 
         if (_PyObject_LookupAttr(obj, state->items, &tmp) < 0) {
             return 1;
@@ -6503,7 +6503,7 @@ obj2ast_stmt(struct ast_state *state, PyObject* obj, stmt_ty* out, PyArena*
     if (isinstance) {
         asdl_withitem_seq* items;
         asdl_stmt_seq* body;
-        string type_comment;
+        str type_comment;
 
         if (_PyObject_LookupAttr(obj, state->items, &tmp) < 0) {
             return 1;
@@ -8204,7 +8204,7 @@ obj2ast_expr(struct ast_state *state, PyObject* obj, expr_ty* out, PyArena*
     }
     if (isinstance) {
         constant value;
-        string kind;
+        str kind;
 
         if (_PyObject_LookupAttr(obj, state->value, &tmp) < 0) {
             return 1;
@@ -9374,7 +9374,7 @@ obj2ast_arg(struct ast_state *state, PyObject* obj, arg_ty* out, PyArena* arena)
     PyObject* tmp = NULL;
     identifier arg;
     expr_ty annotation;
-    string type_comment;
+    str type_comment;
     int lineno;
     int col_offset;
     int end_lineno;
@@ -9679,7 +9679,7 @@ obj2ast_type_ignore(struct ast_state *state, PyObject* obj, type_ignore_ty*
     }
     if (isinstance) {
         int lineno;
-        string tag;
+        str tag;
 
         if (_PyObject_LookupAttr(obj, state->lineno, &tmp) < 0) {
             return 1;

@@ -1,9 +1,22 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 
 /* audioopmodule - Module to detect peak values in arrays */
 
 #define PY_SSIZE_T_CLEAN
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #if defined(__CHAR_UNSIGNED__)
 #if defined(signed)
@@ -1892,7 +1905,15 @@ audioop_adpcm2lin_impl(PyObject *module, Py_buffer *fragment, int width,
     return rv;
 }
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/audioop.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyMethodDef audioop_methods[] = {
     AUDIOOP_MAX_METHODDEF

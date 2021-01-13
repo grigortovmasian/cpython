@@ -1,4 +1,17 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef X87_DOUBLE_ROUNDING
 /* On x86 platforms using an x87 FPU, this function is called from the
