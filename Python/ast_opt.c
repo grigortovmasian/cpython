@@ -51,7 +51,7 @@ fold_unaryop(expr_ty node, PyArena *arena, _PyASTOptimizeState *state)
                of !=. Detecting such cases doesn't seem worthwhile.
                Python uses </> for 'is subset'/'is superset' operations on sets.
                They don't satisfy not folding laws. */
-            cmpop_ty op = asdl_seq_GET(arg->v.Compare.ops, 0);
+            cmpop_ty op = (cmpop_ty)asdl_seq_GET(arg->v.Compare.ops, 0);
             switch (op) {
             case Is:
                 op = IsNot;
@@ -72,7 +72,7 @@ fold_unaryop(expr_ty node, PyArena *arena, _PyASTOptimizeState *state)
             case LtE:
             case Gt:
             case GtE:
-                op = 0; // The AST enums leave "0" free as an "unused" marker
+                op = (cmpop_ty)0; // The AST enums leave "0" free as an "unused" marker
                 break;
             // No default case, so the compiler will emit a warning if new
             // comparison operators are added without being handled here
@@ -85,14 +85,14 @@ fold_unaryop(expr_ty node, PyArena *arena, _PyASTOptimizeState *state)
         }
         return 1;
     }
-
+    
     typedef PyObject *(*unary_op)(PyObject*);
-    static const unary_op ops[] = {
-        [Invert] = PyNumber_Invert,
-        [Not] = unary_not,
-        [UAdd] = PyNumber_Positive,
-        [USub] = PyNumber_Negative,
-    };
+    static unary_op ops[4];
+    ops[Invert] = PyNumber_Invert;
+    ops[Not] = unary_not;
+    ops[UAdd] = PyNumber_Positive;
+    ops[USub] = PyNumber_Negative;
+
     PyObject *newval = ops[node->v.UnaryOp.op](arg->v.Constant.value);
     return make_const(node, newval, arena);
 }

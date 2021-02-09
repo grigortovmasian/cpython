@@ -872,15 +872,15 @@ odict_or(PyObject *left, PyObject *right)
     if (!PyDict_Check(other)) {
         Py_RETURN_NOTIMPLEMENTED;
     }
-    PyObject *new = PyObject_CallOneArg((PyObject*)type, left);
-    if (!new) {
+    PyObject *nw = PyObject_CallOneArg((PyObject*)type, left);
+    if (!nw) {
         return NULL;
     }
-    if (mutablemapping_update_arg(new, right) < 0) {
-        Py_DECREF(new);
+    if (mutablemapping_update_arg(nw, right) < 0) {
+        Py_DECREF(nw);
         return NULL;
     }
-    return new;
+    return nw;
 }
 
 static PyObject *

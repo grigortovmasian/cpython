@@ -682,7 +682,7 @@ PyDoc_STRVAR(unicode_replace__doc__,
     {"replace", (PyCFunction)(void(*)(void))unicode_replace, METH_FASTCALL, unicode_replace__doc__},
 
 static PyObject *
-unicode_replace_impl(PyObject *self, PyObject *old, PyObject *new,
+unicode_replace_impl(PyObject *self, PyObject *old, PyObject *nw,
                      Py_ssize_t count);
 
 static PyObject *
@@ -690,7 +690,7 @@ unicode_replace(PyObject *self, PyObject *const *args, Py_ssize_t nargs)
 {
     PyObject *return_value = NULL;
     PyObject *old;
-    PyObject *new;
+    PyObject *nw;
     Py_ssize_t count = -1;
 
     if (!_PyArg_CheckPositional("replace", nargs, 2, 3)) {
@@ -711,7 +711,7 @@ unicode_replace(PyObject *self, PyObject *const *args, Py_ssize_t nargs)
     if (PyUnicode_READY(args[1]) == -1) {
         goto exit;
     }
-    new = args[1];
+    nw = args[1];
     if (nargs < 3) {
         goto skip_optional;
     }
@@ -728,7 +728,7 @@ unicode_replace(PyObject *self, PyObject *const *args, Py_ssize_t nargs)
         count = ival;
     }
 skip_optional:
-    return_value = unicode_replace_impl(self, old, new, count);
+    return_value = unicode_replace_impl(self, old, nw, count);
 
 exit:
     return return_value;

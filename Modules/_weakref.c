@@ -168,7 +168,7 @@ weakref_exec(PyObject *module)
 }
 
 static struct PyModuleDef_Slot weakref_slots[] = {
-    {Py_mod_exec, weakref_exec},
+    {Py_mod_exec, (void*)weakref_exec},
     {0, NULL}
 };
 

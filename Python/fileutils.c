@@ -121,6 +121,7 @@ static int
 check_force_ascii(void)
 {
     char *loc = setlocale(LC_CTYPE, NULL);
+    {
     if (loc == NULL) {
         goto error;
     }
@@ -211,7 +212,7 @@ check_force_ascii(void)
     /* nl_langinfo(CODESET) is not available: always force ASCII */
     return 1;
 #endif   /* defined(HAVE_LANGINFO_H) && defined(CODESET) */
-
+    }
 error:
     /* if an error occurred, force the ASCII encoding */
     return 1;
@@ -253,10 +254,10 @@ encode_ascii(const wchar_t *text, char **str,
 
     /* +1 for NULL byte */
     if (raw_malloc) {
-        result = PyMem_RawMalloc(len + 1);
+        result = (char*)PyMem_RawMalloc(len + 1);
     }
     else {
-        result = PyMem_Malloc(len + 1);
+        result = (char*)PyMem_Malloc(len + 1);
     }
     if (result == NULL) {
         return -1;
@@ -327,7 +328,7 @@ decode_ascii(const char *arg, wchar_t **wstr, size_t *wlen,
     if (argsize > PY_SSIZE_T_MAX / sizeof(wchar_t)) {
         return -1;
     }
-    res = PyMem_RawMalloc(argsize * sizeof(wchar_t));
+    res = (wchar_t*)PyMem_RawMalloc(argsize * sizeof(wchar_t));
     if (!res) {
         return -1;
     }
@@ -671,10 +672,10 @@ encode_current_locale(const wchar_t *text, char **str,
 
         size += 1; /* nul byte at the end */
         if (raw_malloc) {
-            result = PyMem_RawMalloc(size);
+            result = (char*)PyMem_RawMalloc(size);
         }
         else {
-            result = PyMem_Malloc(size);
+            result = (char*)PyMem_Malloc(size);
         }
         if (result == NULL) {
             return -1;
@@ -1894,7 +1895,7 @@ _Py_abspath(const wchar_t *path, wchar_t **abspath_p)
     size_t path_len = wcslen(path);
     size_t len = cwd_len + 1 + path_len + 1;
     if (len <= (size_t)PY_SSIZE_T_MAX / sizeof(wchar_t)) {
-        *abspath_p = PyMem_RawMalloc(len * sizeof(wchar_t));
+        *abspath_p = (wchar_t*)PyMem_RawMalloc(len * sizeof(wchar_t));
     }
     else {
         *abspath_p = NULL;

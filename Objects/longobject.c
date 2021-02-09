@@ -131,7 +131,7 @@ _PyLong_New(Py_ssize_t size)
                         "too many digits in integer");
         return NULL;
     }
-    result = PyObject_Malloc(offsetof(PyLongObject, ob_digit) +
+    result = (PyLongObject*)PyObject_Malloc(offsetof(PyLongObject, ob_digit) +
                              size*sizeof(digit));
     if (!result) {
         PyErr_NoMemory();
@@ -1668,7 +1668,7 @@ long_to_decimal_string_internal(PyObject *aa,
         kind = writer->kind;
     }
     else if (bytes_writer) {
-        *bytes_str = _PyBytesWriter_Prepare(bytes_writer, *bytes_str, strlen);
+        *bytes_str = (char*)_PyBytesWriter_Prepare(bytes_writer, *bytes_str, strlen);
         if (*bytes_str == NULL) {
             Py_DECREF(scratch);
             return -1;
@@ -1836,7 +1836,7 @@ long_format_binary(PyObject *aa, int base, int alternate,
         kind = writer->kind;
     }
     else if (bytes_writer) {
-        *bytes_str = _PyBytesWriter_Prepare(bytes_writer, *bytes_str, sz);
+        *bytes_str = (char*)_PyBytesWriter_Prepare(bytes_writer, *bytes_str, sz);
         if (*bytes_str == NULL)
             return -1;
     }
@@ -5062,11 +5062,12 @@ int___format___impl(PyObject *self, PyObject *format_spec)
 PyObject *
 _PyLong_DivmodNear(PyObject *a, PyObject *b)
 {
+    
     PyLongObject *quo = NULL, *rem = NULL;
     PyObject *twice_rem, *result, *temp;
     int quo_is_odd, quo_is_neg;
     Py_ssize_t cmp;
-
+    {
     /* Equivalent Python code:
 
        def divmod_near(a, b):
@@ -5140,7 +5141,7 @@ _PyLong_DivmodNear(PyObject *a, PyObject *b)
     PyTuple_SET_ITEM(result, 0, (PyObject *)quo);
     PyTuple_SET_ITEM(result, 1, (PyObject *)rem);
     return result;
-
+ }
   error:
     Py_XDECREF(quo);
     Py_XDECREF(rem);

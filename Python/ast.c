@@ -204,7 +204,7 @@ validate_expr(expr_ty exp, expr_context_ty ctx)
         }
         check_ctx = 0;
         /* set actual_ctx to prevent gcc warning */
-        actual_ctx = 0;
+        actual_ctx = (expr_context_ty)0;
     }
     if (check_ctx && actual_ctx != ctx) {
         PyErr_Format(PyExc_ValueError, "expression must have %s context but has %s instead",

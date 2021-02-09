@@ -1371,7 +1371,7 @@ warnings_module_exec(PyObject *module)
 
 
 static PyModuleDef_Slot warnings_slots[] = {
-    {Py_mod_exec, warnings_module_exec},
+    {Py_mod_exec, (void*)warnings_module_exec},
     {0, NULL}
 };
 

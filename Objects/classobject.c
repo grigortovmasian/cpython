@@ -67,7 +67,7 @@ method_vectorcall(PyObject *method, PyObject *const *args,
             newargs = newargs_stack;
         }
         else {
-            newargs = PyMem_Malloc((totalargs+1) * sizeof(PyObject *));
+            newargs = (PyObject**)PyMem_Malloc((totalargs+1) * sizeof(PyObject *));
             if (newargs == NULL) {
                 _PyErr_NoMemory(tstate);
                 return NULL;

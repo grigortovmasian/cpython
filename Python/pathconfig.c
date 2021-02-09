@@ -120,7 +120,7 @@ _PyWideStringList_Join(const PyWideStringList *list, wchar_t sep)
         len += wcslen(list->items[i]);
     }
 
-    wchar_t *text = PyMem_RawMalloc(len * sizeof(wchar_t));
+    wchar_t *text = (wchar_t*)PyMem_RawMalloc(len * sizeof(wchar_t));
     if (text == NULL) {
         return NULL;
     }
@@ -284,7 +284,7 @@ config_init_module_search_paths(PyConfig *config, _PyPathConfig *pathconfig)
         }
 
         size_t path_len = (p - sys_path);
-        wchar_t *path = PyMem_RawMalloc((path_len + 1) * sizeof(wchar_t));
+        wchar_t *path = (wchar_t*)PyMem_RawMalloc((path_len + 1) * sizeof(wchar_t));
         if (path == NULL) {
             return _PyStatus_NO_MEMORY();
         }

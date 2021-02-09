@@ -199,6 +199,7 @@ PyContextVar_Get(PyObject *ovar, PyObject *def, PyObject **val)
     PyContextVar *var = (PyContextVar *)ovar;
 
     PyThreadState *ts = _PyThreadState_GET();
+    {
     assert(ts != NULL);
     if (ts->context == NULL) {
         goto not_found;
@@ -229,7 +230,7 @@ PyContextVar_Get(PyObject *ovar, PyObject *def, PyObject **val)
         *val = found;
         goto found;
     }
-
+    }
 not_found:
     if (def == NULL) {
         if (var->var_default != NULL) {
@@ -705,19 +706,19 @@ PyTypeObject PyContext_Type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "_contextvars.Context",
     sizeof(PyContext),
-    .tp_methods = PyContext_methods,
-    .tp_as_mapping = &PyContext_as_mapping,
-    .tp_as_sequence = &PyContext_as_sequence,
-    .tp_iter = (getiterfunc)context_tp_iter,
     .tp_dealloc = (destructor)context_tp_dealloc,
+    .tp_as_sequence = &PyContext_as_sequence,
+    .tp_as_mapping = &PyContext_as_mapping,
+    .tp_hash = PyObject_HashNotImplemented,
     .tp_getattro = PyObject_GenericGetAttr,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
-    .tp_richcompare = context_tp_richcompare,
     .tp_traverse = (traverseproc)context_tp_traverse,
     .tp_clear = (inquiry)context_tp_clear,
-    .tp_new = context_tp_new,
+    .tp_richcompare = context_tp_richcompare,
     .tp_weaklistoffset = offsetof(PyContext, ctx_weakreflist),
-    .tp_hash = PyObject_HashNotImplemented,
+    .tp_iter = (getiterfunc)context_tp_iter,
+    .tp_methods = PyContext_methods,
+    .tp_new = context_tp_new,
 };
 
 
@@ -903,7 +904,7 @@ contextvar_tp_repr(PyContextVar *self)
     _PyUnicodeWriter writer;
 
     _PyUnicodeWriter_Init(&writer);
-
+    {
     if (_PyUnicodeWriter_WriteASCIIString(
             &writer, "<ContextVar name=", 17) < 0)
     {
@@ -947,7 +948,7 @@ contextvar_tp_repr(PyContextVar *self)
     Py_DECREF(addr);
 
     return _PyUnicodeWriter_Finish(&writer);
-
+    }
 error:
     _PyUnicodeWriter_Dealloc(&writer);
     return NULL;
@@ -1058,17 +1059,17 @@ PyTypeObject PyContextVar_Type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "_contextvars.ContextVar",
     sizeof(PyContextVar),
-    .tp_methods = PyContextVar_methods,
-    .tp_members = PyContextVar_members,
     .tp_dealloc = (destructor)contextvar_tp_dealloc,
+    .tp_repr = (reprfunc)contextvar_tp_repr,
+    .tp_hash = (hashfunc)contextvar_tp_hash,
     .tp_getattro = PyObject_GenericGetAttr,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
     .tp_traverse = (traverseproc)contextvar_tp_traverse,
     .tp_clear = (inquiry)contextvar_tp_clear,
+    .tp_methods = PyContextVar_methods,
+    .tp_members = PyContextVar_members,  
     .tp_new = contextvar_tp_new,
     .tp_free = PyObject_GC_Del,
-    .tp_hash = (hashfunc)contextvar_tp_hash,
-    .tp_repr = (reprfunc)contextvar_tp_repr,
 };
 
 
@@ -1123,7 +1124,7 @@ token_tp_repr(PyContextToken *self)
     _PyUnicodeWriter writer;
 
     _PyUnicodeWriter_Init(&writer);
-
+    {
     if (_PyUnicodeWriter_WriteASCIIString(&writer, "<Token", 6) < 0) {
         goto error;
     }
@@ -1159,7 +1160,7 @@ token_tp_repr(PyContextToken *self)
     Py_DECREF(addr);
 
     return _PyUnicodeWriter_Finish(&writer);
-
+    }
 error:
     _PyUnicodeWriter_Dealloc(&writer);
     return NULL;
@@ -1199,17 +1200,17 @@ PyTypeObject PyContextToken_Type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "_contextvars.Token",
     sizeof(PyContextToken),
-    .tp_methods = PyContextTokenType_methods,
-    .tp_getset = PyContextTokenType_getsetlist,
     .tp_dealloc = (destructor)token_tp_dealloc,
+    .tp_repr = (reprfunc)token_tp_repr,
+    .tp_hash = PyObject_HashNotImplemented,
     .tp_getattro = PyObject_GenericGetAttr,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
     .tp_traverse = (traverseproc)token_tp_traverse,
     .tp_clear = (inquiry)token_tp_clear,
+    .tp_methods = PyContextTokenType_methods,
+    .tp_getset = PyContextTokenType_getsetlist,
     .tp_new = token_tp_new,
     .tp_free = PyObject_GC_Del,
-    .tp_hash = PyObject_HashNotImplemented,
-    .tp_repr = (reprfunc)token_tp_repr,
 };
 
 static PyContextToken *
@@ -1258,9 +1259,9 @@ PyTypeObject PyContextTokenMissing_Type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "Token.MISSING",
     sizeof(PyContextTokenMissing),
+    .tp_repr = context_token_missing_tp_repr,
     .tp_getattro = PyObject_GenericGetAttr,
     .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_repr = context_token_missing_tp_repr,
 };
 
 

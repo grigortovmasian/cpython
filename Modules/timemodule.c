@@ -2022,7 +2022,7 @@ time_exec(PyObject *module)
 }
 
 static struct PyModuleDef_Slot time_slots[] = {
-    {Py_mod_exec, time_exec},
+    {Py_mod_exec, (void*)time_exec},
     {0, NULL}
 };
 

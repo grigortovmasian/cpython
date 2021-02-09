@@ -1,8 +1,6 @@
 #ifndef Py_ATOMIC_H
 #define Py_ATOMIC_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
@@ -11,10 +9,19 @@ extern "C" {
 #include "dynamic_annotations.h"   /* _Py_ANNOTATE_MEMORY_ORDER */
 #include "pyconfig.h"
 
-#ifdef HAVE_STD_ATOMIC
-#  include <stdatomic.h>
+#if defined(HAVE_STD_ATOMIC)
+#ifdef __cplusplus
+#include <atomic>
+#define _Atomic(T) atomic<T>
+using namespace std;
+#else
+#include <stdatomic.h>
+#endif
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -57,10 +64,10 @@ typedef struct _Py_atomic_int {
     atomic_thread_fence(ORDER)
 
 #define _Py_atomic_store_explicit(ATOMIC_VAL, NEW_VAL, ORDER) \
-    atomic_store_explicit(&((ATOMIC_VAL)->_value), NEW_VAL, ORDER)
+    atomic_store_explicit(&((ATOMIC_VAL)->_value),NEW_VAL, (std::memory_order)ORDER)
 
 #define _Py_atomic_load_explicit(ATOMIC_VAL, ORDER) \
-    atomic_load_explicit(&((ATOMIC_VAL)->_value), ORDER)
+    atomic_load_explicit(&((ATOMIC_VAL)->_value), (std::memory_order)ORDER)
 
 // Use builtin atomic operations in GCC >= 4.7 and clang
 #elif defined(HAVE_BUILTIN_ATOMIC)
@@ -514,6 +521,7 @@ inline int _Py_atomic_load_32bit_impl(volatile int* value, int order) {
 #else  /* !gcc x86  !_msc_ver */
 typedef enum _Py_memory_order {
     _Py_memory_order_relaxed,
+    _Py_memory_order_consume
     _Py_memory_order_acquire,
     _Py_memory_order_release,
     _Py_memory_order_acq_rel,

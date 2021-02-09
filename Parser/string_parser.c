@@ -365,7 +365,7 @@ fstring_compile_expr(Parser *p, const char *expr_start, const char *expr_end,
 
     len = expr_end - expr_start;
     /* Allocate 3 extra bytes: open paren, close paren, null byte. */
-    str = PyMem_Malloc(len + 3);
+    str = (char*)PyMem_Malloc(len + 3);
     if (str == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -407,7 +407,7 @@ fstring_compile_expr(Parser *p, const char *expr_start, const char *expr_end,
     p2->starting_lineno = t->lineno + lines - 1;
     p2->starting_col_offset = t->col_offset + cols;
 
-    expr = _PyPegen_run_parser(p2);
+    expr = (expr_ty)_PyPegen_run_parser(p2);
 
     if (expr == NULL) {
         goto exit;
@@ -927,7 +927,7 @@ ExprList_Append(ExprList *l, expr_ty exp)
             Py_ssize_t i;
             /* We're still using the cached data. Switch to
                alloc-ing. */
-            l->p = PyMem_Malloc(sizeof(expr_ty) * new_size);
+            l->p = (_expr**)PyMem_Malloc(sizeof(expr_ty) * new_size);
             if (!l->p) {
                 return -1;
             }
@@ -937,7 +937,7 @@ ExprList_Append(ExprList *l, expr_ty exp)
             }
         } else {
             /* Just realloc. */
-            expr_ty *tmp = PyMem_Realloc(l->p, sizeof(expr_ty) * new_size);
+            expr_ty *tmp = (_expr**)PyMem_Realloc(l->p, sizeof(expr_ty) * new_size);
             if (!tmp) {
                 PyMem_Free(l->p);
                 l->p = NULL;

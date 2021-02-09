@@ -110,8 +110,8 @@ symtable_init_constants(PyObject *m)
 }
 
 static PyModuleDef_Slot symtable_slots[] = {
-    {Py_mod_exec, symtable_init_stentry_type},
-    {Py_mod_exec, symtable_init_constants},
+    {Py_mod_exec, (void*)symtable_init_stentry_type},
+    {Py_mod_exec, (void*	)symtable_init_constants},
     {0, NULL}
 };
 

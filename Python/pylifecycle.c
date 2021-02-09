@@ -713,7 +713,7 @@ pycore_init_builtins(PyThreadState *tstate)
     if (bimod == NULL) {
         goto error;
     }
-
+    {
     PyInterpreterState *interp = tstate->interp;
     if (_PyImport_FixupBuiltin(bimod, "builtins", interp->modules) < 0) {
         goto error;
@@ -748,7 +748,7 @@ pycore_init_builtins(PyThreadState *tstate)
     assert(!_PyErr_Occurred(tstate));
 
     return _PyStatus_OK();
-
+    }
 error:
     Py_XDECREF(bimod);
     return _PyStatus_ERR("can't initialize builtins module");
@@ -765,7 +765,7 @@ pycore_interp_init(PyThreadState *tstate)
     if (_PyStatus_EXCEPTION(status)) {
         goto done;
     }
-
+    {
     status = _PySys_Create(tstate, &sysmod);
     if (_PyStatus_EXCEPTION(status)) {
         goto done;
@@ -783,7 +783,7 @@ pycore_interp_init(PyThreadState *tstate)
             return _PyStatus_ERR("failed to initialize importlib");
         }
     }
-
+    }
 done:
     /* sys.modules['sys'] contains a strong reference to the module */
     Py_XDECREF(sysmod);
@@ -869,7 +869,7 @@ _Py_PreInitializeFromPyArgv(const PyPreConfig *src_config, const _PyArgv *args)
 PyStatus
 Py_PreInitializeFromBytesArgs(const PyPreConfig *src_config, Py_ssize_t argc, char **argv)
 {
-    _PyArgv args = {.use_bytes_argv = 1, .argc = argc, .bytes_argv = argv};
+    _PyArgv args = {.argc = argc, .use_bytes_argv = 1,  .bytes_argv = argv};
     return _Py_PreInitializeFromPyArgv(src_config, &args);
 }
 
@@ -877,7 +877,7 @@ Py_PreInitializeFromBytesArgs(const PyPreConfig *src_config, Py_ssize_t argc, ch
 PyStatus
 Py_PreInitializeFromArgs(const PyPreConfig *src_config, Py_ssize_t argc, wchar_t **argv)
 {
-    _PyArgv args = {.use_bytes_argv = 0, .argc = argc, .wchar_argv = argv};
+    _PyArgv args = { .argc = argc, .use_bytes_argv = 0, .wchar_argv = argv};
     return _Py_PreInitializeFromPyArgv(src_config, &args);
 }
 
@@ -915,8 +915,8 @@ _Py_PreInitializeFromConfig(const PyConfig *config,
     }
     else if (args == NULL) {
         _PyArgv config_args = {
-            .use_bytes_argv = 0,
             .argc = config->argv.length,
+            .use_bytes_argv = 0,   
             .wchar_argv = config->argv.items};
         return _Py_PreInitializeFromPyArgv(&preconfig, &config_args);
     }
@@ -2130,7 +2130,7 @@ create_stdio(const PyConfig *config, PyObject* io,
     if (PyWindowsConsoleIO_Check(raw))
         encoding = L"utf-8";
 #endif
-
+    {
     text = PyUnicode_FromString(name);
     if (text == NULL || _PyObject_SetAttrId(raw, &PyId_name, text) < 0)
         goto error;
@@ -2195,7 +2195,7 @@ create_stdio(const PyConfig *config, PyObject* io,
         goto error;
     Py_CLEAR(text);
     return stream;
-
+    }
 error:
     Py_XDECREF(buf);
     Py_XDECREF(stream);

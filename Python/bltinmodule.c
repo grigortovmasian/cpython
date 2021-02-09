@@ -1265,7 +1265,7 @@ map_next(mapobject *lz)
         stack = small_stack;
     }
     else {
-        stack = PyMem_Malloc(niters * sizeof(stack[0]));
+        stack = (PyObject**)PyMem_Malloc(niters * sizeof(stack[0]));
         if (stack == NULL) {
             _PyErr_NoMemory(tstate);
             return NULL;

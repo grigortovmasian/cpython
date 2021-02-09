@@ -668,9 +668,6 @@ static PyNumberMethods ga_as_number = {
 PyTypeObject Py_GenericAliasType = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     .tp_name = "types.GenericAlias",
-    .tp_doc = "Represent a PEP 585 generic type\n"
-              "\n"
-              "E.g. for t = list[int], t.__origin__ is list and t.__args__ is (int,).",
     .tp_basicsize = sizeof(gaobject),
     .tp_dealloc = ga_dealloc,
     .tp_repr = ga_repr,
@@ -680,15 +677,19 @@ PyTypeObject Py_GenericAliasType = {
     .tp_call = ga_call,
     .tp_getattro = ga_getattro,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC | Py_TPFLAGS_BASETYPE,
+     .tp_doc = "Represent a PEP 585 generic type\n"
+              "\n"
+              "E.g. for t = list[int], t.__origin__ is list and t.__args__ is (int,).",
     .tp_traverse = ga_traverse,
     .tp_richcompare = ga_richcompare,
     .tp_weaklistoffset = offsetof(gaobject, weakreflist),
     .tp_methods = ga_methods,
     .tp_members = ga_members,
+    .tp_getset = ga_properties,
     .tp_alloc = PyType_GenericAlloc,
     .tp_new = ga_new,
-    .tp_free = PyObject_GC_Del,
-    .tp_getset = ga_properties,
+    .tp_free = PyObject_GC_Del,    
+
 };
 
 PyObject *

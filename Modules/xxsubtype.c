@@ -290,7 +290,7 @@ xxsubtype_exec(PyObject* m)
 }
 
 static struct PyModuleDef_Slot xxsubtype_slots[] = {
-    {Py_mod_exec, xxsubtype_exec},
+    {Py_mod_exec, (void*)xxsubtype_exec},
     {0, NULL},
 };
 

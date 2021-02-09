@@ -396,7 +396,7 @@ _Py_string_to_number_with_underscores(
         return innerfunc(s, orig_len, arg);
     }
 
-    dup = PyMem_Malloc(orig_len + 1);
+    dup = (char*)PyMem_Malloc(orig_len + 1);
     if (dup == NULL) {
         return PyErr_NoMemory();
     }

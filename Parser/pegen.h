@@ -179,6 +179,7 @@ CHECK_CALL_NULL_ALLOWED(Parser *p, void *result)
     return result;
 }
 
+
 #define CHECK(type, result) ((type) CHECK_CALL(p, result))
 #define CHECK_NULL_ALLOWED(type, result) ((type) CHECK_CALL_NULL_ALLOWED(p, result))
 
@@ -190,15 +191,19 @@ NEW_TYPE_COMMENT(Parser *p, Token *tc)
     if (tc == NULL) {
         return NULL;
     }
-    char *bytes = PyBytes_AsString(tc->bytes);
-    if (bytes == NULL) {
-        goto error;
+    {
+        char *bytes = PyBytes_AsString(tc->bytes);
+        if (bytes == NULL) {
+            goto error;
+        }
+
+        PyObject *tco = _PyPegen_new_type_comment(p, bytes);
+        if (tco == NULL) {
+            goto error;
+        }
+        return tco;
     }
-    PyObject *tco = _PyPegen_new_type_comment(p, bytes);
-    if (tco == NULL) {
-        goto error;
-    }
-    return tco;
+
  error:
     p->error_indicator = 1;  // Inline CHECK_CALL
     return NULL;
@@ -275,10 +280,11 @@ typedef enum {
 expr_ty _PyPegen_get_invalid_target(expr_ty e, TARGETS_TYPE targets_type);
 #define RAISE_SYNTAX_ERROR_INVALID_TARGET(type, e) _RAISE_SYNTAX_ERROR_INVALID_TARGET(p, type, e)
 
+
 Py_LOCAL_INLINE(void *)
 _RAISE_SYNTAX_ERROR_INVALID_TARGET(Parser *p, TARGETS_TYPE type, void *e)
 {
-    expr_ty invalid_target = CHECK_NULL_ALLOWED(expr_ty, _PyPegen_get_invalid_target(e, type));
+    expr_ty invalid_target = CHECK_NULL_ALLOWED(expr_ty, _PyPegen_get_invalid_target((expr_ty)e, type));
     if (invalid_target != NULL) {
         const char *msg;
         if (type == STAR_TARGETS || type == FOR_TARGETS) {
@@ -296,11 +302,11 @@ _RAISE_SYNTAX_ERROR_INVALID_TARGET(Parser *p, TARGETS_TYPE type, void *e)
     return RAISE_SYNTAX_ERROR("invalid syntax");
 }
 
+
 void *_PyPegen_arguments_parsing_error(Parser *, expr_ty);
 void *_PyPegen_nonparen_genexp_in_call(Parser *p, expr_ty args);
 
 
 // Generated function in parse.c - function definition in python.gram
 void *_PyPegen_parse(Parser *);
-
 #endif

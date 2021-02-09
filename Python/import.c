@@ -59,6 +59,7 @@ _PyImportZip_Init(PyThreadState *tstate)
     int err = 0;
 
     path_hooks = PySys_GetObject("path_hooks");
+    {
     if (path_hooks == NULL) {
         _PyErr_SetString(tstate, PyExc_RuntimeError,
                          "unable to get sys.path_hooks");
@@ -102,7 +103,7 @@ _PyImportZip_Init(PyThreadState *tstate)
     }
 
     return _PyStatus_OK();
-
+  }
   error:
     PyErr_Print();
     return _PyStatus_ERR("initializing zipimport failed");
@@ -2081,7 +2082,7 @@ _imp_source_hash_impl(PyObject *module, long key, Py_buffer *source)
         uint64_t x;
         char data[sizeof(uint64_t)];
     } hash;
-    hash.x = _Py_KeyedHash((uint64_t)key, source->buf, source->len);
+    hash.x = _Py_KeyedHash((uint64_t)key, (const char*)source->buf, source->len);
 #if !PY_LITTLE_ENDIAN
     // Force to little-endian. There really ought to be a succinct standard way
     // to do this.
@@ -2137,7 +2138,7 @@ imp_module_exec(PyObject *module)
 
 
 static PyModuleDef_Slot imp_slots[] = {
-    {Py_mod_exec, imp_module_exec},
+    {Py_mod_exec, (void*)imp_module_exec},
     {0, NULL}
 };
 
@@ -2164,6 +2165,7 @@ PyObject*
 _PyImport_BootstrapImp(PyThreadState *tstate)
 {
     PyObject *name = PyUnicode_FromString("_imp");
+    {
     if (name == NULL) {
         return NULL;
     }
@@ -2197,7 +2199,7 @@ _PyImport_BootstrapImp(PyThreadState *tstate)
         goto error;
     }
     return mod;
-
+    }
 error:
     Py_XDECREF(name);
     return NULL;
@@ -2235,7 +2237,7 @@ PyImport_ExtendInittab(struct _inittab *newtab)
     p = NULL;
     if (i + n <= SIZE_MAX / sizeof(struct _inittab) - 1) {
         size_t size = sizeof(struct _inittab) * (i + n + 1);
-        p = PyMem_RawRealloc(inittab_copy, size);
+        p = (_inittab*)PyMem_RawRealloc(inittab_copy, size);
     }
     if (p == NULL) {
         res = -1;

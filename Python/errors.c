@@ -1087,6 +1087,7 @@ PyErr_NewException(const char *name, PyObject *base, PyObject *dict)
     PyObject *result = NULL;
 
     const char *dot = strrchr(name, '.');
+    {
     if (dot == NULL) {
         _PyErr_SetString(tstate, PyExc_SystemError,
                          "PyErr_NewException: name must be module.class");
@@ -1125,6 +1126,7 @@ PyErr_NewException(const char *name, PyObject *base, PyObject *dict)
     /* Create a real class. */
     result = PyObject_CallFunction((PyObject *)&PyType_Type, "sOO",
                                    dot+1, bases, dict);
+  }
   failure:
     Py_XDECREF(bases);
     Py_XDECREF(mydict);
@@ -1435,7 +1437,7 @@ _PyErr_WriteUnraisableMsg(const char *err_msg_str, PyObject *obj)
     _PyErr_Fetch(tstate, &exc_type, &exc_value, &exc_tb);
 
     assert(exc_type != NULL);
-
+    {
     if (exc_type == NULL) {
         /* sys.unraisablehook requires that at least exc_type is set */
         goto default_hook;
@@ -1503,7 +1505,7 @@ _PyErr_WriteUnraisableMsg(const char *err_msg_str, PyObject *obj)
     /* sys.unraisablehook failed: log its error using default hook */
     obj = hook;
     err_msg_str = NULL;
-
+    }
 error:
     /* err_msg_str and obj have been updated and we have a new exception */
     Py_XSETREF(err_msg, PyUnicode_FromString(err_msg_str ?

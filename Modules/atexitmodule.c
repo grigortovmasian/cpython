@@ -159,7 +159,7 @@ atexit_register(PyObject *module, PyObject *args, PyObject *kwargs)
         state->callbacks = r;
     }
 
-    atexit_callback *callback = PyMem_Malloc(sizeof(atexit_callback));
+    atexit_callback *callback = (atexit_callback*)PyMem_Malloc(sizeof(atexit_callback));
     if (callback == NULL) {
         return PyErr_NoMemory();
     }

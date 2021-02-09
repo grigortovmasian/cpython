@@ -641,7 +641,7 @@ _PyMem_RawWcsdup(const wchar_t *str)
     }
 
     size_t size = (len + 1) * sizeof(wchar_t);
-    wchar_t *str2 = PyMem_RawMalloc(size);
+    wchar_t *str2 = (wchar_t*)PyMem_RawMalloc(size);
     if (str2 == NULL) {
         return NULL;
     }
@@ -655,7 +655,7 @@ _PyMem_RawStrdup(const char *str)
 {
     assert(str != NULL);
     size_t size = strlen(str) + 1;
-    char *copy = PyMem_RawMalloc(size);
+    char *copy = (char*)PyMem_RawMalloc(size);
     if (copy == NULL) {
         return NULL;
     }
@@ -668,7 +668,7 @@ _PyMem_Strdup(const char *str)
 {
     assert(str != NULL);
     size_t size = strlen(str) + 1;
-    char *copy = PyMem_Malloc(size);
+    char *copy = (char*)PyMem_Malloc(size);
     if (copy == NULL) {
         return NULL;
     }
@@ -1627,7 +1627,7 @@ pymalloc_alloc(void *ctx, size_t nbytes)
         /* There isn't a pool of the right size class immediately
          * available:  use a free pool.
          */
-        bp = allocate_from_new_pool(size);
+        bp = (block*)allocate_from_new_pool(size);
     }
 
     return (void *)bp;

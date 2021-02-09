@@ -919,7 +919,7 @@ ast_dealloc(AST_object *self)
     PyTypeObject *tp = Py_TYPE(self);
     PyObject_GC_UnTrack(self);
     Py_CLEAR(self->dict);
-    freefunc free_func = PyType_GetSlot(tp, Py_tp_free);
+    freefunc free_func = (freefunc)PyType_GetSlot(tp, Py_tp_free);
     assert(free_func != NULL);
     free_func(self);
     Py_DECREF(tp);
@@ -1050,18 +1050,18 @@ static PyGetSetDef ast_type_getsets[] = {
 };
 
 static PyType_Slot AST_type_slots[] = {
-    {Py_tp_dealloc, ast_dealloc},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_setattro, PyObject_GenericSetAttr},
-    {Py_tp_traverse, ast_traverse},
-    {Py_tp_clear, ast_clear},
+    {Py_tp_dealloc, (void*)ast_dealloc},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
+    {Py_tp_setattro, (void*)PyObject_GenericSetAttr},
+    {Py_tp_traverse, (void*)ast_traverse},
+    {Py_tp_clear, (void*)ast_clear},
     {Py_tp_members, ast_type_members},
     {Py_tp_methods, ast_type_methods},
     {Py_tp_getset, ast_type_getsets},
-    {Py_tp_init, ast_type_init},
-    {Py_tp_alloc, PyType_GenericAlloc},
-    {Py_tp_new, PyType_GenericNew},
-    {Py_tp_free, PyObject_GC_Del},
+    {Py_tp_init, (void*)ast_type_init},
+    {Py_tp_alloc, (void*)PyType_GenericAlloc},
+    {Py_tp_new, (void*)PyType_GenericNew},
+    {Py_tp_free, (void*)PyObject_GC_Del},
     {0, 0},
 };
 
@@ -10060,7 +10060,7 @@ astmodule_exec(PyObject *m)
 }
 
 static PyModuleDef_Slot astmodule_slots[] = {
-    {Py_mod_exec, astmodule_exec},
+    {Py_mod_exec, (void*)astmodule_exec},
     {0, NULL}
 };
 

@@ -30,7 +30,7 @@
 #include "pycore_getopt.h"
 
 #ifdef __cplusplus
-extern "C" {
+//extern "C" {
 #endif
 
 int _PyOS_opterr = 1;                 /* generate error messages */
@@ -140,7 +140,7 @@ int _PyOS_GetOpt(Py_ssize_t argc, wchar_t * const *argv, int *longindex)
         return '_';
     }
 
-    if ((ptr = wcschr(SHORT_OPTS, option)) == NULL) {
+    if ((ptr = (wchar_t*)wcschr(SHORT_OPTS, option)) == NULL) {
         if (_PyOS_opterr) {
             fprintf(stderr, "Unknown option: -%c\n", (char)option);
         }
@@ -170,6 +170,6 @@ int _PyOS_GetOpt(Py_ssize_t argc, wchar_t * const *argv, int *longindex)
 }
 
 #ifdef __cplusplus
-}
+//}
 #endif
 

@@ -611,7 +611,7 @@ stat_exec(PyObject *module)
 
 
 static PyModuleDef_Slot stat_slots[] = {
-    {Py_mod_exec, stat_exec},
+    {Py_mod_exec, (void*)stat_exec},
     {0, NULL}
 };
 

@@ -59,7 +59,6 @@ get_pwd_state(PyObject *module)
     return (pwdmodulestate *)state;
 }
 
-static struct PyModuleDef pwdmodule;
 
 #define DEFAULT_BUFFER_SIZE 1024
 
@@ -154,7 +153,7 @@ pwd_getpwuid(PyObject *module, PyObject *uidobj)
     }
 
     while(1) {
-        buf2 = PyMem_RawRealloc(buf, bufsize);
+        buf2 = (char*)PyMem_RawRealloc(buf, bufsize);
         if (buf2 == NULL) {
             p = NULL;
             nomem = 1;
@@ -237,7 +236,7 @@ pwd_getpwnam_impl(PyObject *module, PyObject *name)
     }
 
     while(1) {
-        buf2 = PyMem_RawRealloc(buf, bufsize);
+        buf2 = (char*)PyMem_RawRealloc(buf, bufsize);
         if (buf2 == NULL) {
             p = NULL;
             nomem = 1;
@@ -337,7 +336,7 @@ pwdmodule_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot pwdmodule_slots[] = {
-    {Py_mod_exec, pwdmodule_exec},
+    {Py_mod_exec, (void*	)pwdmodule_exec},
     {0, NULL}
 };
 
@@ -364,6 +363,10 @@ static struct PyModuleDef pwdmodule = {
     .m_clear = pwdmodule_clear,
     .m_free = pwdmodule_free,
 };
+
+//pwdmodule = pwdmoduleTmp ;
+
+
 
 
 PyMODINIT_FUNC

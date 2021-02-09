@@ -473,7 +473,7 @@ _PyObject_Call_Prepend(PyThreadState *tstate, PyObject *callable,
         stack = small_stack;
     }
     else {
-        stack = PyMem_Malloc((argcount + 1) * sizeof(PyObject *));
+        stack = (PyObject**)PyMem_Malloc((argcount + 1) * sizeof(PyObject *));
         if (stack == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -772,7 +772,7 @@ object_vacall(PyThreadState *tstate, PyObject *base,
         stack = small_stack;
     }
     else {
-        stack = PyMem_Malloc(nargs * sizeof(stack[0]));
+        stack = (PyObject**)PyMem_Malloc(nargs * sizeof(stack[0]));
         if (stack == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -964,7 +964,7 @@ _PyStack_UnpackDict(PyThreadState *tstate,
     }
 
     /* Add 1 to support PY_VECTORCALL_ARGUMENTS_OFFSET */
-    PyObject **stack = PyMem_Malloc((1 + nargs + nkwargs) * sizeof(args[0]));
+    PyObject **stack = (PyObject**)PyMem_Malloc((1 + nargs + nkwargs) * sizeof(args[0]));
     if (stack == NULL) {
         _PyErr_NoMemory(tstate);
         return NULL;

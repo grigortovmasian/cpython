@@ -1,8 +1,5 @@
 #ifndef Py_INTERNAL_RUNTIME_H
 #define Py_INTERNAL_RUNTIME_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
@@ -10,6 +7,10 @@ extern "C" {
 
 #include "pycore_atomic.h"    /* _Py_atomic_address */
 #include "pycore_gil.h"       // struct _gil_runtime_state
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ceval state */
 

@@ -245,7 +245,7 @@ _locale_localeconv_impl(PyObject *module)
     PyObject* result;
     struct lconv *lc;
     PyObject *x;
-
+    {
     result = PyDict_New();
     if (!result) {
         return NULL;
@@ -329,7 +329,7 @@ _locale_localeconv_impl(PyObject *module)
     RESULT("grouping", x);
 
     return result;
-
+  }
   failed:
     Py_DECREF(result);
     return NULL;
@@ -420,7 +420,7 @@ _locale_strxfrm_impl(PyObject *module, PyObject *str)
     }
     if (n2 >= (size_t)n1) {
         /* more space needed */
-        wchar_t * new_buf = PyMem_Realloc(buf, (n2+1)*sizeof(wchar_t));
+        wchar_t * new_buf = (wchar_t*)PyMem_Realloc(buf, (n2+1)*sizeof(wchar_t));
         if (!new_buf) {
             PyErr_NoMemory();
             goto exit;
@@ -871,7 +871,7 @@ _locale_exec(PyObject *module)
 }
 
 static struct PyModuleDef_Slot _locale_slots[] = {
-    {Py_mod_exec, _locale_exec},
+    {Py_mod_exec, (void*)_locale_exec},
     {0, NULL}
 };
 

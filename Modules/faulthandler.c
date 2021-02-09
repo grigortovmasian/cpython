@@ -913,7 +913,7 @@ faulthandler_register_py(PyObject *self,
         return NULL;
 
     if (user_signals == NULL) {
-        user_signals = PyMem_Calloc(NSIG, sizeof(user_signal_t));
+        user_signals = (user_signal_t*)PyMem_Calloc(NSIG, sizeof(user_signal_t));
         if (user_signals == NULL)
             return PyErr_NoMemory();
     }
@@ -1305,7 +1305,7 @@ PyExec_faulthandler(PyObject *module) {
 }
 
 static PyModuleDef_Slot faulthandler_slots[] = {
-    {Py_mod_exec, PyExec_faulthandler},
+    {Py_mod_exec, (void*)PyExec_faulthandler},
     {0, NULL}
 };
 
@@ -1314,8 +1314,8 @@ static struct PyModuleDef module_def = {
     .m_name = "faulthandler",
     .m_doc = module_doc,
     .m_methods = module_methods,
+    .m_slots = faulthandler_slots,
     .m_traverse = faulthandler_traverse,
-    .m_slots = faulthandler_slots
 };
 
 PyMODINIT_FUNC

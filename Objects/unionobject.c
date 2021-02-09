@@ -124,6 +124,7 @@ union_richcompare(PyObject *a, PyObject *b, int op)
         return NULL;
     }
     PyObject* b_set = PySet_New(NULL);
+    {
     if (b_set == NULL) {
         goto exit;
     }
@@ -170,6 +171,7 @@ union_richcompare(PyObject *a, PyObject *b, int op)
         }
     }
     result = PyObject_RichCompare(a_set, b_set, op);
+    }
 exit:
     Py_XDECREF(a_set);
     Py_XDECREF(b_set);
@@ -420,21 +422,21 @@ static PyNumberMethods union_as_number = {
 PyTypeObject _Py_UnionType = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     .tp_name = "types.Union",
+    .tp_basicsize = sizeof(unionobject),
+    .tp_dealloc = unionobject_dealloc,
+    .tp_repr = union_repr,
+    .tp_as_number = &union_as_number,  
+    .tp_hash = union_hash,
+    .tp_getattro = PyObject_GenericGetAttr,
+    .tp_flags = Py_TPFLAGS_DEFAULT,  
     .tp_doc = "Represent a PEP 604 union type\n"
               "\n"
               "E.g. for int | str",
-    .tp_basicsize = sizeof(unionobject),
-    .tp_dealloc = unionobject_dealloc,
-    .tp_alloc = PyType_GenericAlloc,
-    .tp_free = PyObject_Del,
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_hash = union_hash,
-    .tp_getattro = PyObject_GenericGetAttr,
-    .tp_members = union_members,
-    .tp_methods = union_methods,
     .tp_richcompare = union_richcompare,
-    .tp_as_number = &union_as_number,
-    .tp_repr = union_repr,
+    .tp_methods = union_methods,
+    .tp_members = union_members,  
+    .tp_alloc = PyType_GenericAlloc,
+    .tp_free = PyObject_Del,  
 };
 
 PyObject *

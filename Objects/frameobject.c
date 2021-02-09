@@ -104,7 +104,7 @@ pop_block(int64_t stack)
 static inline Kind
 top_block(int64_t stack)
 {
-    return stack & ((1<<BITS_PER_BLOCK)-1);
+    return (Kind)(stack & ((1<<BITS_PER_BLOCK)-1));
 }
 
 static int64_t *
@@ -765,7 +765,7 @@ frame_alloc(PyCodeObject *code)
 {
     PyFrameObject *f;
 
-    f = code->co_zombieframe;
+    f = (PyFrameObject*)code->co_zombieframe;
     if (f != NULL) {
         code->co_zombieframe = NULL;
         _Py_NewReference((PyObject *)f);

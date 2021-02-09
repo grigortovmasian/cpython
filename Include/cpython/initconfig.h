@@ -5,7 +5,7 @@
 /* --- PyStatus ----------------------------------------------- */
 
 typedef struct {
-    enum {
+    enum st{
         _PyStatus_TYPE_OK=0,
         _PyStatus_TYPE_ERROR=1,
         _PyStatus_TYPE_EXIT=2

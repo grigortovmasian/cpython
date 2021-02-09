@@ -518,13 +518,13 @@ PyBuffer_FromContiguous(Py_buffer *view, void *buf, Py_ssize_t len, char fort)
     else {
         addone = _Py_add_one_to_index_C;
     }
-    src = buf;
+    src = (char*)buf;
     /* XXX : This is not going to be the fastest code in the world
              several optimizations are possible.
      */
     elements = len / view->itemsize;
     while (elements--) {
-        ptr = PyBuffer_GetPointer(view, indices);
+        ptr = (char*)PyBuffer_GetPointer(view, indices);
         memcpy(ptr, src, view->itemsize);
         src += view->itemsize;
         addone(view->ndim, indices, view->shape);
@@ -594,8 +594,8 @@ int PyObject_CopyData(PyObject *dest, PyObject *src)
     }
     while (elements--) {
         _Py_add_one_to_index_C(view_src.ndim, indices, view_src.shape);
-        dptr = PyBuffer_GetPointer(&view_dest, indices);
-        sptr = PyBuffer_GetPointer(&view_src, indices);
+        dptr = (char*)PyBuffer_GetPointer(&view_dest, indices);
+        sptr = (char*)PyBuffer_GetPointer(&view_src, indices);
         memcpy(dptr, sptr, view_src.itemsize);
     }
     PyMem_Free(indices);
@@ -1312,7 +1312,7 @@ PyNumber_AsSsize_t(PyObject *item, PyObject *err)
     PyObject *value = _PyNumber_Index(item);
     if (value == NULL)
         return -1;
-
+    {
     /* We're done if PyLong_AsSsize_t() returns without error. */
     result = PyLong_AsSsize_t(value);
     if (result != -1)
@@ -1348,7 +1348,7 @@ PyNumber_AsSsize_t(PyObject *item, PyObject *err)
                       "cannot fit '%.200s' into an index-sized integer",
                       Py_TYPE(item)->tp_name);
     }
-
+    }
  finish:
     Py_DECREF(value);
     return result;
@@ -2722,7 +2722,7 @@ _PySequence_BytesToCharpArray(PyObject* self)
         return NULL;
     }
 
-    array = PyMem_Malloc((argc + 1) * sizeof(char *));
+    array = (char**)PyMem_Malloc((argc + 1) * sizeof(char *));
     if (array == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -2742,7 +2742,7 @@ _PySequence_BytesToCharpArray(PyObject* self)
             goto fail;
         }
         size = PyBytes_GET_SIZE(item) + 1;
-        array[i] = PyMem_Malloc(size);
+        array[i] = (char*)PyMem_Malloc(size);
         if (!array[i]) {
             PyErr_NoMemory();
             goto fail;

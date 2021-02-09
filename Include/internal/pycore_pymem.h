@@ -1,14 +1,15 @@
 #ifndef Py_INTERNAL_PYMEM_H
 #define Py_INTERNAL_PYMEM_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
 #endif
 
 #include "pymem.h"      // PyMemAllocatorName
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /* Set the memory allocator of the specified domain to the default.
@@ -88,7 +89,7 @@ struct _PyTraceMalloc_Config {
 };
 
 #define _PyTraceMalloc_Config_INIT \
-    {.initialized = TRACEMALLOC_NOT_INITIALIZED, \
+    {.initialized = _PyTraceMalloc_Config::TRACEMALLOC_NOT_INITIALIZED, \
      .tracing = 0, \
      .max_nframe = 1}
 

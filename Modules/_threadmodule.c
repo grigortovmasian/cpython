@@ -19,8 +19,9 @@ _Py_IDENTIFIER(flush);
 
 
 // Forward declarations
-static struct PyModuleDef thread_module;
-
+namespace{
+extern struct PyModuleDef thread_module;
+}
 
 typedef struct {
     PyTypeObject *lock_type;
@@ -295,11 +296,11 @@ static PyMemberDef lock_type_members[] = {
 };
 
 static PyType_Slot lock_type_slots[] = {
-    {Py_tp_dealloc, (destructor)lock_dealloc},
-    {Py_tp_repr, (reprfunc)lock_repr},
+    {Py_tp_dealloc, (void*)lock_dealloc},
+    {Py_tp_repr, (void*)lock_repr},
     {Py_tp_doc, (void *)lock_doc},
     {Py_tp_methods, lock_methods},
-    {Py_tp_traverse, lock_traverse},
+    {Py_tp_traverse, (void*)lock_traverse},
     {Py_tp_members, lock_type_members},
     {0, 0}
 };
@@ -567,11 +568,11 @@ static PyMemberDef rlock_type_members[] = {
 };
 
 static PyType_Slot rlock_type_slots[] = {
-    {Py_tp_dealloc, (destructor)rlock_dealloc},
-    {Py_tp_repr, (reprfunc)rlock_repr},
+    {Py_tp_dealloc, (void *)rlock_dealloc},
+    {Py_tp_repr, (void *)rlock_repr},
     {Py_tp_methods, rlock_methods},
-    {Py_tp_alloc, PyType_GenericAlloc},
-    {Py_tp_new, rlock_new},
+    {Py_tp_alloc, (void*)PyType_GenericAlloc},
+    {Py_tp_new, (void*)rlock_new},
     {Py_tp_members, rlock_type_members},
     {0, 0},
 };
@@ -669,8 +670,8 @@ static PyMemberDef local_dummy_type_members[] = {
 };
 
 static PyType_Slot local_dummy_type_slots[] = {
-    {Py_tp_dealloc, (destructor)localdummy_dealloc},
-    {Py_tp_doc, "Thread-local dummy"},
+    {Py_tp_dealloc, (void*)localdummy_dealloc},
+    {Py_tp_doc, (void*)"Thread-local dummy"},
     {Py_tp_members, local_dummy_type_members},
     {0, 0}
 };
@@ -709,6 +710,7 @@ _local_create_dummy(localobject *self, thread_module_state *state)
     PyTypeObject *type = state->local_dummy_type;
 
     PyObject *tdict = PyThreadState_GetDict();
+    {
     if (tdict == NULL) {
         PyErr_SetString(PyExc_SystemError,
                         "Couldn't get thread-state dictionary");
@@ -744,7 +746,7 @@ _local_create_dummy(localobject *self, thread_module_state *state)
 
     Py_DECREF(ldict);
     return ldict;
-
+    }
 err:
     Py_XDECREF(ldict);
     Py_XDECREF(wr);
@@ -781,7 +783,7 @@ local_new(PyTypeObject *type, PyObject *args, PyObject *kw)
     if (self == NULL) {
         return NULL;
     }
-
+    {
     self->args = Py_XNewRef(args);
     self->kw = Py_XNewRef(kw);
     self->key = PyUnicode_FromFormat("thread.local.%p", self);
@@ -809,7 +811,7 @@ local_new(PyTypeObject *type, PyObject *args, PyObject *kw)
         goto err;
     }
     return (PyObject *)self;
-
+    }
   err:
     Py_DECREF(self);
     return NULL;
@@ -949,13 +951,13 @@ static PyMemberDef local_type_members[] = {
 };
 
 static PyType_Slot local_type_slots[] = {
-    {Py_tp_dealloc, (destructor)local_dealloc},
-    {Py_tp_getattro, (getattrofunc)local_getattro},
-    {Py_tp_setattro, (setattrofunc)local_setattro},
-    {Py_tp_doc, "Thread-local data"},
-    {Py_tp_traverse, (traverseproc)local_traverse},
-    {Py_tp_clear, (inquiry)local_clear},
-    {Py_tp_new, local_new},
+    {Py_tp_dealloc, (void*)local_dealloc},
+    {Py_tp_getattro, (void*)local_getattro},
+    {Py_tp_setattro, (void*)local_setattro},
+    {Py_tp_doc, (void*)"Thread-local data"},
+    {Py_tp_traverse, (void*)local_traverse},
+    {Py_tp_clear, (void*)local_clear},
+    {Py_tp_new, (void*)local_new},
     {Py_tp_members, local_type_members},
     {0, 0}
 };
@@ -1658,22 +1660,22 @@ PyDoc_STRVAR(thread_doc,
 The 'threading' module provides a more convenient interface.");
 
 static PyModuleDef_Slot thread_module_slots[] = {
-    {Py_mod_exec, thread_module_exec},
+    {Py_mod_exec, (void*)thread_module_exec},
     {0, NULL}
 };
-
-static struct PyModuleDef thread_module = {
+namespace {
+struct PyModuleDef thread_module = {
     PyModuleDef_HEAD_INIT,
     .m_name = "_thread",
     .m_doc = thread_doc,
     .m_size = sizeof(thread_module_state),
     .m_methods = thread_methods,
+    .m_slots = thread_module_slots,
     .m_traverse = thread_module_traverse,
     .m_clear = thread_module_clear,
     .m_free = thread_module_free,
-    .m_slots = thread_module_slots,
 };
-
+}
 PyMODINIT_FUNC
 PyInit__thread(void)
 {

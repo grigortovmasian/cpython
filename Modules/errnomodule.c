@@ -926,7 +926,7 @@ errno_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot errno_slots[] = {
-    {Py_mod_exec, errno_exec},
+    {Py_mod_exec, (void*)errno_exec},
     {0, NULL}
 };
 

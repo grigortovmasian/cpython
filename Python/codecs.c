@@ -92,7 +92,7 @@ PyObject *normalizestring(const char *string)
         return NULL;
     }
 
-    encoding = PyMem_Malloc(len + 1);
+    encoding = (char*)PyMem_Malloc(len + 1);
     if (encoding == NULL)
         return PyErr_NoMemory();
 
@@ -146,6 +146,7 @@ PyObject *_PyCodec_Lookup(const char *encoding)
 
     /* First, try to lookup the name in the registry dictionary */
     PyObject *result = PyDict_GetItemWithError(interp->codec_search_cache, v);
+    {
     if (result != NULL) {
         Py_INCREF(result);
         Py_DECREF(v);
@@ -202,7 +203,7 @@ PyObject *_PyCodec_Lookup(const char *encoding)
     }
     Py_DECREF(v);
     return result;
-
+    }
  onError:
     Py_DECREF(v);
     return NULL;

@@ -233,7 +233,7 @@ PyObject *
 PyComplex_FromCComplex(Py_complex cval)
 {
     /* Inline PyObject_New */
-    PyComplexObject *op = PyObject_Malloc(sizeof(PyComplexObject));
+    PyComplexObject *op = (PyComplexObject*)PyObject_Malloc(sizeof(PyComplexObject));
     if (op == NULL) {
         return PyErr_NoMemory();
     }

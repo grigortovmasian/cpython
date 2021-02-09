@@ -638,7 +638,7 @@ r_string(Py_ssize_t n, RFILE *p)
         return res;
     }
     if (p->buf == NULL) {
-        p->buf = PyMem_Malloc(n);
+        p->buf = (char*)PyMem_Malloc(n);
         if (p->buf == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -646,7 +646,7 @@ r_string(Py_ssize_t n, RFILE *p)
         p->buf_size = n;
     }
     else if (p->buf_size < n) {
-        char *tmp = PyMem_Realloc(p->buf, n);
+        char *tmp = (char*)PyMem_Realloc(p->buf, n);
         if (tmp == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -1731,7 +1731,7 @@ marshal_loads_impl(PyObject *module, Py_buffer *bytes)
 /*[clinic end generated code: output=9fc65985c93d1bb1 input=6f426518459c8495]*/
 {
     RFILE rf;
-    char *s = bytes->buf;
+    char *s = (char*)bytes->buf;
     Py_ssize_t n = bytes->len;
     PyObject* result;
     rf.fp = NULL;
@@ -1795,7 +1795,7 @@ marshal_module_exec(PyObject *mod)
 }
 
 static PyModuleDef_Slot marshalmodule_slots[] = {
-    {Py_mod_exec, marshal_module_exec},
+    {Py_mod_exec, (void*)marshal_module_exec},
     {0, NULL}
 };
 

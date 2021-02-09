@@ -2926,7 +2926,7 @@ PyType_FromModuleAndSpec(PyObject *module, PyType_Spec *spec, PyObject *bases)
     for (slot = spec->slots; slot->slot; slot++) {
         if (slot->slot == Py_tp_members) {
             nmembers = 0;
-            for (const PyMemberDef *memb = slot->pfunc; memb->name != NULL; memb++) {
+            for (const PyMemberDef *memb = (const PyMemberDef*)slot->pfunc; memb->name != NULL; memb++) {
                 nmembers++;
                 if (strcmp(memb->name, "__weaklistoffset__") == 0) {
                     // The PyMemberDef must be a Py_ssize_t and readonly
@@ -2954,7 +2954,7 @@ PyType_FromModuleAndSpec(PyObject *module, PyType_Spec *spec, PyObject *bases)
     if (res == NULL)
         return NULL;
     res_start = (char*)res;
-
+    {
     if (spec->name == NULL) {
         PyErr_SetString(PyExc_SystemError,
                         "Type spec does not define the name field.");
@@ -2987,9 +2987,9 @@ PyType_FromModuleAndSpec(PyObject *module, PyType_Spec *spec, PyObject *bases)
         /* See whether Py_tp_base(s) was specified */
         for (slot = spec->slots; slot->slot; slot++) {
             if (slot->slot == Py_tp_base)
-                base = slot->pfunc;
+                base = (PyTypeObject*)slot->pfunc;
             else if (slot->slot == Py_tp_bases) {
-                bases = slot->pfunc;
+                bases = (PyObject*)slot->pfunc;
             }
         }
         if (!bases) {
@@ -3059,8 +3059,8 @@ PyType_FromModuleAndSpec(PyObject *module, PyType_Spec *spec, PyObject *bases)
                 type->tp_doc = NULL;
                 continue;
             }
-            size_t len = strlen(slot->pfunc)+1;
-            char *tp_doc = PyObject_Malloc(len);
+            size_t len = strlen((const char*)slot->pfunc)+1;
+            char *tp_doc = (char*)PyObject_Malloc(len);
             if (tp_doc == NULL) {
                 type->tp_doc = NULL;
                 PyErr_NoMemory();
@@ -3153,7 +3153,7 @@ PyType_FromModuleAndSpec(PyObject *module, PyType_Spec *spec, PyObject *bases)
     }
 
     return (PyObject*)res;
-
+    }
  fail:
     Py_DECREF(res);
     return NULL;
@@ -5504,7 +5504,7 @@ PyType_Ready(PyTypeObject *type)
      */
     _Py_AddToAllObjects((PyObject *)type, 0);
 #endif
-
+     {
     if (type->tp_name == NULL) {
         PyErr_Format(PyExc_SystemError,
                      "Type does not define the tp_name field.");
@@ -5704,7 +5704,7 @@ PyType_Ready(PyTypeObject *type)
         (type->tp_flags & ~Py_TPFLAGS_READYING) | Py_TPFLAGS_READY;
     assert(_PyType_CheckConsistency(type));
     return 0;
-
+  }
   error:
     type->tp_flags &= ~Py_TPFLAGS_READYING;
     return -1;

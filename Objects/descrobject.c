@@ -321,6 +321,7 @@ method_vectorcall_VARARGS_KEYWORDS(
     PyObject *func, PyObject *const *args, size_t nargsf, PyObject *kwnames)
 {
     PyThreadState *tstate = _PyThreadState_GET();
+    PyObject *kwdict = NULL;
     Py_ssize_t nargs = PyVectorcall_NARGS(nargsf);
     if (method_check_args(func, args, nargs, NULL)) {
         return NULL;
@@ -330,8 +331,8 @@ method_vectorcall_VARARGS_KEYWORDS(
         return NULL;
     }
     PyObject *result = NULL;
+    {
     /* Create a temporary dict for keyword arguments */
-    PyObject *kwdict = NULL;
     if (kwnames != NULL && PyTuple_GET_SIZE(kwnames) > 0) {
         kwdict = _PyStack_AsDict(args + nargs, kwnames);
         if (kwdict == NULL) {
@@ -345,6 +346,7 @@ method_vectorcall_VARARGS_KEYWORDS(
     }
     result = meth(args[0], argstuple, kwdict);
     _Py_LeaveRecursiveCall(tstate);
+    }
 exit:
     Py_DECREF(argstuple);
     Py_XDECREF(kwdict);
@@ -1642,7 +1644,7 @@ static PyObject *
 property_copy(PyObject *old, PyObject *get, PyObject *set, PyObject *del)
 {
     propertyobject *pold = (propertyobject *)old;
-    PyObject *new, *type, *doc;
+    PyObject *nw, *type, *doc;
 
     type = PyObject_Type(old);
     if (type == NULL)
@@ -1668,14 +1670,14 @@ property_copy(PyObject *old, PyObject *get, PyObject *set, PyObject *del)
         doc = pold->prop_doc ? pold->prop_doc : Py_None;
     }
 
-    new =  PyObject_CallFunctionObjArgs(type, get, set, del, doc, NULL);
+    nw =  PyObject_CallFunctionObjArgs(type, get, set, del, doc, NULL);
     Py_DECREF(type);
-    if (new == NULL)
+    if (nw == NULL)
         return NULL;
 
     Py_XINCREF(pold->prop_name);
-    Py_XSETREF(((propertyobject *) new)->prop_name, pold->prop_name);
-    return new;
+    Py_XSETREF(((propertyobject *) nw)->prop_name, pold->prop_name);
+    return nw;
 }
 
 /*[clinic input]

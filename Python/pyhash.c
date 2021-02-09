@@ -22,7 +22,8 @@ _Py_HashSecret_t _Py_HashSecret = {{0}};
 #if Py_HASH_ALGORITHM == Py_HASH_EXTERNAL
 extern PyHash_FuncDef PyHash_Func;
 #else
-static PyHash_FuncDef PyHash_Func;
+static Py_hash_t pysiphash(const void *src, Py_ssize_t src_sz);
+static PyHash_FuncDef PyHash_Func = {pysiphash, "siphash24", 64, 128};
 #endif
 
 /* Count _Py_HashBytes() calls */
@@ -429,7 +430,6 @@ pysiphash(const void *src, Py_ssize_t src_sz) {
         src, src_sz);
 }
 
-static PyHash_FuncDef PyHash_Func = {pysiphash, "siphash24", 64, 128};
 #endif
 
 #ifdef __cplusplus

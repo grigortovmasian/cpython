@@ -835,8 +835,8 @@ _operator__compare_digest_impl(PyObject *module, PyObject *a, PyObject *b)
             return NULL;
         }
 
-        rc = _tscmp(PyUnicode_DATA(a),
-                    PyUnicode_DATA(b),
+        rc = _tscmp((const unsigned char*)PyUnicode_DATA(a),
+                    (const unsigned char*)PyUnicode_DATA(b),
                     PyUnicode_GET_LENGTH(a),
                     PyUnicode_GET_LENGTH(b));
     }
@@ -975,7 +975,7 @@ itemgetter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     } else {
         item = args;
     }
-    _operator_state *state = PyType_GetModuleState(type);
+    _operator_state *state = (_operator_state*)PyType_GetModuleState(type);
     /* create itemgetterobject structure */
     ig = PyObject_GC_New(itemgetterobject, (PyTypeObject *) state->itemgetter_type);
     if (ig == NULL) {
@@ -1111,13 +1111,13 @@ After g = itemgetter(2, 5, 3), the call g(r) returns (r[2], r[5], r[3])");
 
 static PyType_Slot itemgetter_type_slots[] = {
     {Py_tp_doc, (void *)itemgetter_doc},
-    {Py_tp_dealloc, itemgetter_dealloc},
-    {Py_tp_call, itemgetter_call},
-    {Py_tp_traverse, itemgetter_traverse},
+    {Py_tp_dealloc, (void *)itemgetter_dealloc},
+    {Py_tp_call, (void *)itemgetter_call},
+    {Py_tp_traverse, (void *)itemgetter_traverse},
     {Py_tp_methods, itemgetter_methods},
-    {Py_tp_new, itemgetter_new},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_repr, itemgetter_repr},
+    {Py_tp_new, (void *)itemgetter_new},
+    {Py_tp_getattro, (void *)PyObject_GenericGetAttr},
+    {Py_tp_repr, (void *)itemgetter_repr},
     {0, 0}
 };
 
@@ -1236,7 +1236,7 @@ attrgetter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         }
     }
 
-    _operator_state *state = PyType_GetModuleState(type);
+    _operator_state *state = (_operator_state*)PyType_GetModuleState(type);
     /* create attrgetterobject structure */
     ag = PyObject_GC_New(attrgetterobject, (PyTypeObject *)state->attrgetter_type);
     if (ag == NULL) {
@@ -1433,13 +1433,13 @@ After h = attrgetter('name.first', 'name.last'), the call h(r) returns\n\
 
 static PyType_Slot attrgetter_type_slots[] = {
     {Py_tp_doc, (void *)attrgetter_doc},
-    {Py_tp_dealloc, attrgetter_dealloc},
-    {Py_tp_call, attrgetter_call},
-    {Py_tp_traverse, attrgetter_traverse},
+    {Py_tp_dealloc, (void *)attrgetter_dealloc},
+    {Py_tp_call, (void *)attrgetter_call},
+    {Py_tp_traverse,(void *) attrgetter_traverse},
     {Py_tp_methods, attrgetter_methods},
-    {Py_tp_new, attrgetter_new},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_repr, attrgetter_repr},
+    {Py_tp_new, (void *)attrgetter_new},
+    {Py_tp_getattro, (void *)PyObject_GenericGetAttr},
+    {Py_tp_repr, (void *)attrgetter_repr},
     {0, 0}
 };
 
@@ -1481,7 +1481,7 @@ methodcaller_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-    _operator_state *state = PyType_GetModuleState(type);
+    _operator_state *state = (_operator_state*)PyType_GetModuleState(type);
     /* create methodcallerobject structure */
     mc = PyObject_GC_New(methodcallerobject, (PyTypeObject *)state->methodcaller_type);
     if (mc == NULL) {
@@ -1678,13 +1678,13 @@ r.name('date', foo=1).");
 
 static PyType_Slot methodcaller_type_slots[] = {
     {Py_tp_doc, (void *)methodcaller_doc},
-    {Py_tp_dealloc, methodcaller_dealloc},
-    {Py_tp_call, methodcaller_call},
-    {Py_tp_traverse, methodcaller_traverse},
+    {Py_tp_dealloc, (void *)methodcaller_dealloc},
+    {Py_tp_call,(void *)methodcaller_call},
+    {Py_tp_traverse, (void *)methodcaller_traverse},
     {Py_tp_methods, methodcaller_methods},
-    {Py_tp_new, methodcaller_new},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_repr, methodcaller_repr},
+    {Py_tp_new, (void *)methodcaller_new},
+    {Py_tp_getattro, (void *)PyObject_GenericGetAttr},
+    {Py_tp_repr, (void *)methodcaller_repr},
     {0, 0}
 };
 
@@ -1729,7 +1729,7 @@ operator_exec(PyObject *module)
 
 
 static struct PyModuleDef_Slot operator_slots[] = {
-    {Py_mod_exec, operator_exec},
+    {Py_mod_exec, (void *)operator_exec},
     {0, NULL}
 };
 

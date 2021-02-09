@@ -1386,7 +1386,7 @@ _PyEval_EvalFrameDefault(PyThreadState *tstate, PyFrameObject *f, int throwflag)
     co = f->f_code;
     PyCodeAddressRange bounds;
     _PyCode_InitAddressRange(co, &bounds);
-
+    {
     if (tstate->use_tracing) {
         if (tstate->c_tracefunc != NULL) {
             /* tstate->c_tracefunc, if defined, is a
@@ -4118,7 +4118,7 @@ exiting:
             }
         }
     }
-
+    }
     /* pop frame */
 exit_eval_frame:
     if (PyDTrace_FUNCTION_RETURN_ENABLED())

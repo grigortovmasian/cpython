@@ -733,7 +733,7 @@ file_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ file[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "statements? $"));
-            _res = _PyPegen_make_module ( p , a );
+            _res = _PyPegen_make_module ( p , (asdl_stmt_seq*)a );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -880,7 +880,7 @@ func_type_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ func_type[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'(' type_expressions? ')' '->' expression NEWLINE* $"));
-            _res = FunctionType ( a , b , p -> arena );
+            _res = FunctionType ( (asdl_expr_seq*)a , b , p -> arena );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -2081,7 +2081,7 @@ assignment_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = CHECK_VERSION ( stmt_ty , 6 , "Variable annotation syntax is" , _Py_AnnAssign ( CHECK ( expr_ty , _PyPegen_set_expr_context ( p , a , Store ) ) , b , c , 1 , EXTRA ) );
+            _res = CHECK_VERSION ( stmt_ty , 6 , "Variable annotation syntax is" , _Py_AnnAssign ( CHECK ( expr_ty , _PyPegen_set_expr_context ( p , a , Store ) ) , b , (expr_ty)c , 1 , EXTRA ) );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -2123,7 +2123,7 @@ assignment_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = CHECK_VERSION ( stmt_ty , 6 , "Variable annotations syntax is" , _Py_AnnAssign ( a , b , c , 0 , EXTRA ) );
+            _res = CHECK_VERSION ( stmt_ty , 6 , "Variable annotations syntax is" , _Py_AnnAssign ( (expr_ty)a , b , (expr_ty)c , 0 , EXTRA ) );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -2164,7 +2164,7 @@ assignment_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Assign ( a , b , NEW_TYPE_COMMENT ( p , tc ) , EXTRA );
+            _res = _Py_Assign ( a , (expr_ty)b , NEW_TYPE_COMMENT ( p , (Token *)tc ) , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -2206,7 +2206,7 @@ assignment_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_AugAssign ( a , b -> kind , c , EXTRA );
+            _res = _Py_AugAssign ( a , b -> kind , (expr_ty)c , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -2234,7 +2234,7 @@ assignment_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ assignment[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_assignment"));
-            _res = invalid_assignment_var;
+            _res = (stmt_ty)invalid_assignment_var;
             goto done;
         }
         p->mark = _mark;
@@ -2819,7 +2819,7 @@ assert_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Assert ( a , b , EXTRA );
+            _res = _Py_Assert ( a , (expr_ty)b , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -2907,7 +2907,7 @@ del_stmt_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ del_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_del_stmt"));
-            _res = invalid_del_stmt_var;
+            _res = (stmt_ty)invalid_del_stmt_var;
             goto done;
         }
         p->mark = _mark;
@@ -3258,7 +3258,7 @@ import_from_targets_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ import_from_targets[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_import_from_targets"));
-            _res = invalid_import_from_targets_var;
+            _res = (asdl_alias_seq*)invalid_import_from_targets_var;
             goto done;
         }
         p->mark = _mark;
@@ -3468,7 +3468,7 @@ dotted_name_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -3639,7 +3639,7 @@ if_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_If ( a , b , c , EXTRA );
+            _res = _Py_If ( a , b , (asdl_stmt_seq*)c , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -3757,7 +3757,7 @@ elif_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_If ( a , b , c , EXTRA );
+            _res = _Py_If ( a , b , (asdl_stmt_seq*)c , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -3875,7 +3875,7 @@ while_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_While ( a , b , c , EXTRA );
+            _res = _Py_While ( a , b , (asdl_stmt_seq*)c , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -3961,7 +3961,7 @@ for_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_For ( t , ex , b , el , NEW_TYPE_COMMENT ( p , tc ) , EXTRA );
+            _res = _Py_For ( t , ex , b , (asdl_stmt_seq*)el , NEW_TYPE_COMMENT ( p , (Token*)tc ) , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -4025,7 +4025,7 @@ for_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = CHECK_VERSION ( stmt_ty , 5 , "Async for loops are" , _Py_AsyncFor ( t , ex , b , el , NEW_TYPE_COMMENT ( p , tc ) , EXTRA ) );
+            _res = CHECK_VERSION ( stmt_ty , 5 , "Async for loops are" , _Py_AsyncFor ( t , ex , b , (asdl_stmt_seq*)el , NEW_TYPE_COMMENT ( p , (Token*)tc ) , EXTRA ) );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -4053,7 +4053,7 @@ for_stmt_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ for_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_for_target"));
-            _res = invalid_for_target_var;
+            _res = (stmt_ty)invalid_for_target_var;
             goto done;
         }
         p->mark = _mark;
@@ -4175,7 +4175,7 @@ with_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_With ( a , b , NEW_TYPE_COMMENT ( p , tc ) , EXTRA );
+            _res = _Py_With ( a , b , NEW_TYPE_COMMENT ( p , (Token*)tc ) , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -4278,7 +4278,7 @@ with_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = CHECK_VERSION ( stmt_ty , 5 , "Async with statements are" , _Py_AsyncWith ( a , b , NEW_TYPE_COMMENT ( p , tc ) , EXTRA ) );
+            _res = CHECK_VERSION ( stmt_ty , 5 , "Async with statements are" , _Py_AsyncWith ( a , b , NEW_TYPE_COMMENT ( p , (Token*)tc ) , EXTRA ) );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -4354,7 +4354,7 @@ with_item_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ with_item[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_with_item"));
-            _res = invalid_with_item_var;
+            _res = (withitem_ty)invalid_with_item_var;
             goto done;
         }
         p->mark = _mark;
@@ -4491,7 +4491,7 @@ try_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Try ( b , ex , el , f , EXTRA );
+            _res = _Py_Try ( b , ex , (asdl_stmt_seq*)el , (asdl_stmt_seq*)f , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -4710,7 +4710,7 @@ return_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Return ( a , EXTRA );
+            _res = _Py_Return ( (expr_ty)a , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -4775,7 +4775,7 @@ raise_stmt_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Raise ( a , b , EXTRA );
+            _res = _Py_Raise ( a , (expr_ty)b , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -4956,7 +4956,7 @@ function_def_raw_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_FunctionDef ( n -> v . Name . id , ( params ) ? params : CHECK ( arguments_ty , _PyPegen_empty_arguments ( p ) ) , b , NULL , a , NEW_TYPE_COMMENT ( p , tc ) , EXTRA );
+            _res = _Py_FunctionDef ( n -> v . Name . id , ( params ) ? (arguments_ty)params : CHECK ( arguments_ty , _PyPegen_empty_arguments ( p ) ) , b , NULL , (expr_ty)a , NEW_TYPE_COMMENT ( p , (Token*)tc ) , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5016,7 +5016,7 @@ function_def_raw_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = CHECK_VERSION ( stmt_ty , 5 , "Async functions are" , _Py_AsyncFunctionDef ( n -> v . Name . id , ( params ) ? params : CHECK ( arguments_ty , _PyPegen_empty_arguments ( p ) ) , b , NULL , a , NEW_TYPE_COMMENT ( p , tc ) , EXTRA ) );
+            _res = CHECK_VERSION ( stmt_ty , 5 , "Async functions are" , _Py_AsyncFunctionDef ( n -> v . Name . id , ( params ) ? (arguments_ty)params : CHECK ( arguments_ty , _PyPegen_empty_arguments ( p ) ) , b , NULL , (expr_ty)a , NEW_TYPE_COMMENT ( p , (Token*)tc ) , EXTRA ) );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5089,7 +5089,7 @@ func_type_comment_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ func_type_comment[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_double_type_comments"));
-            _res = invalid_double_type_comments_var;
+            _res = (Token*)invalid_double_type_comments_var;
             goto done;
         }
         p->mark = _mark;
@@ -5144,7 +5144,7 @@ params_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ params[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_parameters"));
-            _res = invalid_parameters_var;
+            _res = (arguments_ty)invalid_parameters_var;
             goto done;
         }
         p->mark = _mark;
@@ -5213,7 +5213,7 @@ parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "slash_no_default param_no_default* param_with_default* star_etc?"));
-            _res = _PyPegen_make_arguments ( p , a , NULL , b , c , d );
+            _res = _PyPegen_make_arguments ( p , a , NULL , b , c , (StarEtc*)d );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5243,7 +5243,7 @@ parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "slash_with_default param_with_default* star_etc?"));
-            _res = _PyPegen_make_arguments ( p , NULL , a , NULL , b , c );
+            _res = _PyPegen_make_arguments ( p , NULL , a , NULL , b , (StarEtc*)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5273,7 +5273,7 @@ parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param_no_default+ param_with_default* star_etc?"));
-            _res = _PyPegen_make_arguments ( p , NULL , NULL , a , b , c );
+            _res = _PyPegen_make_arguments ( p , NULL , NULL , a , b , (StarEtc*)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5300,7 +5300,7 @@ parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param_with_default+ star_etc?"));
-            _res = _PyPegen_make_arguments ( p , NULL , NULL , NULL , a , b );
+            _res = _PyPegen_make_arguments ( p , NULL , NULL , NULL , a , (StarEtc*)b );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5538,7 +5538,7 @@ star_etc_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ star_etc[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'*' param_no_default param_maybe_default* kwds?"));
-            _res = _PyPegen_star_etc ( p , a , b , c );
+            _res = _PyPegen_star_etc ( p , a , b , (arg_ty)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5571,7 +5571,7 @@ star_etc_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ star_etc[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'*' ',' param_maybe_default+ kwds?"));
-            _res = _PyPegen_star_etc ( p , NULL , b , c );
+            _res = _PyPegen_star_etc ( p , NULL , b , (arg_ty)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5619,7 +5619,7 @@ star_etc_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ star_etc[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_star_etc"));
-            _res = invalid_star_etc_var;
+            _res = (StarEtc*)invalid_star_etc_var;
             goto done;
         }
         p->mark = _mark;
@@ -5705,7 +5705,7 @@ param_no_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ param_no_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param ',' TYPE_COMMENT?"));
-            _res = _PyPegen_add_type_comment_to_arg ( p , a , tc );
+            _res = _PyPegen_add_type_comment_to_arg ( p , a , (Token*)tc );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5734,7 +5734,7 @@ param_no_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ param_no_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param TYPE_COMMENT? &')'"));
-            _res = _PyPegen_add_type_comment_to_arg ( p , a , tc );
+            _res = _PyPegen_add_type_comment_to_arg ( p , a , (Token*)tc );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5784,7 +5784,7 @@ param_with_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ param_with_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param default ',' TYPE_COMMENT?"));
-            _res = _PyPegen_name_default_pair ( p , a , c , tc );
+            _res = _PyPegen_name_default_pair ( p , a , c , (Token*)tc );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5816,7 +5816,7 @@ param_with_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ param_with_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param default TYPE_COMMENT? &')'"));
-            _res = _PyPegen_name_default_pair ( p , a , c , tc );
+            _res = _PyPegen_name_default_pair ( p , a , c , (Token*)tc );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5868,7 +5868,7 @@ param_maybe_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ param_maybe_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param default? ',' TYPE_COMMENT?"));
-            _res = _PyPegen_name_default_pair ( p , a , c , tc );
+            _res = _PyPegen_name_default_pair ( p , a , (expr_ty)c , (Token*)tc );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5900,7 +5900,7 @@ param_maybe_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ param_maybe_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "param default? TYPE_COMMENT? &')'"));
-            _res = _PyPegen_name_default_pair ( p , a , c , tc );
+            _res = _PyPegen_name_default_pair ( p , a , (expr_ty)c , (Token*)tc );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -5962,7 +5962,7 @@ param_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_arg ( a -> v . Name . id , b , NULL , EXTRA );
+            _res = _Py_arg ( a -> v . Name . id , (expr_ty)b , NULL , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -6322,7 +6322,7 @@ block_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ block[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_block"));
-            _res = invalid_block_var;
+            _res = (asdl_stmt_seq*	)invalid_block_var;
             goto done;
         }
         p->mark = _mark;
@@ -6771,7 +6771,7 @@ named_expression_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ named_expression[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_named_expression"));
-            _res = invalid_named_expression_var;
+            _res = (expr_ty)invalid_named_expression_var;
             goto done;
         }
         p->mark = _mark;
@@ -7124,7 +7124,7 @@ lambdef_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Lambda ( ( a ) ? a : CHECK ( arguments_ty , _PyPegen_empty_arguments ( p ) ) , b , EXTRA );
+            _res = _Py_Lambda ( ( a ) ? (arguments_ty)a : CHECK ( arguments_ty , _PyPegen_empty_arguments ( p ) ) , b , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7165,7 +7165,7 @@ lambda_params_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_params[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_lambda_parameters"));
-            _res = invalid_lambda_parameters_var;
+            _res = (arguments_ty)invalid_lambda_parameters_var;
             goto done;
         }
         p->mark = _mark;
@@ -7234,7 +7234,7 @@ lambda_parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "lambda_slash_no_default lambda_param_no_default* lambda_param_with_default* lambda_star_etc?"));
-            _res = _PyPegen_make_arguments ( p , a , NULL , b , c , d );
+            _res = _PyPegen_make_arguments ( p , a , NULL , b , c , (StarEtc*)d );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7264,7 +7264,7 @@ lambda_parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "lambda_slash_with_default lambda_param_with_default* lambda_star_etc?"));
-            _res = _PyPegen_make_arguments ( p , NULL , a , NULL , b , c );
+            _res = _PyPegen_make_arguments ( p , NULL , a , NULL , b , (StarEtc*)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7294,7 +7294,7 @@ lambda_parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "lambda_param_no_default+ lambda_param_with_default* lambda_star_etc?"));
-            _res = _PyPegen_make_arguments ( p , NULL , NULL , a , b , c );
+            _res = _PyPegen_make_arguments ( p , NULL , NULL , a , b , (StarEtc*)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7321,7 +7321,7 @@ lambda_parameters_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_parameters[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "lambda_param_with_default+ lambda_star_etc?"));
-            _res = _PyPegen_make_arguments ( p , NULL , NULL , NULL , a , b );
+            _res = _PyPegen_make_arguments ( p , NULL , NULL , NULL , a , (StarEtc*)b );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7561,7 +7561,7 @@ lambda_star_etc_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_star_etc[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'*' lambda_param_no_default lambda_param_maybe_default* lambda_kwds?"));
-            _res = _PyPegen_star_etc ( p , a , b , c );
+            _res = _PyPegen_star_etc ( p , a , b , (arg_ty)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7594,7 +7594,7 @@ lambda_star_etc_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_star_etc[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'*' ',' lambda_param_maybe_default+ lambda_kwds?"));
-            _res = _PyPegen_star_etc ( p , NULL , b , c );
+            _res = _PyPegen_star_etc ( p , NULL , b , (arg_ty)c );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7642,7 +7642,7 @@ lambda_star_etc_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_star_etc[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_lambda_star_etc"));
-            _res = invalid_lambda_star_etc_var;
+            _res = (StarEtc*)invalid_lambda_star_etc_var;
             goto done;
         }
         p->mark = _mark;
@@ -7874,7 +7874,7 @@ lambda_param_maybe_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_param_maybe_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "lambda_param default? ','"));
-            _res = _PyPegen_name_default_pair ( p , a , c , NULL );
+            _res = _PyPegen_name_default_pair ( p , a , (expr_ty)c , NULL );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -7903,7 +7903,7 @@ lambda_param_maybe_default_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ lambda_param_maybe_default[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "lambda_param default? &':'"));
-            _res = _PyPegen_name_default_pair ( p , a , c , NULL );
+            _res = _PyPegen_name_default_pair ( p , a , (expr_ty)c , NULL );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -9009,7 +9009,7 @@ bitwise_or_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -9125,7 +9125,7 @@ bitwise_xor_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -9241,7 +9241,7 @@ bitwise_and_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -9357,7 +9357,7 @@ shift_expr_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty	)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -9512,7 +9512,7 @@ sum_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -9673,7 +9673,7 @@ term_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -10279,7 +10279,7 @@ primary_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -10316,7 +10316,7 @@ primary_raw(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ primary[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_primary"));
-            _res = invalid_primary_var;
+            _res = (expr_ty)invalid_primary_var;
             goto done;
         }
         p->mark = _mark;
@@ -10646,7 +10646,7 @@ slice_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Slice ( a , b , c , EXTRA );
+            _res = _Py_Slice ( (expr_ty)a , (expr_ty)b , (expr_ty)c , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -10890,7 +10890,7 @@ atom_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ atom[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&'(' (tuple | group | genexp)"));
-            _res = _tmp_95_var;
+            _res = (expr_ty)_tmp_95_var;
             goto done;
         }
         p->mark = _mark;
@@ -10911,7 +10911,7 @@ atom_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ atom[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&'[' (list | listcomp)"));
-            _res = _tmp_96_var;
+            _res = (expr_ty)_tmp_96_var;
             goto done;
         }
         p->mark = _mark;
@@ -10932,7 +10932,7 @@ atom_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ atom[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&'{' (dict | set | dictcomp | setcomp)"));
-            _res = _tmp_97_var;
+            _res = (expr_ty)_tmp_97_var;
             goto done;
         }
         p->mark = _mark;
@@ -11071,7 +11071,7 @@ list_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_List ( a , Load , EXTRA );
+            _res = _Py_List ( (asdl_expr_seq*)a , Load , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -11170,7 +11170,7 @@ listcomp_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ listcomp[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_comprehension"));
-            _res = invalid_comprehension_var;
+            _res = (expr_ty)invalid_comprehension_var;
             goto done;
         }
         p->mark = _mark;
@@ -11230,7 +11230,7 @@ tuple_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Tuple ( a , Load , EXTRA );
+            _res = _Py_Tuple ( (asdl_expr_seq*)a , Load , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -11277,7 +11277,7 @@ group_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ group[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'(' (yield_expr | named_expression) ')'"));
-            _res = a;
+            _res = (expr_ty)a;
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -11301,7 +11301,7 @@ group_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ group[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_group"));
-            _res = invalid_group_var;
+            _res = (expr_ty)invalid_group_var;
             goto done;
         }
         p->mark = _mark;
@@ -11395,7 +11395,7 @@ genexp_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ genexp[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_comprehension"));
-            _res = invalid_comprehension_var;
+            _res = (expr_ty)invalid_comprehension_var;
             goto done;
         }
         p->mark = _mark;
@@ -11554,7 +11554,7 @@ setcomp_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ setcomp[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_comprehension"));
-            _res = invalid_comprehension_var;
+            _res = (expr_ty)invalid_comprehension_var;
             goto done;
         }
         p->mark = _mark;
@@ -11614,7 +11614,7 @@ dict_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Dict ( CHECK ( asdl_expr_seq * , _PyPegen_get_keys ( p , a ) ) , CHECK ( asdl_expr_seq * , _PyPegen_get_values ( p , a ) ) , EXTRA );
+            _res = _Py_Dict ( CHECK ( asdl_expr_seq * , _PyPegen_get_keys ( p , (asdl_seq*)a ) ) , CHECK ( asdl_expr_seq * , _PyPegen_get_values ( p , (asdl_seq*)a ) ) , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -11706,7 +11706,7 @@ dictcomp_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ dictcomp[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_dict_comprehension"));
-            _res = invalid_dict_comprehension_var;
+            _res = (expr_ty)invalid_dict_comprehension_var;
             goto done;
         }
         p->mark = _mark;
@@ -12030,7 +12030,7 @@ for_if_clause_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ for_if_clause[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_for_target"));
-            _res = invalid_for_target_var;
+            _res = (comprehension_ty)invalid_for_target_var;
             goto done;
         }
         p->mark = _mark;
@@ -12126,7 +12126,7 @@ yield_expr_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Yield ( a , EXTRA );
+            _res = _Py_Yield ( (expr_ty)a , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -12201,7 +12201,7 @@ arguments_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ arguments[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_arguments"));
-            _res = invalid_arguments_var;
+            _res = (expr_ty)invalid_arguments_var;
             goto done;
         }
         p->mark = _mark;
@@ -12259,7 +12259,7 @@ args_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _PyPegen_collect_call_seqs ( p , a , b , EXTRA );
+            _res = _PyPegen_collect_call_seqs ( p , a , (asdl_seq*)b , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -12292,7 +12292,7 @@ args_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Call ( _PyPegen_dummy_name ( p ) , CHECK_NULL_ALLOWED ( asdl_expr_seq * , _PyPegen_seq_extract_starred_exprs ( p , a ) ) , CHECK_NULL_ALLOWED ( asdl_keyword_seq * , _PyPegen_seq_delete_starred_exprs ( p , a ) ) , EXTRA );
+            _res = _Py_Call ( (expr_ty)_PyPegen_dummy_name ( p ) , CHECK_NULL_ALLOWED ( asdl_expr_seq * , _PyPegen_seq_extract_starred_exprs ( p , a ) ) , CHECK_NULL_ALLOWED ( asdl_keyword_seq * , _PyPegen_seq_delete_starred_exprs ( p , a ) ) , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -12555,7 +12555,7 @@ kwarg_or_starred_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ kwarg_or_starred[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_kwarg"));
-            _res = invalid_kwarg_var;
+            _res = (KeywordOrStarred*)invalid_kwarg_var;
             goto done;
         }
         p->mark = _mark;
@@ -12675,7 +12675,7 @@ kwarg_or_double_starred_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ kwarg_or_double_starred[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "invalid_kwarg"));
-            _res = invalid_kwarg_var;
+            _res = (KeywordOrStarred*)invalid_kwarg_var;
             goto done;
         }
         p->mark = _mark;
@@ -12948,7 +12948,7 @@ star_target_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Starred ( CHECK ( expr_ty , _PyPegen_set_expr_context ( p , a , Store ) ) , Store , EXTRA );
+            _res = _Py_Starred ( CHECK ( expr_ty , _PyPegen_set_expr_context ( p , (expr_ty)a , Store ) ) , Store , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -13229,7 +13229,7 @@ star_atom_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Tuple ( a , Store , EXTRA );
+            _res = _Py_Tuple ( (asdl_expr_seq*)a , Store , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -13268,7 +13268,7 @@ star_atom_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_List ( a , Store , EXTRA );
+            _res = _Py_List ( (asdl_expr_seq*)a , Store , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -13773,7 +13773,7 @@ del_t_atom_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Tuple ( a , Del , EXTRA );
+            _res = _Py_Tuple ( (asdl_expr_seq*)a , Del , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -13812,7 +13812,7 @@ del_t_atom_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_List ( a , Del , EXTRA );
+            _res = _Py_List ( (asdl_expr_seq*)a , Del , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -14045,7 +14045,7 @@ t_primary_rule(Parser *p)
         if (_raw == NULL || p->mark <= _resmark)
             break;
         _resmark = p->mark;
-        _res = _raw;
+        _res = (expr_ty)_raw;
     }
     p->mark = _resmark;
     D(p->level--);
@@ -14444,7 +14444,7 @@ t_atom_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_Tuple ( b , Store , EXTRA );
+            _res = _Py_Tuple ( (asdl_expr_seq*)b , Store , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -14483,7 +14483,7 @@ t_atom_rule(Parser *p)
             UNUSED(_end_lineno); // Only used by EXTRA macro
             int _end_col_offset = _token->end_col_offset;
             UNUSED(_end_col_offset); // Only used by EXTRA macro
-            _res = _Py_List ( b , Store , EXTRA );
+            _res = _Py_List ( (asdl_expr_seq*)b , Store , EXTRA );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -15880,7 +15880,7 @@ _loop0_1_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)	PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -15903,7 +15903,7 @@ _loop0_1_rule(Parser *p)
             _res = newline_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -15946,7 +15946,7 @@ _loop0_2_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -15969,7 +15969,7 @@ _loop0_2_rule(Parser *p)
             _res = newline_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -16012,7 +16012,7 @@ _loop0_4_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -16044,7 +16044,7 @@ _loop0_4_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -16126,7 +16126,7 @@ _loop0_6_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -16158,7 +16158,7 @@ _loop0_6_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -16240,7 +16240,7 @@ _loop0_8_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -16272,7 +16272,7 @@ _loop0_8_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -16354,7 +16354,7 @@ _loop0_10_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -16386,7 +16386,7 @@ _loop0_10_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -16468,7 +16468,7 @@ _loop1_11_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -16491,7 +16491,7 @@ _loop1_11_rule(Parser *p)
             _res = statement_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -16539,7 +16539,7 @@ _loop0_13_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -16571,7 +16571,7 @@ _loop0_13_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -17101,7 +17101,7 @@ _loop1_22_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -17124,7 +17124,7 @@ _loop1_22_rule(Parser *p)
             _res = _tmp_138_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -17282,7 +17282,7 @@ _loop0_26_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -17314,7 +17314,7 @@ _loop0_26_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -17396,7 +17396,7 @@ _loop0_28_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -17428,7 +17428,7 @@ _loop0_28_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -17609,7 +17609,7 @@ _loop0_31_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -17632,7 +17632,7 @@ _loop0_31_rule(Parser *p)
             _res = _tmp_139_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -17675,7 +17675,7 @@ _loop1_32_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -17698,7 +17698,7 @@ _loop1_32_rule(Parser *p)
             _res = _tmp_140_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -17746,7 +17746,7 @@ _loop0_34_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -17778,7 +17778,7 @@ _loop0_34_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -17904,7 +17904,7 @@ _loop0_37_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -17936,7 +17936,7 @@ _loop0_37_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -18062,7 +18062,7 @@ _loop0_40_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -18094,7 +18094,7 @@ _loop0_40_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -18176,7 +18176,7 @@ _loop0_42_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -18208,7 +18208,7 @@ _loop0_42_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -18290,7 +18290,7 @@ _loop0_44_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -18322,7 +18322,7 @@ _loop0_44_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -18404,7 +18404,7 @@ _loop0_46_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -18436,7 +18436,7 @@ _loop0_46_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -18592,7 +18592,7 @@ _loop1_48_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -18615,7 +18615,7 @@ _loop1_48_rule(Parser *p)
             _res = except_block_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -18878,7 +18878,7 @@ _loop0_54_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -18901,7 +18901,7 @@ _loop0_54_rule(Parser *p)
             _res = param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -18944,7 +18944,7 @@ _loop0_55_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -18967,7 +18967,7 @@ _loop0_55_rule(Parser *p)
             _res = param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19010,7 +19010,7 @@ _loop0_56_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19033,7 +19033,7 @@ _loop0_56_rule(Parser *p)
             _res = param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19076,7 +19076,7 @@ _loop1_57_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19099,7 +19099,7 @@ _loop1_57_rule(Parser *p)
             _res = param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19147,7 +19147,7 @@ _loop0_58_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19170,7 +19170,7 @@ _loop0_58_rule(Parser *p)
             _res = param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19213,7 +19213,7 @@ _loop1_59_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19236,7 +19236,7 @@ _loop1_59_rule(Parser *p)
             _res = param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19284,7 +19284,7 @@ _loop1_60_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19307,7 +19307,7 @@ _loop1_60_rule(Parser *p)
             _res = param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19355,7 +19355,7 @@ _loop1_61_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19378,7 +19378,7 @@ _loop1_61_rule(Parser *p)
             _res = param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19426,7 +19426,7 @@ _loop0_62_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19449,7 +19449,7 @@ _loop0_62_rule(Parser *p)
             _res = param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19492,7 +19492,7 @@ _loop1_63_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19515,7 +19515,7 @@ _loop1_63_rule(Parser *p)
             _res = param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19563,7 +19563,7 @@ _loop0_64_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19586,7 +19586,7 @@ _loop0_64_rule(Parser *p)
             _res = param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19629,7 +19629,7 @@ _loop1_65_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19652,7 +19652,7 @@ _loop1_65_rule(Parser *p)
             _res = param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19700,7 +19700,7 @@ _loop0_66_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19723,7 +19723,7 @@ _loop0_66_rule(Parser *p)
             _res = param_maybe_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19766,7 +19766,7 @@ _loop1_67_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19789,7 +19789,7 @@ _loop1_67_rule(Parser *p)
             _res = param_maybe_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19837,7 +19837,7 @@ _loop1_68_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19860,7 +19860,7 @@ _loop1_68_rule(Parser *p)
             _res = _tmp_141_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -19955,7 +19955,7 @@ _loop1_70_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -19978,7 +19978,7 @@ _loop1_70_rule(Parser *p)
             _res = _tmp_142_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20026,7 +20026,7 @@ _loop0_72_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20058,7 +20058,7 @@ _loop0_72_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20140,7 +20140,7 @@ _loop1_73_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20163,7 +20163,7 @@ _loop1_73_rule(Parser *p)
             _res = _tmp_143_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20211,7 +20211,7 @@ _loop0_74_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20234,7 +20234,7 @@ _loop0_74_rule(Parser *p)
             _res = lambda_param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20277,7 +20277,7 @@ _loop0_75_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20300,7 +20300,7 @@ _loop0_75_rule(Parser *p)
             _res = lambda_param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20343,7 +20343,7 @@ _loop0_76_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20366,7 +20366,7 @@ _loop0_76_rule(Parser *p)
             _res = lambda_param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20409,7 +20409,7 @@ _loop1_77_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20432,7 +20432,7 @@ _loop1_77_rule(Parser *p)
             _res = lambda_param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20480,7 +20480,7 @@ _loop0_78_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20503,7 +20503,7 @@ _loop0_78_rule(Parser *p)
             _res = lambda_param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20546,7 +20546,7 @@ _loop1_79_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20569,7 +20569,7 @@ _loop1_79_rule(Parser *p)
             _res = lambda_param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20617,7 +20617,7 @@ _loop1_80_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20640,7 +20640,7 @@ _loop1_80_rule(Parser *p)
             _res = lambda_param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20688,7 +20688,7 @@ _loop1_81_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+	    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20711,7 +20711,7 @@ _loop1_81_rule(Parser *p)
             _res = lambda_param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20759,7 +20759,7 @@ _loop0_82_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20782,7 +20782,7 @@ _loop0_82_rule(Parser *p)
             _res = lambda_param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20825,7 +20825,7 @@ _loop1_83_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20848,7 +20848,7 @@ _loop1_83_rule(Parser *p)
             _res = lambda_param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20896,7 +20896,7 @@ _loop0_84_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20919,7 +20919,7 @@ _loop0_84_rule(Parser *p)
             _res = lambda_param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -20962,7 +20962,7 @@ _loop1_85_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -20985,7 +20985,7 @@ _loop1_85_rule(Parser *p)
             _res = lambda_param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21033,7 +21033,7 @@ _loop0_86_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -21056,7 +21056,7 @@ _loop0_86_rule(Parser *p)
             _res = lambda_param_maybe_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21099,7 +21099,7 @@ _loop1_87_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -21122,7 +21122,7 @@ _loop1_87_rule(Parser *p)
             _res = lambda_param_maybe_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21170,7 +21170,7 @@ _loop1_88_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -21193,7 +21193,7 @@ _loop1_88_rule(Parser *p)
             _res = _tmp_144_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21241,7 +21241,7 @@ _loop1_89_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -21264,7 +21264,7 @@ _loop1_89_rule(Parser *p)
             _res = _tmp_145_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21312,7 +21312,7 @@ _loop1_90_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -21335,7 +21335,7 @@ _loop1_90_rule(Parser *p)
             _res = compare_op_bitwise_or_pair_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21424,7 +21424,7 @@ _loop0_93_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -21456,7 +21456,7 @@ _loop0_93_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21804,7 +21804,7 @@ _loop1_98_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -21821,13 +21821,13 @@ _loop1_98_rule(Parser *p)
         D(fprintf(stderr, "%*c> _loop1_98[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "STRING"));
         expr_ty string_var;
         while (
-            (string_var = _PyPegen_string_token(p))  // STRING
+            (string_var = (expr_ty)_PyPegen_string_token(p))  // STRING
         )
         {
             _res = string_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -21892,7 +21892,7 @@ _tmp_99_rule(Parser *p)
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_99[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "star_named_expression ',' star_named_expressions?"));
-            _res = _PyPegen_seq_insert_in_front ( p , y , z );
+            _res = _PyPegen_seq_insert_in_front ( p , y , (asdl_seq *)z );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 D(p->level--);
@@ -21977,7 +21977,7 @@ _loop0_102_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22009,7 +22009,7 @@ _loop0_102_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22091,7 +22091,7 @@ _loop1_103_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22114,7 +22114,7 @@ _loop1_103_rule(Parser *p)
             _res = for_if_clause_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22162,7 +22162,7 @@ _loop0_104_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22185,7 +22185,7 @@ _loop0_104_rule(Parser *p)
             _res = _tmp_146_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22228,7 +22228,7 @@ _loop0_105_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22251,7 +22251,7 @@ _loop0_105_rule(Parser *p)
             _res = _tmp_147_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22294,7 +22294,7 @@ _loop0_107_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22326,7 +22326,7 @@ _loop0_107_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22452,7 +22452,7 @@ _loop0_110_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22484,7 +22484,7 @@ _loop0_110_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22566,7 +22566,7 @@ _loop0_112_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22598,7 +22598,7 @@ _loop0_112_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22680,7 +22680,7 @@ _loop0_114_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22712,7 +22712,7 @@ _loop0_114_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22794,7 +22794,7 @@ _loop0_116_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22826,7 +22826,7 @@ _loop0_116_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22908,7 +22908,7 @@ _loop0_117_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -22931,7 +22931,7 @@ _loop0_117_rule(Parser *p)
             _res = _tmp_149_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -22974,7 +22974,7 @@ _loop0_119_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23006,7 +23006,7 @@ _loop0_119_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23088,7 +23088,7 @@ _loop1_120_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23111,7 +23111,7 @@ _loop1_120_rule(Parser *p)
             _res = _tmp_150_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23197,7 +23197,7 @@ _loop0_123_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23229,7 +23229,7 @@ _loop0_123_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23311,7 +23311,7 @@ _loop0_125_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23343,7 +23343,7 @@ _loop0_125_rule(Parser *p)
             }
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23483,7 +23483,7 @@ _loop0_127_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23506,7 +23506,7 @@ _loop0_127_rule(Parser *p)
             _res = star_named_expressions_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23549,7 +23549,7 @@ _loop0_128_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23572,7 +23572,7 @@ _loop0_128_rule(Parser *p)
             _res = _tmp_151_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23615,7 +23615,7 @@ _loop0_129_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23638,7 +23638,7 @@ _loop0_129_rule(Parser *p)
             _res = _tmp_152_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23810,7 +23810,7 @@ _loop0_132_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23833,7 +23833,7 @@ _loop0_132_rule(Parser *p)
             _res = param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23876,7 +23876,7 @@ _loop1_133_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23899,7 +23899,7 @@ _loop1_133_rule(Parser *p)
             _res = param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -23947,7 +23947,7 @@ _loop0_134_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -23970,7 +23970,7 @@ _loop0_134_rule(Parser *p)
             _res = lambda_param_no_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();
@@ -24013,7 +24013,7 @@ _loop1_135_rule(Parser *p)
     void *_res = NULL;
     int _mark = p->mark;
     int _start_mark = p->mark;
-    void **_children = PyMem_Malloc(sizeof(void *));
+    void **_children = (void **)PyMem_Malloc(sizeof(void *));
     if (!_children) {
         p->error_indicator = 1;
         PyErr_NoMemory();
@@ -24036,7 +24036,7 @@ _loop1_135_rule(Parser *p)
             _res = lambda_param_with_default_var;
             if (_n == _children_capacity) {
                 _children_capacity *= 2;
-                void **_new_children = PyMem_Realloc(_children, _children_capacity*sizeof(void *));
+                void **_new_children = (void **)PyMem_Realloc(_children, _children_capacity*sizeof(void *));
                 if (!_new_children) {
                     p->error_indicator = 1;
                     PyErr_NoMemory();

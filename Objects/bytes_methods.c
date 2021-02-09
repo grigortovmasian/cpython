@@ -524,7 +524,7 @@ find_internal(const char *str, Py_ssize_t len,
         if (PyObject_GetBuffer(subobj, &subbuf, PyBUF_SIMPLE) != 0)
             return -2;
 
-        sub = subbuf.buf;
+        sub = (const char*)subbuf.buf;
         sub_len = subbuf.len;
     }
     else {
@@ -673,7 +673,7 @@ _Py_bytes_count(const char *str, Py_ssize_t len, PyObject *args)
         if (PyObject_GetBuffer(sub_obj, &vsub, PyBUF_SIMPLE) != 0)
             return NULL;
 
-        sub = vsub.buf;
+        sub = (const char*)vsub.buf;
         sub_len = vsub.len;
     }
     else {
@@ -704,7 +704,7 @@ _Py_bytes_contains(const char *str, Py_ssize_t len, PyObject *arg)
         if (PyObject_GetBuffer(arg, &varg, PyBUF_SIMPLE) != 0)
             return -1;
         pos = stringlib_find(str, len,
-                             varg.buf, varg.len, 0);
+                             (const char*)varg.buf, varg.len, 0);
         PyBuffer_Release(&varg);
         return pos >= 0;
     }
@@ -736,7 +736,7 @@ tailmatch(const char *str, Py_ssize_t len, PyObject *substr,
     else {
         if (PyObject_GetBuffer(substr, &sub_view, PyBUF_SIMPLE) != 0)
             return -1;
-        sub = sub_view.buf;
+        sub = (const char*)sub_view.buf;
         slen = sub_view.len;
     }
 

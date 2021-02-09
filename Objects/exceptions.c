@@ -2034,7 +2034,7 @@ UnicodeDecodeError_init(PyObject *self, PyObject *args, PyObject *kwds)
         Py_buffer view;
         if (PyObject_GetBuffer(ude->object, &view, PyBUF_SIMPLE) != 0)
             goto error;
-        Py_XSETREF(ude->object, PyBytes_FromStringAndSize(view.buf, view.len));
+        Py_XSETREF(ude->object, PyBytes_FromStringAndSize((const char*)view.buf, view.len));
         PyBuffer_Release(&view);
         if (!ude->object)
             goto error;

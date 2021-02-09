@@ -11,10 +11,12 @@ PyFloatObject represents a (double precision) floating point number.
 extern "C" {
 #endif
 
+#include "idouble.h"
+
 #ifndef Py_LIMITED_API
 typedef struct {
     PyObject_HEAD
-    double ob_fval;
+    struct idouble ob_fval;
 } PyFloatObject;
 #endif
 
@@ -48,7 +50,7 @@ PyAPI_FUNC(PyObject *) PyFloat_FromDouble(double);
    speed. */
 PyAPI_FUNC(double) PyFloat_AsDouble(PyObject *);
 #ifndef Py_LIMITED_API
-#define PyFloat_AS_DOUBLE(op) (((PyFloatObject *)(op))->ob_fval)
+#define PyFloat_AS_DOUBLE(op) (*(((PyFloatObject *)(op))->ob_fval.val))
 #endif
 
 #ifndef Py_LIMITED_API

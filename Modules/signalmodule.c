@@ -851,18 +851,18 @@ signal_setitimer_impl(PyObject *module, int which, PyObject *seconds,
                       PyObject *interval)
 /*[clinic end generated code: output=65f9dcbddc35527b input=de43daf194e6f66f]*/
 {
-    struct itimerval new;
+    struct itimerval nw;
 
-    if (timeval_from_double(seconds, &new.it_value) < 0) {
+    if (timeval_from_double(seconds, &nw.it_value) < 0) {
         return NULL;
     }
-    if (timeval_from_double(interval, &new.it_interval) < 0) {
+    if (timeval_from_double(interval, &nw.it_interval) < 0) {
         return NULL;
     }
 
     /* Let OS check "which" value */
     struct itimerval old;
-    if (setitimer(which, &new, &old) != 0) {
+    if (setitimer(which, &nw, &old) != 0) {
         PyErr_SetFromErrno(ItimerError);
         return NULL;
     }
@@ -1604,7 +1604,7 @@ signal_module_exec(PyObject *m)
 
 
 static PyModuleDef_Slot signal_slots[] = {
-    {Py_mod_exec, signal_module_exec},
+    {Py_mod_exec, (void*)signal_module_exec},
     {0, NULL}
 };
 

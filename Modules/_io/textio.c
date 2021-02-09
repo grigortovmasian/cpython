@@ -342,7 +342,7 @@ _PyIncrementalNewlineDecoder_decode(PyObject *myself,
         if (modified == NULL)
             goto error;
         kind = PyUnicode_KIND(modified);
-        out = PyUnicode_DATA(modified);
+        out = (char*)PyUnicode_DATA(modified);
         PyUnicode_WRITE(kind, out, 0, '\r');
         memcpy(out + kind, PyUnicode_DATA(output), kind * output_len);
         Py_DECREF(output);
@@ -1539,7 +1539,7 @@ _textiowrapper_writeflush(textio *self)
         assert(PyUnicode_IS_ASCII(pending));
         assert(PyUnicode_GET_LENGTH(pending) == self->pending_bytes_count);
         b = PyBytes_FromStringAndSize(
-                PyUnicode_DATA(pending), PyUnicode_GET_LENGTH(pending));
+                (const char*)PyUnicode_DATA(pending), PyUnicode_GET_LENGTH(pending));
         if (b == NULL) {
             return -1;
         }
@@ -1560,7 +1560,7 @@ _textiowrapper_writeflush(textio *self)
             Py_ssize_t len;
             if (PyUnicode_Check(obj)) {
                 assert(PyUnicode_IS_ASCII(obj));
-                src = PyUnicode_DATA(obj);
+                src = (char*)PyUnicode_DATA(obj);
                 len = PyUnicode_GET_LENGTH(obj);
             }
             else {
@@ -2171,7 +2171,7 @@ _textiowrapper_readline(textio *self, Py_ssize_t limit)
                 goto error;
         }
 
-        ptr = PyUnicode_DATA(line);
+        ptr = (const char*)PyUnicode_DATA(line);
         line_len = PyUnicode_GET_LENGTH(line);
         kind = PyUnicode_KIND(line);
 
@@ -2436,14 +2436,13 @@ _io_TextIOWrapper_seek_impl(textio *self, PyObject *cookieObj, int whence)
     CHECK_CLOSED(self);
 
     Py_INCREF(cookieObj);
-
+    {
     if (!self->seekable) {
         _unsupported("underlying stream is not seekable");
         goto fail;
     }
 
     PyObject *zero = _PyLong_GetZero();  // borrowed reference
-
     switch (whence) {
     case SEEK_CUR:
         /* seek relative to current position */
@@ -2606,6 +2605,7 @@ _io_TextIOWrapper_seek_impl(textio *self, PyObject *cookieObj, int whence)
             goto fail;
     }
     return cookieObj;
+    }
   fail:
     Py_XDECREF(cookieObj);
     return NULL;

@@ -263,7 +263,7 @@ get_sre_module_state(PyObject *m)
     return state;
 }
 
-static struct PyModuleDef sremodule;
+//static struct PyModuleDef sremodule;
 #define get_sre_module_state_by_class(cls) \
     (get_sre_module_state(PyType_GetModule(cls)))
 
@@ -2035,13 +2035,13 @@ Return the string obtained by doing backslash substitution on the string templat
 [clinic start generated code]*/
 
 static PyObject *
-_sre_SRE_Match_expand_impl(MatchObject *self, PyObject *template)
+_sre_SRE_Match_expand_impl(MatchObject *self, PyObject *tmplt)
 /*[clinic end generated code: output=931b58ccc323c3a1 input=4bfdb22c2f8b146a]*/
 {
     /* delegate to Python code */
     return call(
         SRE_PY_MODULE, "_expand",
-        PyTuple_Pack(3, self->pattern, self, template)
+        PyTuple_Pack(3, self->pattern, self, tmplt)
         );
 }
 
@@ -2674,11 +2674,11 @@ static PyMemberDef pattern_members[] = {
 };
 
 static PyType_Slot pattern_slots[] = {
-    {Py_tp_dealloc, (destructor)pattern_dealloc},
-    {Py_tp_repr, (reprfunc)pattern_repr},
-    {Py_tp_hash, (hashfunc)pattern_hash},
+    {Py_tp_dealloc, (void*)pattern_dealloc},
+    {Py_tp_repr, (void*)pattern_repr},
+    {Py_tp_hash, (void*)pattern_hash},
     {Py_tp_doc, (void *)pattern_doc},
-    {Py_tp_richcompare, pattern_richcompare},
+    {Py_tp_richcompare, (void*)pattern_richcompare},
     {Py_tp_methods, pattern_methods},
     {Py_tp_members, pattern_members},
     {Py_tp_getset, pattern_getset},
@@ -2733,8 +2733,8 @@ static PyMemberDef match_members[] = {
 /* FIXME: implement setattr("string", None) as a special case (to
    detach the associated string, if any */
 static PyType_Slot match_slots[] = {
-    {Py_tp_dealloc, match_dealloc},
-    {Py_tp_repr, match_repr},
+    {Py_tp_dealloc, (void*)match_dealloc},
+    {Py_tp_repr, (void*)match_repr},
     {Py_tp_doc, (void *)match_doc},
     {Py_tp_methods, match_methods},
     {Py_tp_members, match_members},
@@ -2745,7 +2745,7 @@ static PyType_Slot match_slots[] = {
      * Match objects do not support length or assignment, but do support
      * __getitem__.
      */
-    {Py_mp_subscript, match_getitem},
+    {Py_mp_subscript, (void*)match_getitem},
 
     {0, NULL},
 };
@@ -2771,7 +2771,7 @@ static PyMemberDef scanner_members[] = {
 };
 
 static PyType_Slot scanner_slots[] = {
-    {Py_tp_dealloc, scanner_dealloc},
+    {Py_tp_dealloc, (void*)scanner_dealloc},
     {Py_tp_methods, scanner_methods},
     {Py_tp_members, scanner_members},
     {0, NULL},
@@ -2877,7 +2877,7 @@ error:
 }
 
 static PyModuleDef_Slot sre_slots[] = {
-    {Py_mod_exec, sre_exec},
+    {Py_mod_exec, (void*)sre_exec},
     {0, NULL},
 };
 
@@ -2888,8 +2888,8 @@ static struct PyModuleDef sremodule = {
     .m_methods = _functions,
     .m_slots = sre_slots,
     .m_traverse = sre_traverse,
-    .m_free = sre_free,
     .m_clear = sre_clear,
+    .m_free = sre_free,
 };
 
 PyMODINIT_FUNC

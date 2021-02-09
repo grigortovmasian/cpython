@@ -1,5 +1,6 @@
 #ifndef Py_INTERNAL_LIST_H
 #define Py_INTERNAL_LIST_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif

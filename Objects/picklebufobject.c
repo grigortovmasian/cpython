@@ -206,14 +206,14 @@ static PyMethodDef picklebuf_methods[] = {
 PyTypeObject PyPickleBuffer_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "pickle.PickleBuffer",
-    .tp_doc = "Wrapper for potentially out-of-band buffers",
     .tp_basicsize = sizeof(PyPickleBufferObject),
-    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
-    .tp_new = picklebuf_new,
     .tp_dealloc = (destructor) picklebuf_dealloc,
+    .tp_as_buffer = &picklebuf_as_buffer,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
+    .tp_doc = "Wrapper for potentially out-of-band buffers",
     .tp_traverse = (traverseproc) picklebuf_traverse,
     .tp_clear = (inquiry) picklebuf_clear,
     .tp_weaklistoffset = offsetof(PyPickleBufferObject, weakreflist),
-    .tp_as_buffer = &picklebuf_as_buffer,
     .tp_methods = picklebuf_methods,
+    .tp_new = picklebuf_new,
 };

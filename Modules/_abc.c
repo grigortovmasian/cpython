@@ -80,7 +80,7 @@ abc_data_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-    state = PyType_GetModuleState(type);
+    state = (_abcmodule_state*)PyType_GetModuleState(type);
     if (state == NULL) {
         Py_DECREF(self);
         return NULL;
@@ -98,10 +98,10 @@ PyDoc_STRVAR(abc_data_doc,
 
 static PyType_Slot _abc_data_type_spec_slots[] = {
     {Py_tp_doc, (void *)abc_data_doc},
-    {Py_tp_new, abc_data_new},
-    {Py_tp_dealloc, abc_data_dealloc},
-    {Py_tp_traverse, abc_data_traverse},
-    {Py_tp_clear, abc_data_clear},
+    {Py_tp_new, (void *)abc_data_new},
+    {Py_tp_dealloc, (void *)abc_data_dealloc},
+    {Py_tp_traverse, (void *)abc_data_traverse},
+    {Py_tp_clear, (void *)abc_data_clear},
     {0, 0}
 };
 
@@ -620,7 +620,7 @@ _abc__abc_subclasscheck_impl(PyObject *module, PyObject *self,
     if (impl == NULL) {
         return NULL;
     }
-
+    {
     /* 1. Check cache. */
     incache = _in_weak_set(impl->_abc_cache, subclass);
     if (incache < 0) {
@@ -735,7 +735,7 @@ _abc__abc_subclasscheck_impl(PyObject *module, PyObject *self,
         goto end;
     }
     result = Py_False;
-
+   }
 end:
     Py_DECREF(impl);
     Py_XDECREF(subclasses);
@@ -768,7 +768,7 @@ subclasscheck_check_registry(_abc_data *impl, PyObject *subclass,
     }
     // Weakref callback may remove entry from set.
     // So we take snapshot of registry first.
-    PyObject **copy = PyMem_Malloc(sizeof(PyObject*) * registry_size);
+    PyObject **copy = (PyObject**)PyMem_Malloc(sizeof(PyObject*) * registry_size);
     if (copy == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -885,7 +885,7 @@ _abcmodule_free(void *module)
 }
 
 static PyModuleDef_Slot _abcmodule_slots[] = {
-    {Py_mod_exec, _abcmodule_exec},
+    {Py_mod_exec, (void*)_abcmodule_exec},
     {0, NULL}
 };
 

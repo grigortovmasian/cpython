@@ -1,8 +1,5 @@
 #ifndef Py_INTERNAL_LONG_H
 #define Py_INTERNAL_LONG_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
@@ -10,6 +7,9 @@ extern "C" {
 
 #include "pycore_interp.h"        // PyInterpreterState.small_ints
 #include "pycore_pystate.h"       // _PyThreadState_GET()
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Don't call this function but _PyLong_GetZero() and _PyLong_GetOne()
 static inline PyObject* __PyLong_GetSmallInt_internal(int value)

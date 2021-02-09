@@ -1326,15 +1326,15 @@ merge_consts_recursive(struct compiler *c, PyObject *o)
 
         // Instead of rewriting o, we create new frozenset and embed in the
         // key tuple.  Caller should get merged frozenset from the key tuple.
-        PyObject *new = PyFrozenSet_New(tuple);
+        PyObject *nw = PyFrozenSet_New(tuple);
         Py_DECREF(tuple);
-        if (new == NULL) {
+        if (nw == NULL) {
             Py_DECREF(key);
             return NULL;
         }
         assert(PyTuple_GET_ITEM(key, 1) == o);
         Py_DECREF(o);
-        PyTuple_SET_ITEM(key, 1, new);
+        PyTuple_SET_ITEM(key, 1, nw);
     }
 
     return key;
@@ -1709,7 +1709,7 @@ compiler_unwind_fblock(struct compiler *c, struct fblockinfo *info,
                 }
             }
             /* Emit the finally block */
-            VISIT_SEQ(c, stmt, info->fb_datum);
+            VISIT_SEQ(c, stmt, (asdl_stmt_seq*)info->fb_datum);
             if (preserve_tos) {
                 compiler_pop_fblock(c, POP_VALUE, NULL);
             }
@@ -1759,8 +1759,8 @@ compiler_unwind_fblock(struct compiler *c, struct fblockinfo *info,
             ADDOP(c, POP_EXCEPT);
             if (info->fb_datum) {
                 ADDOP_LOAD_CONST(c, Py_None);
-                compiler_nameop(c, info->fb_datum, Store);
-                compiler_nameop(c, info->fb_datum, Del);
+                compiler_nameop(c, (identifier)info->fb_datum, Store);
+                compiler_nameop(c, (identifier)info->fb_datum, Del);
             }
             return 1;
 

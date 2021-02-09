@@ -402,7 +402,7 @@ PyOS_Readline(FILE *sys_stdin, FILE *sys_stdout, const char *prompt)
         return NULL;
 
     len = strlen(rv) + 1;
-    res = PyMem_Malloc(len);
+    res = (char*)PyMem_Malloc(len);
     if (res != NULL) {
         memcpy(res, rv, len);
     }

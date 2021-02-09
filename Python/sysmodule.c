@@ -210,6 +210,7 @@ sys_audit_tstate(PyThreadState *ts, const char *event,
     _PyErr_Fetch(ts, &exc_type, &exc_value, &exc_tb);
 
     /* Initialize event args now */
+    {
     if (argFormat && argFormat[0]) {
         eventArgs = _Py_VaBuildValue_SizeT(argFormat, vargs);
         if (eventArgs && !PyTuple_Check(eventArgs)) {
@@ -288,7 +289,7 @@ sys_audit_tstate(PyThreadState *ts, const char *event,
     }
 
     res = 0;
-
+    }
 exit:
     Py_XDECREF(hook);
     Py_XDECREF(hooks);
@@ -550,7 +551,7 @@ sys_breakpointhook(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyOb
     const char *last_dot = strrchr(envar, '.');
     const char *attrname = NULL;
     PyObject *modulepath = NULL;
-
+    {
     if (last_dot == NULL) {
         /* The breakpoint is a built-in, e.g. PYTHONBREAKPOINT=int */
         modulepath = PyUnicode_FromString("builtins");
@@ -594,7 +595,7 @@ sys_breakpointhook(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyOb
     PyObject *retval = PyObject_Vectorcall(hook, args, nargs, keywords);
     Py_DECREF(hook);
     return retval;
-
+    }
   warn:
     /* If any of the imports went wrong, then warn and ignore. */
     _PyErr_Clear(tstate);
@@ -1880,7 +1881,7 @@ sys_call_tracing_impl(PyObject *module, PyObject *func, PyObject *funcargs)
 
 
 #ifdef __cplusplus
-extern "C" {
+//extern "C" {
 #endif
 
 /*[clinic input]
@@ -1917,7 +1918,7 @@ extern PyObject *_Py_GetDXProfile(PyObject *,  PyObject *);
 #endif
 
 #ifdef __cplusplus
-}
+//}
 #endif
 
 
@@ -2084,7 +2085,7 @@ _alloc_preinit_entry(const wchar_t *value)
     PyMemAllocatorEx old_alloc;
     _PyMem_SetDefaultAllocator(PYMEM_DOMAIN_RAW, &old_alloc);
 
-    _Py_PreInitEntry node = PyMem_RawCalloc(1, sizeof(*node));
+    _Py_PreInitEntry node = (_Py_PreInitEntry)PyMem_RawCalloc(1, sizeof(*node));
     if (node != NULL) {
         node->value = _PyMem_RawWcsdup(value);
         if (node->value == NULL) {
@@ -2301,6 +2302,7 @@ _PySys_AddXOptionWithError(const wchar_t *s)
 
     PyThreadState *tstate = _PyThreadState_GET();
     PyObject *opts = get_xoptions(tstate);
+    {
     if (opts == NULL) {
         goto error;
     }
@@ -2324,7 +2326,7 @@ _PySys_AddXOptionWithError(const wchar_t *s)
     Py_DECREF(name);
     Py_DECREF(value);
     return 0;
-
+    }
 error:
     Py_XDECREF(name);
     Py_XDECREF(value);
@@ -2918,7 +2920,7 @@ _PySys_UpdateConfig(PyThreadState *tstate)
     PyObject *sysdict = tstate->interp->sysdict;
     const PyConfig *config = _PyInterpreterState_GetConfig(tstate->interp);
     int res;
-
+    {
 #define COPY_LIST(KEY, VALUE) \
         SET_SYS(KEY, _PyWideStringList_AsList(&(VALUE)));
 
@@ -2974,7 +2976,7 @@ _PySys_UpdateConfig(PyThreadState *tstate)
     }
 
     return 0;
-
+    }
 err_occurred:
     return -1;
 }
@@ -3019,6 +3021,7 @@ _PySys_Create(PyThreadState *tstate, PyObject **sysmod_p)
     PyInterpreterState *interp = tstate->interp;
 
     PyObject *modules = PyDict_New();
+    {
     if (modules == NULL) {
         goto error;
     }
@@ -3058,7 +3061,7 @@ _PySys_Create(PyThreadState *tstate, PyObject **sysmod_p)
 
     *sysmod_p = sysmod;
     return _PyStatus_OK();
-
+    }
 error:
     return _PyStatus_ERR("can't initialize sys module");
 }

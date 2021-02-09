@@ -41,20 +41,11 @@ get_functools_state(PyObject *module)
 }
 
 static void partial_setvectorcall(partialobject *pto);
-static struct PyModuleDef _functools_module;
+//static struct PyModuleDef _functools_module;
+static inline _functools_state *
+get_functools_state_by_type(PyTypeObject *type);
 static PyObject *
 partial_call(partialobject *pto, PyObject *args, PyObject *kwargs);
-
-static inline _functools_state *
-get_functools_state_by_type(PyTypeObject *type)
-{
-    PyObject *module = _PyType_GetModuleByDef(type, &_functools_module);
-    if (module == NULL) {
-        return NULL;
-    }
-    _functools_state *state = get_functools_state(module);
-    return state;
-}
 
 static PyObject *
 partial_new(PyTypeObject *type, PyObject *args, PyObject *kw)
@@ -225,7 +216,7 @@ partial_vectorcall(partialobject *pto, PyObject *const *args,
         stack = small_stack;
     }
     else {
-        stack = PyMem_Malloc(newnargs_total * sizeof(PyObject *));
+        stack = (PyObject**)PyMem_Malloc(newnargs_total * sizeof(PyObject *));
         if (stack == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -461,18 +452,18 @@ static PyMethodDef partial_methods[] = {
 };
 
 static PyType_Slot partial_type_slots[] = {
-    {Py_tp_dealloc, partial_dealloc},
-    {Py_tp_repr, partial_repr},
-    {Py_tp_call, partial_call},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_setattro, PyObject_GenericSetAttr},
+    {Py_tp_dealloc, (void*)partial_dealloc},
+    {Py_tp_repr, (void*)partial_repr},
+    {Py_tp_call, (void*)partial_call},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
+    {Py_tp_setattro, (void*)PyObject_GenericSetAttr},
     {Py_tp_doc, (void *)partial_doc},
-    {Py_tp_traverse, partial_traverse},
+    {Py_tp_traverse, (void*)partial_traverse},
     {Py_tp_methods, partial_methods},
     {Py_tp_members, partial_memberlist},
     {Py_tp_getset, partial_getsetlist},
-    {Py_tp_new, partial_new},
-    {Py_tp_free, PyObject_GC_Del},
+    {Py_tp_new, (void*)partial_new},
+    {Py_tp_free, (void*)PyObject_GC_Del},
     {0, 0}
 };
 
@@ -532,12 +523,12 @@ static PyObject *
 keyobject_richcompare(PyObject *ko, PyObject *other, int op);
 
 static PyType_Slot keyobject_type_slots[] = {
-    {Py_tp_dealloc, keyobject_dealloc},
-    {Py_tp_call, keyobject_call},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_traverse, keyobject_traverse},
-    {Py_tp_clear, keyobject_clear},
-    {Py_tp_richcompare, keyobject_richcompare},
+    {Py_tp_dealloc, (void*)keyobject_dealloc},
+    {Py_tp_call, (void*)keyobject_call},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
+    {Py_tp_traverse, (void*)keyobject_traverse},
+    {Py_tp_clear, (void*)keyobject_clear},
+    {Py_tp_richcompare, (void*)keyobject_richcompare},
     {Py_tp_members, keyobject_members},
     {0, 0}
 };
@@ -758,7 +749,7 @@ lru_list_elem_dealloc(lru_list_elem *link)
 }
 
 static PyType_Slot lru_list_elem_type_slots[] = {
-    {Py_tp_dealloc, lru_list_elem_dealloc},
+    {Py_tp_dealloc, (void*)lru_list_elem_dealloc},
     {0, 0}
 };
 
@@ -1375,16 +1366,16 @@ static PyMemberDef lru_cache_memberlist[] = {
 };
 
 static PyType_Slot lru_cache_type_slots[] = {
-    {Py_tp_dealloc, lru_cache_dealloc},
-    {Py_tp_call, lru_cache_call},
+    {Py_tp_dealloc, (void*)lru_cache_dealloc},
+    {Py_tp_call, (void*)lru_cache_call},
     {Py_tp_doc, (void *)lru_cache_doc},
-    {Py_tp_traverse, lru_cache_tp_traverse},
-    {Py_tp_clear, lru_cache_tp_clear},
+    {Py_tp_traverse, (void*)lru_cache_tp_traverse},
+    {Py_tp_clear, (void*)lru_cache_tp_clear},
     {Py_tp_methods, lru_cache_methods},
     {Py_tp_members, lru_cache_memberlist},
     {Py_tp_getset, lru_cache_getsetlist},
-    {Py_tp_descr_get, lru_cache_descr_get},
-    {Py_tp_new, lru_cache_new},
+    {Py_tp_descr_get, (void*)lru_cache_descr_get},
+    {Py_tp_new, (void*)lru_cache_new},
     {0, 0}
 };
 
@@ -1488,7 +1479,7 @@ _functools_free(void *module)
 }
 
 static struct PyModuleDef_Slot _functools_slots[] = {
-    {Py_mod_exec, _functools_exec},
+    {Py_mod_exec, (void*)_functools_exec},
     {0, NULL}
 };
 
@@ -1504,6 +1495,16 @@ static struct PyModuleDef _functools_module = {
     .m_free = _functools_free,
 };
 
+static inline _functools_state *
+get_functools_state_by_type(PyTypeObject *type)
+{
+    PyObject *module = _PyType_GetModuleByDef(type, &_functools_module);
+    if (module == NULL) {
+        return NULL;
+    }
+    _functools_state *state = get_functools_state(module);
+    return state;
+}
 PyMODINIT_FUNC
 PyInit__functools(void)
 {

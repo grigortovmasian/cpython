@@ -2024,7 +2024,7 @@ gcmodule_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot gcmodule_slots[] = {
-    {Py_mod_exec, gcmodule_exec},
+    {Py_mod_exec, (void*)gcmodule_exec},
     {0, NULL}
 };
 

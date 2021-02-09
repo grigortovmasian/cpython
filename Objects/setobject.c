@@ -36,7 +36,50 @@
 #include <stddef.h>               // offsetof()
 
 /* Object used as dummy key to fill deleted entries */
-static PyObject _dummy_struct;
+/***** Dummy Struct  *************************************************/
+
+static PyObject *
+dummy_repr(PyObject *op)
+{
+    return PyUnicode_FromString("<dummy key>");
+}
+
+static void _Py_NO_RETURN
+dummy_dealloc(PyObject* ignore)
+{
+    Py_FatalError("deallocating <dummy key>");
+}
+
+static PyTypeObject _PySetDummy_Type = {
+    PyVarObject_HEAD_INIT(&PyType_Type, 0)
+    "<dummy key> type",
+    0,
+    0,
+    dummy_dealloc,      /*tp_dealloc*/ /*never called*/
+    0,                  /*tp_vectorcall_offset*/
+    0,                  /*tp_getattr*/
+    0,                  /*tp_setattr*/
+    0,                  /*tp_as_async*/
+    dummy_repr,         /*tp_repr*/
+    0,                  /*tp_as_number*/
+    0,                  /*tp_as_sequence*/
+    0,                  /*tp_as_mapping*/
+    0,                  /*tp_hash */
+    0,                  /*tp_call */
+    0,                  /*tp_str */
+    0,                  /*tp_getattro */
+    0,                  /*tp_setattro */
+    0,                  /*tp_as_buffer */
+    Py_TPFLAGS_DEFAULT, /*tp_flags */
+};
+
+static PyObject _dummy_struct = {
+  _PyObject_EXTRA_INIT
+  2, &_PySetDummy_Type
+};
+
+
+
 
 #define dummy (&_dummy_struct)
 
@@ -2462,46 +2505,4 @@ test_c_api(PySetObject *so, PyObject *Py_UNUSED(ignored))
 #undef assertRaises
 
 #endif
-
-/***** Dummy Struct  *************************************************/
-
-static PyObject *
-dummy_repr(PyObject *op)
-{
-    return PyUnicode_FromString("<dummy key>");
-}
-
-static void _Py_NO_RETURN
-dummy_dealloc(PyObject* ignore)
-{
-    Py_FatalError("deallocating <dummy key>");
-}
-
-static PyTypeObject _PySetDummy_Type = {
-    PyVarObject_HEAD_INIT(&PyType_Type, 0)
-    "<dummy key> type",
-    0,
-    0,
-    dummy_dealloc,      /*tp_dealloc*/ /*never called*/
-    0,                  /*tp_vectorcall_offset*/
-    0,                  /*tp_getattr*/
-    0,                  /*tp_setattr*/
-    0,                  /*tp_as_async*/
-    dummy_repr,         /*tp_repr*/
-    0,                  /*tp_as_number*/
-    0,                  /*tp_as_sequence*/
-    0,                  /*tp_as_mapping*/
-    0,                  /*tp_hash */
-    0,                  /*tp_call */
-    0,                  /*tp_str */
-    0,                  /*tp_getattro */
-    0,                  /*tp_setattro */
-    0,                  /*tp_as_buffer */
-    Py_TPFLAGS_DEFAULT, /*tp_flags */
-};
-
-static PyObject _dummy_struct = {
-  _PyObject_EXTRA_INIT
-  2, &_PySetDummy_Type
-};
 

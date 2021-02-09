@@ -182,7 +182,7 @@ _codecs_escape_decode_impl(PyObject *module, Py_buffer *data,
                            const char *errors)
 /*[clinic end generated code: output=505200ba8056979a input=77298a561c90bd82]*/
 {
-    PyObject *decoded = PyBytes_DecodeEscape(data->buf, data->len,
+    PyObject *decoded = PyBytes_DecodeEscape((const char*)data->buf, data->len,
                                              errors, 0, NULL);
     return codec_tuple(decoded, data->len);
 }
@@ -265,7 +265,7 @@ _codecs_utf_7_decode_impl(PyObject *module, Py_buffer *data,
 /*[clinic end generated code: output=0cd3a944a32a4089 input=22c395d357815d26]*/
 {
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF7Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF7Stateful((const char*)data->buf, data->len,
                                                      errors,
                                                      final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -285,7 +285,7 @@ _codecs_utf_8_decode_impl(PyObject *module, Py_buffer *data,
 /*[clinic end generated code: output=10f74dec8d9bb8bf input=f611b3867352ba59]*/
 {
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF8Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF8Stateful((const char*)data->buf, data->len,
                                                      errors,
                                                      final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -307,7 +307,7 @@ _codecs_utf_16_decode_impl(PyObject *module, Py_buffer *data,
     int byteorder = 0;
     /* This is overwritten unless final is true. */
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF16Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF16Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -329,7 +329,7 @@ _codecs_utf_16_le_decode_impl(PyObject *module, Py_buffer *data,
     int byteorder = -1;
     /* This is overwritten unless final is true. */
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF16Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF16Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -351,7 +351,7 @@ _codecs_utf_16_be_decode_impl(PyObject *module, Py_buffer *data,
     int byteorder = 1;
     /* This is overwritten unless final is true. */
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF16Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF16Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -381,7 +381,7 @@ _codecs_utf_16_ex_decode_impl(PyObject *module, Py_buffer *data,
     /* This is overwritten unless final is true. */
     Py_ssize_t consumed = data->len;
 
-    PyObject *decoded = PyUnicode_DecodeUTF16Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF16Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     if (decoded == NULL)
@@ -405,7 +405,7 @@ _codecs_utf_32_decode_impl(PyObject *module, Py_buffer *data,
     int byteorder = 0;
     /* This is overwritten unless final is true. */
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF32Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF32Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -427,7 +427,7 @@ _codecs_utf_32_le_decode_impl(PyObject *module, Py_buffer *data,
     int byteorder = -1;
     /* This is overwritten unless final is true. */
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF32Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF32Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -449,7 +449,7 @@ _codecs_utf_32_be_decode_impl(PyObject *module, Py_buffer *data,
     int byteorder = 1;
     /* This is overwritten unless final is true. */
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF32Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF32Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     return codec_tuple(decoded, consumed);
@@ -477,7 +477,7 @@ _codecs_utf_32_ex_decode_impl(PyObject *module, Py_buffer *data,
 /*[clinic end generated code: output=6bfb177dceaf4848 input=e46a73bc859d0bd0]*/
 {
     Py_ssize_t consumed = data->len;
-    PyObject *decoded = PyUnicode_DecodeUTF32Stateful(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUTF32Stateful((const char*)data->buf, data->len,
                                                       errors, &byteorder,
                                                       final ? NULL : &consumed);
     if (decoded == NULL)
@@ -497,7 +497,7 @@ _codecs_unicode_escape_decode_impl(PyObject *module, Py_buffer *data,
                                    const char *errors)
 /*[clinic end generated code: output=3ca3c917176b82ab input=8328081a3a569bd6]*/
 {
-    PyObject *decoded = PyUnicode_DecodeUnicodeEscape(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeUnicodeEscape((const char*)data->buf, data->len,
                                                       errors);
     return codec_tuple(decoded, data->len);
 }
@@ -514,7 +514,7 @@ _codecs_raw_unicode_escape_decode_impl(PyObject *module, Py_buffer *data,
                                        const char *errors)
 /*[clinic end generated code: output=c98eeb56028070a6 input=d2f5159ce3b3392f]*/
 {
-    PyObject *decoded = PyUnicode_DecodeRawUnicodeEscape(data->buf, data->len,
+    PyObject *decoded = PyUnicode_DecodeRawUnicodeEscape((const char*)data->buf, data->len,
                                                          errors);
     return codec_tuple(decoded, data->len);
 }
@@ -531,7 +531,7 @@ _codecs_latin_1_decode_impl(PyObject *module, Py_buffer *data,
                             const char *errors)
 /*[clinic end generated code: output=07f3dfa3f72c7d8f input=76ca58fd6dcd08c7]*/
 {
-    PyObject *decoded = PyUnicode_DecodeLatin1(data->buf, data->len, errors);
+    PyObject *decoded = PyUnicode_DecodeLatin1((const char*)data->buf, data->len, errors);
     return codec_tuple(decoded, data->len);
 }
 
@@ -547,7 +547,7 @@ _codecs_ascii_decode_impl(PyObject *module, Py_buffer *data,
                           const char *errors)
 /*[clinic end generated code: output=2627d72058d42429 input=e428a267a04b4481]*/
 {
-    PyObject *decoded = PyUnicode_DecodeASCII(data->buf, data->len, errors);
+    PyObject *decoded = PyUnicode_DecodeASCII((const char*)data->buf, data->len, errors);
     return codec_tuple(decoded, data->len);
 }
 
@@ -569,7 +569,7 @@ _codecs_charmap_decode_impl(PyObject *module, Py_buffer *data,
     if (mapping == Py_None)
         mapping = NULL;
 
-    decoded = PyUnicode_DecodeCharmap(data->buf, data->len, mapping, errors);
+    decoded = PyUnicode_DecodeCharmap((const char*)data->buf, data->len, mapping, errors);
     return codec_tuple(decoded, data->len);
 }
 
@@ -651,7 +651,7 @@ _codecs_readbuffer_encode_impl(PyObject *module, Py_buffer *data,
                                const char *errors)
 /*[clinic end generated code: output=c645ea7cdb3d6e86 input=aa10cfdf252455c5]*/
 {
-    PyObject *result = PyBytes_FromStringAndSize(data->buf, data->len);
+    PyObject *result = PyBytes_FromStringAndSize((const char*)data->buf, data->len);
     return codec_tuple(result, data->len);
 }
 

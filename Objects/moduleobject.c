@@ -292,7 +292,7 @@ PyModule_FromDefAndSpec2(struct PyModuleDef* def, PyObject *spec, int module_api
                     name);
                 goto error;
             }
-            create = cur_slot->value;
+            create = (PyObject* (*)(PyObject*, PyModuleDef*))cur_slot->value;
         } else if (cur_slot->slot < 0 || cur_slot->slot > _Py_mod_LAST_SLOT) {
             PyErr_Format(
                 PyExc_SystemError,

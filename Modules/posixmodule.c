@@ -590,6 +590,7 @@ PyOS_AfterFork_Child(void)
     _PyRuntimeState *runtime = &_PyRuntime;
 
     status = _PyGILState_Reinit(runtime);
+    {
     if (_PyStatus_EXCEPTION(status)) {
         goto fatal_error;
     }
@@ -622,7 +623,7 @@ PyOS_AfterFork_Child(void)
 
     run_at_forkers(tstate->interp->after_forkers_child, 0);
     return;
-
+    }
 fatal_error:
     Py_ExitStatusException(status);
 }
@@ -3790,7 +3791,7 @@ posix_getcwd(int use_bytes)
         char *newbuf;
         if (buflen <= PY_SSIZE_T_MAX - chunk) {
             buflen += chunk;
-            newbuf = PyMem_RawRealloc(buf, buflen);
+            newbuf = (char*)PyMem_RawRealloc(buf, buflen);
         }
         else {
             newbuf = NULL;
@@ -5505,7 +5506,7 @@ fsconvert_strdup(PyObject *o, EXECV_CHAR **out)
     if (!PyUnicode_FSConverter(o, &ub))
         return 0;
     size = PyBytes_GET_SIZE(ub);
-    *out = PyMem_Malloc(size + 1);
+    *out = (char*)PyMem_Malloc(size + 1);
     if (*out) {
         memcpy(*out, PyBytes_AS_STRING(ub), size + 1);
         result = 1;
@@ -6762,8 +6763,8 @@ os_sched_param_impl(PyTypeObject *type, PyObject *sched_priority)
     PyStructSequence_SET_ITEM(res, 0, sched_priority);
     return res;
 }
-
-PyDoc_VAR(os_sched_param__doc__);
+static const char os_sched_param__doc__tmp[]={}; 
+//PyDoc_VAR(os_sched_param__doc__);
 
 static PyStructSequence_Field sched_param_fields[] = {
     {"sched_priority", "the scheduling priority"},
@@ -6772,7 +6773,7 @@ static PyStructSequence_Field sched_param_fields[] = {
 
 static PyStructSequence_Desc sched_param_desc = {
     "sched_param", /* name */
-    os_sched_param__doc__, /* doc */
+    os_sched_param__doc__tmp, /* doc */
     sched_param_fields,
     1
 };
@@ -11738,7 +11739,7 @@ os_confstr_impl(PyObject *module, int name)
 
     if (len >= sizeof(buffer)) {
         size_t len2;
-        char *buf = PyMem_Malloc(len);
+        char *buf = (char*)PyMem_Malloc(len);
         if (buf == NULL)
             return PyErr_NoMemory();
         len2 = confstr(name, buf, len);
@@ -12822,7 +12823,7 @@ os_listxattr_impl(PyObject *module, path_t *path, int follow_symlinks)
             path_error(path);
             break;
         }
-        buffer = PyMem_Malloc(buffer_size);
+        buffer = (char*)PyMem_Malloc(buffer_size);
         if (!buffer) {
             PyErr_NoMemory();
             break;
@@ -13346,7 +13347,7 @@ DirEntry_dealloc(DirEntry *entry)
     Py_XDECREF(entry->path);
     Py_XDECREF(entry->stat);
     Py_XDECREF(entry->lstat);
-    freefunc free_func = PyType_GetSlot(tp, Py_tp_free);
+    freefunc free_func = (freefunc)PyType_GetSlot(tp, Py_tp_free);
     free_func(entry);
     Py_DECREF(tp);
 }
@@ -13696,9 +13697,9 @@ static PyMethodDef DirEntry_methods[] = {
 };
 
 static PyType_Slot DirEntryType_slots[] = {
-    {Py_tp_new, _disabled_new},
-    {Py_tp_dealloc, DirEntry_dealloc},
-    {Py_tp_repr, DirEntry_repr},
+    {Py_tp_new, (void*)_disabled_new},
+    {Py_tp_dealloc, (void*)DirEntry_dealloc},
+    {Py_tp_repr, (void*)DirEntry_repr},
     {Py_tp_methods, DirEntry_methods},
     {Py_tp_members, DirEntry_members},
     {0, 0},
@@ -14115,7 +14116,7 @@ ScandirIterator_dealloc(ScandirIterator *iterator)
     if (PyObject_CallFinalizerFromDealloc((PyObject *)iterator) < 0)
         return;
 
-    freefunc free_func = PyType_GetSlot(tp, Py_tp_free);
+    freefunc free_func = (freefunc)PyType_GetSlot(tp, Py_tp_free);
     free_func(iterator);
     Py_DECREF(tp);
 }
@@ -14128,11 +14129,11 @@ static PyMethodDef ScandirIterator_methods[] = {
 };
 
 static PyType_Slot ScandirIteratorType_slots[] = {
-    {Py_tp_new, _disabled_new},
-    {Py_tp_dealloc, ScandirIterator_dealloc},
-    {Py_tp_finalize, ScandirIterator_finalize},
-    {Py_tp_iter, PyObject_SelfIter},
-    {Py_tp_iternext, ScandirIterator_iternext},
+    {Py_tp_new, (void*)_disabled_new},
+    {Py_tp_dealloc, (void*)ScandirIterator_dealloc},
+    {Py_tp_finalize, (void*)ScandirIterator_finalize},
+    {Py_tp_iter, (void*)PyObject_SelfIter},
+    {Py_tp_iternext, (void*)ScandirIterator_iternext},
     {Py_tp_methods, ScandirIterator_methods},
     {0, 0},
 };
@@ -15707,7 +15708,7 @@ posixmodule_exec(PyObject *m)
 
 
 static PyModuleDef_Slot posixmodile_slots[] = {
-    {Py_mod_exec, posixmodule_exec},
+    {Py_mod_exec, (void*)posixmodule_exec},
     {0, NULL}
 };
 

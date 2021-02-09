@@ -229,6 +229,7 @@ pymain_run_command(wchar_t *command)
     int ret;
 
     unicode = PyUnicode_FromWideChar(command, -1);
+    {
     if (unicode == NULL) {
         goto error;
     }
@@ -248,7 +249,7 @@ pymain_run_command(wchar_t *command)
     ret = PyRun_SimpleStringFlags(PyBytes_AsString(bytes), &cf);
     Py_DECREF(bytes);
     return (ret != 0);
-
+    }
 error:
     PySys_WriteStderr("Unable to decode the command from the command line:\n");
     return pymain_exit_err_print();
@@ -385,6 +386,7 @@ pymain_run_startup(PyConfig *config, int *exitcode)
         return 0;
     }
     PyObject *startup = NULL;
+    {{
 #ifdef MS_WINDOWS
     const wchar_t *env = _wgetenv(L"PYTHONSTARTUP");
     if (env == NULL || env[0] == L'\0') {
@@ -424,11 +426,11 @@ pymain_run_startup(PyConfig *config, int *exitcode)
     PyErr_Clear();
     fclose(fp);
     ret = 0;
-
+    }
 done:
     Py_XDECREF(startup);
     return ret;
-
+    }
 error:
     ret = pymain_err_print(exitcode);
     goto done;

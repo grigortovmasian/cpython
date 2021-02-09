@@ -452,7 +452,7 @@ PyDoc_STRVAR(bytes_replace__doc__,
     {"replace", (PyCFunction)(void(*)(void))bytes_replace, METH_FASTCALL, bytes_replace__doc__},
 
 static PyObject *
-bytes_replace_impl(PyBytesObject *self, Py_buffer *old, Py_buffer *new,
+bytes_replace_impl(PyBytesObject *self, Py_buffer *old, Py_buffer *nw,
                    Py_ssize_t count);
 
 static PyObject *
@@ -460,7 +460,7 @@ bytes_replace(PyBytesObject *self, PyObject *const *args, Py_ssize_t nargs)
 {
     PyObject *return_value = NULL;
     Py_buffer old = {NULL, NULL};
-    Py_buffer new = {NULL, NULL};
+    Py_buffer nw = {NULL, NULL};
     Py_ssize_t count = -1;
 
     if (!_PyArg_CheckPositional("replace", nargs, 2, 3)) {
@@ -473,10 +473,10 @@ bytes_replace(PyBytesObject *self, PyObject *const *args, Py_ssize_t nargs)
         _PyArg_BadArgument("replace", "argument 1", "contiguous buffer", args[0]);
         goto exit;
     }
-    if (PyObject_GetBuffer(args[1], &new, PyBUF_SIMPLE) != 0) {
+    if (PyObject_GetBuffer(args[1], &nw, PyBUF_SIMPLE) != 0) {
         goto exit;
     }
-    if (!PyBuffer_IsContiguous(&new, 'C')) {
+    if (!PyBuffer_IsContiguous(&nw, 'C')) {
         _PyArg_BadArgument("replace", "argument 2", "contiguous buffer", args[1]);
         goto exit;
     }
@@ -496,7 +496,7 @@ bytes_replace(PyBytesObject *self, PyObject *const *args, Py_ssize_t nargs)
         count = ival;
     }
 skip_optional:
-    return_value = bytes_replace_impl(self, &old, &new, count);
+    return_value = bytes_replace_impl(self, &old, &nw, count);
 
 exit:
     /* Cleanup for old */
@@ -504,8 +504,8 @@ exit:
        PyBuffer_Release(&old);
     }
     /* Cleanup for new */
-    if (new.obj) {
-       PyBuffer_Release(&new);
+    if (nw.obj) {
+       PyBuffer_Release(&nw);
     }
 
     return return_value;

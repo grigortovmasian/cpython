@@ -264,7 +264,7 @@ joinpath(wchar_t *path, const wchar_t *path2, size_t path_len)
 static wchar_t*
 substring(const wchar_t *str, size_t len)
 {
-    wchar_t *substr = PyMem_RawMalloc((len + 1) * sizeof(wchar_t));
+    wchar_t *substr = (wchar_t*)PyMem_RawMalloc((len + 1) * sizeof(wchar_t));
     if (substr == NULL) {
         return NULL;
     }
@@ -289,7 +289,7 @@ joinpath2(const wchar_t *path, const wchar_t *path2)
     len += add_sep;
     len += wcslen(path2);
 
-    wchar_t *new_path = PyMem_RawMalloc((len + 1) * sizeof(wchar_t));
+    wchar_t *new_path = (wchar_t*)PyMem_RawMalloc((len + 1) * sizeof(wchar_t));
     if (new_path == NULL) {
         return NULL;
     }
@@ -386,7 +386,7 @@ ismodule(const wchar_t *path, int *result)
 
     /* Check for the compiled version of prefix. */
     size_t len = wcslen(filename);
-    wchar_t *pyc = PyMem_RawMalloc((len + 2) * sizeof(wchar_t));
+    wchar_t *pyc = (wchar_t*)PyMem_RawMalloc((len + 2) * sizeof(wchar_t));
     if (pyc == NULL) {
         PyMem_RawFree(filename);
         return _PyStatus_NO_MEMORY();
@@ -882,7 +882,7 @@ calculate_which(const wchar_t *path_env, wchar_t *program_name,
                 wchar_t **abs_path_p)
 {
     while (1) {
-        wchar_t *delim = wcschr(path_env, DELIM);
+        wchar_t *delim = (wchar_t*)wcschr(path_env, DELIM);
         wchar_t *abs_path;
 
         if (delim) {
@@ -1365,7 +1365,7 @@ calculate_module_search_path(PyCalculatePath *calculate,
     bufsz += wcslen(calculate->exec_prefix) + 1;
 
     /* Allocate the buffer */
-    wchar_t *buf = PyMem_RawMalloc(bufsz * sizeof(wchar_t));
+    wchar_t *buf = (wchar_t*)PyMem_RawMalloc(bufsz * sizeof(wchar_t));
     if (buf == NULL) {
         return _PyStatus_NO_MEMORY();
     }

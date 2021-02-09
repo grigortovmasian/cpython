@@ -334,7 +334,7 @@ enum PyUnicode_Kind {
 #define PyUnicode_KIND(op) \
     (assert(PyUnicode_Check(op)), \
      assert(PyUnicode_IS_READY(op)),            \
-     ((PyASCIIObject *)(op))->state.kind)
+     ((PyUnicode_Kind)((PyASCIIObject *)(op))->state.kind))
 
 /* Return a void pointer to the raw unicode buffer. */
 #define _PyUnicode_COMPACT_DATA(op)                     \

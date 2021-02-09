@@ -597,7 +597,7 @@ new_keys_object(Py_ssize_t size)
     }
     else
     {
-        dk = PyObject_Malloc(sizeof(PyDictKeysObject)
+        dk = (PyDictKeysObject*)PyObject_Malloc(sizeof(PyDictKeysObject)
                              + es * size
                              + sizeof(PyDictKeyEntry) * usable);
         if (dk == NULL) {
@@ -706,7 +706,7 @@ clone_combined_dict_keys(PyDictObject *orig)
     assert(orig->ma_keys->dk_refcnt == 1);
 
     Py_ssize_t keys_size = _PyDict_KeysSize(orig->ma_keys);
-    PyDictKeysObject *keys = PyObject_Malloc(keys_size);
+    PyDictKeysObject *keys = (PyDictKeysObject*)PyObject_Malloc(keys_size);
     if (keys == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -1070,6 +1070,7 @@ Returns -1 if an error occurred, or 0 on success.
 static int
 insertdict(PyDictObject *mp, PyObject *key, Py_hash_t hash, PyObject *value)
 {
+    {
     PyObject *old_value;
     PyDictKeyEntry *ep;
 
@@ -1146,7 +1147,7 @@ insertdict(PyDictObject *mp, PyObject *key, Py_hash_t hash, PyObject *value)
     ASSERT_CONSISTENT(mp);
     Py_DECREF(key);
     return 0;
-
+    }
 Fail:
     Py_DECREF(value);
     Py_DECREF(key);
@@ -2839,21 +2840,21 @@ PyDict_Copy(PyObject *o)
         if (keys == NULL) {
             return NULL;
         }
-        PyDictObject *new = (PyDictObject *)new_dict(keys, NULL);
-        if (new == NULL) {
+        PyDictObject *nw = (PyDictObject *)new_dict(keys, NULL);
+        if (nw == NULL) {
             /* In case of an error, `new_dict()` takes care of
                cleaning up `keys`. */
             return NULL;
         }
 
-        new->ma_used = mp->ma_used;
-        ASSERT_CONSISTENT(new);
+        nw->ma_used = mp->ma_used;
+        ASSERT_CONSISTENT(nw);
         if (_PyObject_GC_IS_TRACKED(mp)) {
             /* Maintain tracking. */
-            _PyObject_GC_TRACK(new);
+            _PyObject_GC_TRACK(nw);
         }
 
-        return (PyObject *)new;
+        return (PyObject *)nw;
     }
 
     copy = PyDict_New();
@@ -3332,15 +3333,15 @@ dict_or(PyObject *self, PyObject *other)
     if (!PyDict_Check(self) || !PyDict_Check(other)) {
         Py_RETURN_NOTIMPLEMENTED;
     }
-    PyObject *new = PyDict_Copy(self);
-    if (new == NULL) {
+    PyObject *nw = PyDict_Copy(self);
+    if (nw == NULL) {
         return NULL;
     }
-    if (dict_update_arg(new, other)) {
-        Py_DECREF(new);
+    if (dict_update_arg(nw, other)) {
+        Py_DECREF(nw);
         return NULL;
     }
-    return new;
+    return nw;
 }
 
 static PyObject *
@@ -4581,7 +4582,7 @@ dictitems_xor(PyObject *self, PyObject *other)
     PyObject *key = NULL, *val1 = NULL, *val2 = NULL;
     Py_ssize_t pos = 0;
     Py_hash_t hash;
-
+    {
     while (_PyDict_Next(d2, &pos, &key, &val2, &hash)) {
         Py_INCREF(key);
         Py_INCREF(val2);
@@ -4637,7 +4638,7 @@ dictitems_xor(PyObject *self, PyObject *other)
     Py_DECREF(temp_dict);
     Py_DECREF(remaining_pairs);
     return result_set;
-
+    }
 error:
     Py_XDECREF(temp_dict);
     Py_XDECREF(result_set);
