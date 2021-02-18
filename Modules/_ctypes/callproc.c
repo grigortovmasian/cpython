@@ -634,7 +634,7 @@ union result {
 };
 
 struct argument {
-    ffi_type *ffi_type;
+    ffi_type *ffi_typ;
     PyObject *keep;
     union result value;
 };
@@ -655,7 +655,7 @@ static int ConvParam(PyObject *obj, Py_ssize_t index, struct argument *pa)
         carg = dict->paramfunc((CDataObject *)obj);
         if (carg == NULL)
             return -1;
-        pa->ffi_type = carg->pffi_type;
+        pa->ffi_typ = carg->pffi_type;
         memcpy(&pa->value, &carg->value, sizeof(pa->value));
         pa->keep = (PyObject *)carg;
         return 0;
@@ -663,7 +663,7 @@ static int ConvParam(PyObject *obj, Py_ssize_t index, struct argument *pa)
 
     if (PyCArg_CheckExact(obj)) {
         PyCArgObject *carg = (PyCArgObject *)obj;
-        pa->ffi_type = carg->pffi_type;
+        pa->ffi_typ = carg->pffi_type;
         Py_INCREF(obj);
         pa->keep = obj;
         memcpy(&pa->value, &carg->value, sizeof(pa->value));
@@ -672,13 +672,13 @@ static int ConvParam(PyObject *obj, Py_ssize_t index, struct argument *pa)
 
     /* check for None, integer, string or unicode and use directly if successful */
     if (obj == Py_None) {
-        pa->ffi_type = &ffi_type_pointer;
+        pa->ffi_typ = &ffi_type_pointer;
         pa->value.p = NULL;
         return 0;
     }
 
     if (PyLong_Check(obj)) {
-        pa->ffi_type = &ffi_type_sint;
+        pa->ffi_typ = &ffi_type_sint;
         pa->value.i = (long)PyLong_AsUnsignedLong(obj);
         if (pa->value.i == -1 && PyErr_Occurred()) {
             PyErr_Clear();
@@ -693,7 +693,7 @@ static int ConvParam(PyObject *obj, Py_ssize_t index, struct argument *pa)
     }
 
     if (PyBytes_Check(obj)) {
-        pa->ffi_type = &ffi_type_pointer;
+        pa->ffi_typ = &ffi_type_pointer;
         pa->value.p = PyBytes_AsString(obj);
         Py_INCREF(obj);
         pa->keep = obj;
@@ -701,7 +701,7 @@ static int ConvParam(PyObject *obj, Py_ssize_t index, struct argument *pa)
     }
 
     if (PyUnicode_Check(obj)) {
-        pa->ffi_type = &ffi_type_pointer;
+        pa->ffi_typ = &ffi_type_pointer;
         pa->value.p = PyUnicode_AsWideCharString(obj, NULL);
         if (pa->value.p == NULL)
             return -1;
@@ -856,7 +856,7 @@ static int _call_function_pointer(int flags,
     if (is_variadic) {
         if (HAVE_FFI_PREP_CIF_VAR_RUNTIME) {
             if (FFI_OK != ffi_prep_cif_var(&cif,
-                                        cc,
+                                        (ffi_abi)cc,
                                         argtypecount,
                                         argcount,
                                         restype,
@@ -867,7 +867,7 @@ static int _call_function_pointer(int flags,
             }
         } else {
             if (FFI_OK != ffi_prep_cif(&cif,
-                                       cc,
+                                       (ffi_abi)cc,
                                        argcount,
                                        restype,
                                        atypes)) {
@@ -881,7 +881,7 @@ static int _call_function_pointer(int flags,
 
     {
         if (FFI_OK != ffi_prep_cif(&cif,
-                                   cc,
+                                   (ffi_abi)cc,
                                    argcount,
                                    restype,
                                    atypes)) {
@@ -913,7 +913,7 @@ static int _call_function_pointer(int flags,
     __try {
 #endif
 #endif
-                ffi_call(&cif, (void *)pProc, resmem, avalues);
+                ffi_call(&cif, pProc, resmem, avalues);
 #ifdef MS_WIN32
 #ifndef DONT_USE_SEH
     }
@@ -985,7 +985,7 @@ static PyObject *GetResult(PyObject *restype, void *result, PyObject *checker)
             Py_DECREF(retval);
         }
     } else
-        retval = PyCData_FromBaseObj(restype, NULL, 0, result);
+        retval = PyCData_FromBaseObj(restype, NULL, 0, (char*)result);
 
     if (!checker || !retval)
         return retval;
@@ -1177,7 +1177,7 @@ PyObject *_ctypes_callproc(PPROC pProc,
     argtype_count = argtypes ? PyTuple_GET_SIZE(argtypes) : 0;
 #ifdef MS_WIN32
     if (pIunk) {
-        args[0].ffi_type = &ffi_type_pointer;
+        args[0].ffi_typ = &ffi_type_pointer;
         args[0].value.p = pIunk;
         pa = &args[1];
     } else
@@ -1810,13 +1810,13 @@ resize(PyObject *self, PyObject *args)
         if (ptr == NULL)
             return PyErr_NoMemory();
         memmove(ptr, obj->b_ptr, obj->b_size);
-        obj->b_ptr = ptr;
+        obj->b_ptr = (char*)ptr;
         obj->b_size = size;
     } else {
         void * ptr = PyMem_Realloc(obj->b_ptr, size);
         if (ptr == NULL)
             return PyErr_NoMemory();
-        obj->b_ptr = ptr;
+        obj->b_ptr = (char*)ptr;
         obj->b_size = size;
     }
   done:
@@ -1875,7 +1875,7 @@ POINTER(PyObject *self, PyObject *cls)
         const char *name = PyUnicode_AsUTF8(cls);
         if (name == NULL)
             return NULL;
-        buf = PyMem_Malloc(strlen(name) + 3 + 1);
+        buf = (char*)PyMem_Malloc(strlen(name) + 3 + 1);
         if (buf == NULL)
             return PyErr_NoMemory();
         sprintf(buf, "LP_%s", name);
@@ -1893,7 +1893,7 @@ POINTER(PyObject *self, PyObject *cls)
         }
     } else if (PyType_Check(cls)) {
         typ = (PyTypeObject *)cls;
-        buf = PyMem_Malloc(strlen(typ->tp_name) + 3 + 1);
+        buf = (char*)PyMem_Malloc(strlen(typ->tp_name) + 3 + 1);
         if (buf == NULL)
             return PyErr_NoMemory();
         sprintf(buf, "LP_%s", typ->tp_name);

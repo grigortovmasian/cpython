@@ -577,7 +577,7 @@ mpd_minalloc(mpd_t *result)
 
     if (!mpd_isstatic_data(result) && result->alloc > MPD_MINALLOC) {
         uint8_t err = 0;
-        result->data = mpd_realloc(result->data, MPD_MINALLOC,
+        result->data = (mpd_uint_t*)mpd_realloc(result->data, MPD_MINALLOC,
                                    sizeof *result->data, &err);
         if (!err) {
             result->alloc = MPD_MINALLOC;
@@ -5537,12 +5537,12 @@ _mpd_kmul(const mpd_uint_t *u, const mpd_uint_t *v,
     assert(ulen >= vlen);
 
     *rsize = _kmul_resultsize(ulen, vlen);
-    if ((result = mpd_calloc(*rsize, sizeof *result)) == NULL) {
+    if ((result = (mpd_uint_t*)mpd_calloc(*rsize, sizeof *result)) == NULL) {
         return NULL;
     }
 
     m = _kmul_worksize(ulen, MPD_KARATSUBA_BASECASE);
-    if (m && ((w = mpd_calloc(m, sizeof *w)) == NULL)) {
+    if (m && ((w = (mpd_uint_t*	)mpd_calloc(m, sizeof *w)) == NULL)) {
         mpd_free(result);
         return NULL;
     }
@@ -5666,13 +5666,13 @@ _mpd_fntmul(const mpd_uint_t *u, const mpd_uint_t *v,
         goto malloc_error;
     }
 
-    if ((c1 = mpd_calloc(n, sizeof *c1)) == NULL) {
+    if ((c1 = (mpd_uint_t*)mpd_calloc(n, sizeof *c1)) == NULL) {
         goto malloc_error;
     }
-    if ((c2 = mpd_calloc(n, sizeof *c2)) == NULL) {
+    if ((c2 = (mpd_uint_t*)mpd_calloc(n, sizeof *c2)) == NULL) {
         goto malloc_error;
     }
-    if ((c3 = mpd_calloc(n, sizeof *c3)) == NULL) {
+    if ((c3 = (mpd_uint_t*)mpd_calloc(n, sizeof *c3)) == NULL) {
         goto malloc_error;
     }
 
@@ -5688,7 +5688,7 @@ _mpd_fntmul(const mpd_uint_t *u, const mpd_uint_t *v,
         }
     }
     else {
-        if ((vtmp = mpd_calloc(n, sizeof *vtmp)) == NULL) {
+        if ((vtmp = (mpd_uint_t*)mpd_calloc(n, sizeof *vtmp)) == NULL) {
             goto malloc_error;
         }
 
@@ -5846,12 +5846,12 @@ _mpd_kmul_fnt(const mpd_uint_t *u, const mpd_uint_t *v,
     assert(ulen >= vlen);
 
     *rsize = _kmul_resultsize(ulen, vlen);
-    if ((result = mpd_calloc(*rsize, sizeof *result)) == NULL) {
+    if ((result = (mpd_uint_t*)mpd_calloc(*rsize, sizeof *result)) == NULL) {
         return NULL;
     }
 
     m = _kmul_worksize(ulen, 3*(MPD_MAXTRANSFORM_2N/2));
-    if (m && ((w = mpd_calloc(m, sizeof *w)) == NULL)) {
+    if (m && ((w = (mpd_uint_t*)mpd_calloc(m, sizeof *w)) == NULL)) {
         mpd_free(result); /* GCOV_UNLIKELY */
         return NULL; /* GCOV_UNLIKELY */
     }
@@ -5945,7 +5945,7 @@ _mpd_qmul(mpd_t *result, const mpd_t *a, const mpd_t *b,
 
 
     if (small->len <= 256) {
-        rdata = mpd_calloc(rsize, sizeof *rdata);
+        rdata = (mpd_uint_t*)mpd_calloc(rsize, sizeof *rdata);
         if (rdata != NULL) {
             if (small->len == 1) {
                 _mpd_shortmul(rdata, big->data, big->len, small->data[0]);
@@ -8136,7 +8136,7 @@ static uint8_t
 mpd_resize_u16(uint16_t **w, size_t nmemb)
 {
     uint8_t err = 0;
-    *w = mpd_realloc(*w, nmemb, sizeof **w, &err);
+    *w = (uint16_t*)mpd_realloc(*w, nmemb, sizeof **w, &err);
     return !err;
 }
 
@@ -8144,7 +8144,7 @@ static uint8_t
 mpd_resize_u32(uint32_t **w, size_t nmemb)
 {
     uint8_t err = 0;
-    *w = mpd_realloc(*w, nmemb, sizeof **w, &err);
+    *w = (uint32_t*)mpd_realloc(*w, nmemb, sizeof **w, &err);
     return !err;
 }
 
@@ -8394,7 +8394,7 @@ mpd_qexport_u16(uint16_t **rdata, size_t rlen, uint32_t rbase,
             *status |= MPD_Invalid_operation;
             return SIZE_MAX;
         }
-        *rdata = mpd_alloc(rlen, sizeof **rdata);
+        *rdata = (uint16_t*)mpd_alloc(rlen, sizeof **rdata);
         if (*rdata == NULL) {
             goto malloc_error;
         }
@@ -8471,7 +8471,7 @@ mpd_qexport_u32(uint32_t **rdata, size_t rlen, uint32_t rbase,
             *status |= MPD_Invalid_operation;
             return SIZE_MAX;
         }
-        *rdata = mpd_alloc(rlen, sizeof **rdata);
+        *rdata = (uint32_t*)mpd_alloc(rlen, sizeof **rdata);
         if (*rdata == NULL) {
             goto malloc_error;
         }
@@ -8554,7 +8554,7 @@ mpd_qimport_u16(mpd_t *result,
         return;
     }
 
-    usrc = mpd_alloc((mpd_size_t)srclen, sizeof *usrc);
+    usrc = (mpd_uint_t*)mpd_alloc((mpd_size_t)srclen, sizeof *usrc);
     if (usrc == NULL) {
         mpd_seterror(result, MPD_Malloc_error, status);
         return;
@@ -8774,10 +8774,10 @@ mpd_from_uint128_triple(mpd_t *result, const mpd_uint128_triple_t *triple, uint3
      .prec=MPD_MAX_PREC,
      .emax=MPD_MAX_EMAX,
      .emin=MPD_MIN_EMIN,
-     .round=MPD_ROUND_HALF_EVEN,
      .traps=MPD_Traps,
      .status=0,
      .newtrap=0,
+     .round=MPD_ROUND_HALF_EVEN,
      .clamp=0,
      .allcr=1,
     };

@@ -473,7 +473,7 @@ SHA512Type_copy_impl(SHAobject *self, PyTypeObject *cls)
 /*[clinic end generated code: output=85ea5b47837a08e6 input=f673a18f66527c90]*/
 {
     SHAobject *newobj;
-    SHA512State *st = PyType_GetModuleState(cls);
+    SHA512State *st = (SHA512State*)PyType_GetModuleState(cls);
 
     if (Py_IS_TYPE((PyObject*)self, st->sha512_type)) {
         if ( (newobj = newSHA512object(st))==NULL) {
@@ -545,7 +545,7 @@ SHA512Type_update(SHAobject *self, PyObject *obj)
 
     GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
 
-    sha512_update(self, buf.buf, buf.len);
+    sha512_update(self, (SHA_BYTE*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     Py_RETURN_NONE;
@@ -592,7 +592,7 @@ static PyMemberDef SHA_members[] = {
 };
 
 static PyType_Slot sha512_sha384_type_slots[] = {
-    {Py_tp_dealloc, SHA512_dealloc},
+    {Py_tp_dealloc, (void*)SHA512_dealloc},
     {Py_tp_methods, SHA_methods},
     {Py_tp_members, SHA_members},
     {Py_tp_getset, SHA_getseters},
@@ -607,7 +607,7 @@ static PyType_Spec sha512_sha384_type_spec = {
 };
 
 static PyType_Slot sha512_sha512_type_slots[] = {
-    {Py_tp_dealloc, SHA512_dealloc},
+    {Py_tp_dealloc, (void*)SHA512_dealloc},
     {Py_tp_methods, SHA_methods},
     {Py_tp_members, SHA_members},
     {Py_tp_getset, SHA_getseters},
@@ -639,7 +639,7 @@ static PyObject *
 _sha512_sha512_impl(PyObject *module, PyObject *string, int usedforsecurity)
 /*[clinic end generated code: output=a8d9e5f9e6a0831c input=23b4daebc2ebb9c9]*/
 {
-    SHAobject *new;
+    SHAobject *nw;
     Py_buffer buf;
 
     SHA512State *st = sha512_get_state(module);
@@ -647,26 +647,26 @@ _sha512_sha512_impl(PyObject *module, PyObject *string, int usedforsecurity)
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
-    if ((new = newSHA512object(st)) == NULL) {
+    if ((nw = newSHA512object(st)) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    sha512_init(new);
+    sha512_init(nw);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        sha512_update(new, buf.buf, buf.len);
+        sha512_update(nw, (SHA_BYTE*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 /*[clinic input]
@@ -683,7 +683,7 @@ static PyObject *
 _sha512_sha384_impl(PyObject *module, PyObject *string, int usedforsecurity)
 /*[clinic end generated code: output=da7d594a08027ac3 input=59ef72f039a6b431]*/
 {
-    SHAobject *new;
+    SHAobject *nw;
     Py_buffer buf;
 
     SHA512State *st = sha512_get_state(module);
@@ -691,26 +691,26 @@ _sha512_sha384_impl(PyObject *module, PyObject *string, int usedforsecurity)
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
-    if ((new = newSHA384object(st)) == NULL) {
+    if ((nw = newSHA384object(st)) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    sha384_init(new);
+    sha384_init(nw);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        sha512_update(new, buf.buf, buf.len);
+        sha512_update(nw, (SHA_BYTE*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 
@@ -779,7 +779,7 @@ _sha512_exec(PyObject *m)
 }
 
 static PyModuleDef_Slot _sha512_slots[] = {
-    {Py_mod_exec, _sha512_exec},
+    {Py_mod_exec, (void*) _sha512_exec},
     {0, NULL}
 };
 

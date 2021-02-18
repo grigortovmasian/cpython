@@ -86,7 +86,15 @@ _Py_device_encoding(int fd)
 
 #define USE_FORCE_ASCII
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int _Py_normalize_encoding(const char *, char *, size_t);
+
+#ifdef __cplusplus
+}
+#endif
 
 /* Workaround FreeBSD and OpenIndiana locale encoding issue with the C locale
    and POSIX locale. nl_langinfo(CODESET) announces an alias of the

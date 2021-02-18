@@ -10,11 +10,13 @@ typedef struct {
 static simplequeue_state *
 simplequeue_get_state(PyObject *module)
 {
-    simplequeue_state *state = PyModule_GetState(module);
+    simplequeue_state *state = (simplequeue_state*)PyModule_GetState(module);
     assert(state);
     return state;
 }
-static struct PyModuleDef queuemodule;
+namespace {
+extern struct PyModuleDef queuemodule;
+}
 #define simplequeue_get_state_by_type(type) \
     (simplequeue_get_state(_PyType_GetModuleByDef(type, &queuemodule)))
 
@@ -358,12 +360,12 @@ static struct PyMemberDef simplequeue_members[] = {
 };
 
 static PyType_Slot simplequeue_slots[] = {
-    {Py_tp_dealloc, simplequeue_dealloc},
+    {Py_tp_dealloc, (void *)simplequeue_dealloc},
     {Py_tp_doc, (void *)simplequeue_new__doc__},
-    {Py_tp_traverse, simplequeue_traverse},
+    {Py_tp_traverse, (void *)simplequeue_traverse},
     {Py_tp_members, simplequeue_members},
     {Py_tp_methods, simplequeue_methods},
-    {Py_tp_new, simplequeue_new},
+    {Py_tp_new, (void *)simplequeue_new},
     {0, NULL},
 };
 
@@ -410,12 +412,13 @@ queuemodule_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot queuemodule_slots[] = {
-    {Py_mod_exec, queuemodule_exec},
+    {Py_mod_exec, (void *)queuemodule_exec},
     {0, NULL}
 };
 
 
-static struct PyModuleDef queuemodule = {
+namespace {
+struct PyModuleDef queuemodule = {
     .m_base = PyModuleDef_HEAD_INIT,
     .m_name = "_queue",
     .m_doc = queue_module_doc,
@@ -425,6 +428,7 @@ static struct PyModuleDef queuemodule = {
     .m_clear = queue_clear,
     .m_free = queue_free,
 };
+}
 
 
 PyMODINIT_FUNC

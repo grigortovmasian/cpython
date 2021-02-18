@@ -281,6 +281,9 @@ PyType_ClearCache(void)
     return _PyType_ClearCache(cache);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 _PyType_Fini(PyThreadState *tstate)
@@ -291,6 +294,9 @@ _PyType_Fini(PyThreadState *tstate)
     }
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 void
 PyType_Modified(PyTypeObject *type)
@@ -7665,6 +7671,10 @@ update_slots_callback(PyTypeObject *type, void *data)
     return 0;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static int slotdefs_initialized = 0;
 /* Initialize the slotdefs table by adding interned string objects for the
    names. */
@@ -7686,6 +7696,10 @@ _PyTypes_InitSlotDefs(void)
     slotdefs_initialized = 1;
     return _PyStatus_OK();
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /* Undo _PyTypes_InitSlotDefs(), releasing the interned strings. */
 static void clear_slotdefs(void)

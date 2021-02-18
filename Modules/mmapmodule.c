@@ -121,7 +121,7 @@ typedef struct {
 static mmap_state *
 get_mmap_state(PyObject *module)
 {
-    mmap_state *state = PyModule_GetState(module);
+    mmap_state *state = (mmap_state*)PyModule_GetState(module);
     assert(state);
     return state;
 }
@@ -259,7 +259,7 @@ mmap_read_line_method(mmap_object *self,
     if (!remaining)
         return PyBytes_FromString("");
     start = self->data + self->pos;
-    eol = memchr(start, '\n', remaining);
+    eol = (char*)memchr(start, '\n', remaining);
     if (!eol)
         eol = self->data + self->size;
     else
@@ -305,7 +305,7 @@ mmap_gfind(mmap_object *self,
     } else {
         const char *p, *start_p, *end_p;
         int sign = reverse ? -1 : 1;
-        const char *needle = view.buf;
+        const char *needle = (const char*)view.buf;
         Py_ssize_t len = view.len;
 
         if (start < 0)
@@ -569,7 +569,7 @@ mmap_resize_method(mmap_object *self,
             PyErr_SetFromErrno(PyExc_OSError);
             return NULL;
         }
-        self->data = newmap;
+        self->data = (char*)newmap;
         self->size = new_size;
         Py_RETURN_NONE;
 #endif /* HAVE_MREMAP */
@@ -1084,30 +1084,30 @@ To map anonymous memory, pass -1 as the fileno (both versions).");
 
 
 static PyType_Slot mmap_object_slots[] = {
-    {Py_tp_new, new_mmap_object},
-    {Py_tp_alloc, PyType_GenericAlloc},
-    {Py_tp_dealloc, mmap_object_dealloc},
-    {Py_tp_free, PyObject_Del},
-    {Py_tp_repr, mmap__repr__method},
+    {Py_tp_new, (void*)new_mmap_object},
+    {Py_tp_alloc, (void*)PyType_GenericAlloc},
+    {Py_tp_dealloc, (void*)mmap_object_dealloc},
+    {Py_tp_free, (void*)PyObject_Del},
+    {Py_tp_repr, (void*)mmap__repr__method},
     {Py_tp_doc, (void *)mmap_doc},
     {Py_tp_methods, mmap_object_methods},
     {Py_tp_members, mmap_object_members},
     {Py_tp_getset, mmap_object_getset},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
 
     /* as sequence */
-    {Py_sq_length, mmap_length},
-    {Py_sq_item, mmap_item},
-    {Py_sq_ass_item, mmap_ass_item},
+    {Py_sq_length, (void*)mmap_length},
+    {Py_sq_item, (void*)mmap_item},
+    {Py_sq_ass_item, (void*)mmap_ass_item},
 
     /* as mapping */
-    {Py_mp_length, mmap_length},
-    {Py_mp_subscript, mmap_subscript},
-    {Py_mp_ass_subscript, mmap_ass_subscript},
+    {Py_mp_length, (void*)mmap_length},
+    {Py_mp_subscript, (void*)mmap_subscript},
+    {Py_mp_ass_subscript, (void*)mmap_ass_subscript},
 
     /* as buffer */
-    {Py_bf_getbuffer, mmap_buffer_getbuf},
-    {Py_bf_releasebuffer, mmap_buffer_releasebuf},
+    {Py_bf_getbuffer, (void*)mmap_buffer_getbuf},
+    {Py_bf_releasebuffer, (void*)mmap_buffer_releasebuf},
     {0, NULL},
 };
 
@@ -1273,7 +1273,7 @@ new_mmap_object(PyTypeObject *type, PyObject *args, PyObject *kwdict)
         }
     }
 
-    m_obj->data = mmap(NULL, map_size,
+    m_obj->data = (char*)mmap(NULL, map_size,
                        prot, flags,
                        fd, offset);
 
@@ -1680,7 +1680,7 @@ mmap_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot mmap_slots[] = {
-    {Py_mod_exec, mmap_exec},
+    {Py_mod_exec, (void*)mmap_exec},
     {0, NULL}
 };
 

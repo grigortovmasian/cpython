@@ -123,7 +123,9 @@ PyObject *PyExc_ArgError = NULL;
 /* This dict maps ctypes types to POINTER types */
 PyObject *_ctypes_ptrtype_cache = NULL;
 
-static PyTypeObject Simple_Type;
+namespace {
+extern  PyTypeObject Simple_Type;
+}
 
 /* a callable object used for unpickling:
    strong reference to _ctypes._unpickle() function */
@@ -310,7 +312,7 @@ _ctypes_alloc_format_string_for_type(char code, int big_endian)
         break;
     }
 
-    result = PyMem_Malloc(3);
+    result = (char*)PyMem_Malloc(3);
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -341,7 +343,7 @@ _ctypes_alloc_format_string(const char *prefix, const char *suffix)
     len = strlen(suffix);
     if (prefix)
         len += strlen(prefix);
-    result = PyMem_Malloc(len + 1);
+    result = (char*)PyMem_Malloc(len + 1);
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -373,7 +375,7 @@ _ctypes_alloc_format_string_with_shape(int ndim, const Py_ssize_t *shape,
     prefix_len = 32 * ndim + 3;
     if (prefix)
         prefix_len += strlen(prefix);
-    new_prefix = PyMem_Malloc(prefix_len);
+    new_prefix = (char*)PyMem_Malloc(prefix_len);
     if (new_prefix == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -386,9 +388,9 @@ _ctypes_alloc_format_string_with_shape(int ndim, const Py_ssize_t *shape,
         strcat(new_prefix, "(");
         for (k = 0; k < ndim; ++k) {
             if (k < ndim-1) {
-                sprintf(buf, "%"PY_FORMAT_SIZE_T"d,", shape[k]);
+                sprintf(buf, "\"PY_FORMAT_SIZE_T\"%ld,", shape[k]);
             } else {
-                sprintf(buf, "%"PY_FORMAT_SIZE_T"d)", shape[k]);
+                sprintf(buf, "\"PY_FORMAT_SIZE_T\"%ld)", shape[k]);
             }
             strcat(new_prefix, buf);
         }
@@ -1281,7 +1283,7 @@ CharArray_set_raw(CDataObject *self, PyObject *value, void *Py_UNUSED(ignored))
     if (PyObject_GetBuffer(value, &view, PyBUF_SIMPLE) < 0)
         return -1;
     size = view.len;
-    ptr = view.buf;
+    ptr = (char*)view.buf;
     if (size > self->b_size) {
         PyErr_SetString(PyExc_ValueError,
                         "byte string too long");
@@ -1567,7 +1569,7 @@ PyCArrayType_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (stgdict->format == NULL)
         goto error;
     stgdict->ndim = itemdict->ndim + 1;
-    stgdict->shape = PyMem_Malloc(sizeof(Py_ssize_t) * stgdict->ndim);
+    stgdict->shape = (Py_ssize_t*)PyMem_Malloc(sizeof(Py_ssize_t) * stgdict->ndim);
     if (stgdict->shape == NULL) {
         PyErr_NoMemory();
         goto error;
@@ -2809,7 +2811,7 @@ static int PyCData_NewGetBuffer(PyObject *myself, Py_buffer *view, int flags)
     view->len = self->b_size;
     view->readonly = 0;
     /* use default format character if not set */
-    view->format = dict->format ? dict->format : "B";
+    view->format = dict->format ? dict->format : (char*)"B";
     view->ndim = dict->ndim;
     view->shape = dict->shape;
     view->itemsize = self->b_size;
@@ -3645,7 +3647,7 @@ PyCFuncPtr_FromDll(PyTypeObject *type, PyObject *args, PyObject *kwds)
     Py_XINCREF(paramflags);
     self->paramflags = paramflags;
 
-    *(void **)self->b_ptr = address;
+    *(void **)self->b_ptr = (void*)address;
     Py_INCREF(dll);
     Py_DECREF(ftuple);
     if (-1 == KeepRef((CDataObject *)self, 0, dll)) {
@@ -4198,7 +4200,7 @@ PyCFuncPtr_call(PyCFuncPtrObject *self, PyObject *inargs, PyObject *kwds)
         }
     }
 
-    result = _ctypes_callproc(pProc,
+    result = _ctypes_callproc((PPROC)pProc,
                        callargs,
 #ifdef MS_WIN32
                        piunk,
@@ -5039,7 +5041,8 @@ Simple_repr(CDataObject *self)
     return result;
 }
 
-static PyTypeObject Simple_Type = {
+namespace {
+PyTypeObject Simple_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_ctypes._SimpleCData",
     sizeof(CDataObject),                        /* tp_basicsize */
@@ -5080,6 +5083,7 @@ static PyTypeObject Simple_Type = {
     GenericPyCData_new,                         /* tp_new */
     0,                                          /* tp_free */
 };
+}
 
 /******************************************************************/
 /*
@@ -5169,7 +5173,7 @@ Pointer_get_contents(CDataObject *self, void *closure)
     assert(stgdict); /* Cannot be NULL for pointer instances */
     return PyCData_FromBaseObj(stgdict->proto,
                              (PyObject *)self, 0,
-                             *(void **)self->b_ptr);
+                             self->b_ptr);
 }
 
 static int
@@ -5784,11 +5788,11 @@ _ctypes_add_objects(PyObject *mod)
     MOD_ADD("FUNCFLAG_PYTHONAPI", PyLong_FromLong(FUNCFLAG_PYTHONAPI));
     MOD_ADD("__version__", PyUnicode_FromString("1.1.0"));
 
-    MOD_ADD("_memmove_addr", PyLong_FromVoidPtr(memmove));
-    MOD_ADD("_memset_addr", PyLong_FromVoidPtr(memset));
-    MOD_ADD("_string_at_addr", PyLong_FromVoidPtr(string_at));
-    MOD_ADD("_cast_addr", PyLong_FromVoidPtr(cast));
-    MOD_ADD("_wstring_at_addr", PyLong_FromVoidPtr(wstring_at));
+    MOD_ADD("_memmove_addr", PyLong_FromVoidPtr((void*)memmove));
+    MOD_ADD("_memset_addr", PyLong_FromVoidPtr((void*)memset));
+    MOD_ADD("_string_at_addr", PyLong_FromVoidPtr((void*)string_at));
+    MOD_ADD("_cast_addr", PyLong_FromVoidPtr((void*)cast));
+    MOD_ADD("_wstring_at_addr", PyLong_FromVoidPtr((void*)wstring_at));
 
 /* If RTLD_LOCAL is not defined (Windows!), set it to zero. */
 #if !HAVE_DECL_RTLD_LOCAL

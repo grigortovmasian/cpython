@@ -126,13 +126,16 @@ class datetime.IsoCalendarDate "PyDateTime_IsoCalendarDate *" "&PyDateTime_IsoCa
 #define MONTH_IS_SANE(M) ((unsigned int)(M) - 1 < 12)
 
 /* Forward declarations. */
-static PyTypeObject PyDateTime_DateType;
-static PyTypeObject PyDateTime_DateTimeType;
-static PyTypeObject PyDateTime_DeltaType;
-static PyTypeObject PyDateTime_IsoCalendarDateType;
-static PyTypeObject PyDateTime_TimeType;
-static PyTypeObject PyDateTime_TZInfoType;
-static PyTypeObject PyDateTime_TimeZoneType;
+namespace {
+extern  PyTypeObject PyDateTime_DateType;
+extern  PyTypeObject PyDateTime_DateTimeType;
+extern  PyTypeObject PyDateTime_DeltaType;
+extern  PyTypeObject PyDateTime_IsoCalendarDateType;
+extern  PyTypeObject PyDateTime_TimeType;
+extern  PyTypeObject PyDateTime_TZInfoType;
+extern  PyTypeObject PyDateTime_TimeZoneType;
+
+}
 
 static int check_tzinfo_subclass(PyObject *p);
 
@@ -2708,7 +2711,8 @@ static PyNumberMethods delta_as_number = {
     0,                                          /* nb_inplace_true_divide */
 };
 
-static PyTypeObject PyDateTime_DeltaType = {
+namespace {
+PyTypeObject PyDateTime_DeltaType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "datetime.timedelta",                               /* tp_name */
     sizeof(PyDateTime_Delta),                           /* tp_basicsize */
@@ -2749,6 +2753,7 @@ static PyTypeObject PyDateTime_DeltaType = {
     delta_new,                                          /* tp_new */
     0,                                                  /* tp_free */
 };
+}
 
 /*
  * PyDateTime_Date implementation.
@@ -2971,6 +2976,7 @@ date_fromisoformat(PyObject *cls, PyObject *dtstr)
     Py_ssize_t len;
 
     const char *dt_ptr = PyUnicode_AsUTF8AndSize(dtstr, &len);
+    {
     if (dt_ptr == NULL) {
         goto invalid_string_error;
     }
@@ -2990,7 +2996,7 @@ date_fromisoformat(PyObject *cls, PyObject *dtstr)
     }
 
     return new_date_subclass_ex(year, month, day, cls);
-
+    }
 invalid_string_error:
     PyErr_Format(PyExc_ValueError, "Invalid isoformat string: %R", dtstr);
     return NULL;
@@ -3307,7 +3313,8 @@ static PyMethodDef iso_calendar_date_methods[] = {
     {NULL, NULL},
 };
 
-static PyTypeObject PyDateTime_IsoCalendarDateType = {
+namespace {
+PyTypeObject PyDateTime_IsoCalendarDateType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "datetime.IsoCalendarDate",
     .tp_basicsize = sizeof(PyDateTime_IsoCalendarDate),
@@ -3319,6 +3326,7 @@ static PyTypeObject PyDateTime_IsoCalendarDateType = {
     // .tp_base = &PyTuple_Type,  // filled in PyInit__datetime
     .tp_new = iso_calendar_date_new,
 };
+}
 
 /*[clinic input]
 @classmethod
@@ -3554,7 +3562,8 @@ static PyNumberMethods date_as_number = {
     0,                                                  /* nb_bool */
 };
 
-static PyTypeObject PyDateTime_DateType = {
+namespace {
+PyTypeObject PyDateTime_DateType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "datetime.date",                                    /* tp_name */
     sizeof(PyDateTime_Date),                            /* tp_basicsize */
@@ -3595,6 +3604,7 @@ static PyTypeObject PyDateTime_DateType = {
     date_new,                                           /* tp_new */
     0,                                                  /* tp_free */
 };
+}
 
 /*
  * PyDateTime_TZInfo implementation.
@@ -3803,7 +3813,8 @@ static PyMethodDef tzinfo_methods[] = {
 static const char tzinfo_doc[] =
 PyDoc_STR("Abstract base class for time zone info objects.");
 
-static PyTypeObject PyDateTime_TZInfoType = {
+namespace {
+PyTypeObject PyDateTime_TZInfoType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "datetime.tzinfo",                          /* tp_name */
     sizeof(PyDateTime_TZInfo),                  /* tp_basicsize */
@@ -3844,6 +3855,7 @@ static PyTypeObject PyDateTime_TZInfoType = {
     PyType_GenericNew,                          /* tp_new */
     0,                                          /* tp_free */
 };
+}
 
 static char *timezone_kws[] = {"offset", "name", NULL};
 
@@ -4039,7 +4051,8 @@ static PyMethodDef timezone_methods[] = {
 static const char timezone_doc[] =
 PyDoc_STR("Fixed offset from UTC implementation of tzinfo.");
 
-static PyTypeObject PyDateTime_TimeZoneType = {
+namespace {
+PyTypeObject PyDateTime_TimeZoneType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "datetime.timezone",              /* tp_name */
     sizeof(PyDateTime_TimeZone),      /* tp_basicsize */
@@ -4079,6 +4092,7 @@ static PyTypeObject PyDateTime_TimeZoneType = {
     0,                                /* tp_alloc */
     timezone_new,                     /* tp_new */
 };
+}
 
 /*
  * PyDateTime_Time implementation.
@@ -4576,7 +4590,7 @@ time_fromisoformat(PyObject *cls, PyObject *tstr) {
 
     Py_ssize_t len;
     const char *p = PyUnicode_AsUTF8AndSize(tstr, &len);
-
+    {
     if (p == NULL) {
         goto invalid_string_error;
     }
@@ -4608,7 +4622,7 @@ time_fromisoformat(PyObject *cls, PyObject *tstr) {
 
     Py_DECREF(tzinfo);
     return t;
-
+    }
 invalid_string_error:
     PyErr_Format(PyExc_ValueError, "Invalid isoformat string: %R", tstr);
     return NULL;
@@ -4705,7 +4719,8 @@ PyDoc_STR("time([hour[, minute[, second[, microsecond[, tzinfo]]]]]) --> a time 
 All arguments are optional. tzinfo may be None, or an instance of\n\
 a tzinfo subclass. The remaining arguments may be ints.\n");
 
-static PyTypeObject PyDateTime_TimeType = {
+namespace {
+PyTypeObject PyDateTime_TimeType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "datetime.time",                            /* tp_name */
     sizeof(PyDateTime_Time),                    /* tp_basicsize */
@@ -4746,6 +4761,7 @@ static PyTypeObject PyDateTime_TimeType = {
     time_new,                                   /* tp_new */
     0,                                          /* tp_free */
 };
+}
 
 /*
  * PyDateTime_DateTime implementation.
@@ -5243,13 +5259,14 @@ datetime_fromisoformat(PyObject *cls, PyObject *dtstr)
     }
 
     PyObject *dtstr_clean = _sanitize_isoformat_str(dtstr);
+    {
     if (dtstr_clean == NULL) {
         goto error;
     }
 
     Py_ssize_t len;
     const char *dt_ptr = PyUnicode_AsUTF8AndSize(dtstr_clean, &len);
-
+    {
     if (dt_ptr == NULL) {
         if (PyErr_ExceptionMatches(PyExc_UnicodeEncodeError)) {
             // Encoding errors are invalid string errors at this point
@@ -5307,10 +5324,10 @@ datetime_fromisoformat(PyObject *cls, PyObject *dtstr)
     Py_DECREF(tzinfo);
     Py_DECREF(dtstr_clean);
     return dt;
-
+    }
 invalid_string_error:
     PyErr_Format(PyExc_ValueError, "Invalid isoformat string: %R", dtstr);
-
+    }
 error:
     Py_XDECREF(dtstr_clean);
 
@@ -6422,7 +6439,8 @@ static PyNumberMethods datetime_as_number = {
     0,                                          /* nb_bool */
 };
 
-static PyTypeObject PyDateTime_DateTimeType = {
+namespace {
+PyTypeObject PyDateTime_DateTimeType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "datetime.datetime",                        /* tp_name */
     sizeof(PyDateTime_DateTime),                /* tp_basicsize */
@@ -6464,6 +6482,7 @@ static PyTypeObject PyDateTime_DateTimeType = {
     datetime_new,                               /* tp_new */
     0,                                          /* tp_free */
 };
+}
 
 /* ---------------------------------------------------------------------------
  * Module methods and initialization.
@@ -6479,7 +6498,7 @@ static PyMethodDef module_methods[] = {
 static inline PyDateTime_CAPI *
 get_datetime_capi(void)
 {
-    PyDateTime_CAPI *capi = PyMem_Malloc(sizeof(PyDateTime_CAPI));
+    PyDateTime_CAPI *capi = (PyDateTime_CAPI*)PyMem_Malloc(sizeof(PyDateTime_CAPI));
     if (capi == NULL) {
         PyErr_NoMemory();
         return NULL;

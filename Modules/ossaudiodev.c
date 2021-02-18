@@ -64,9 +64,10 @@ typedef struct {
     int      fd;                      /* The open mixer device */
 } oss_mixer_t;
 
-
-static PyTypeObject OSSAudioType;
-static PyTypeObject OSSMixerType;
+namespace {
+extern PyTypeObject OSSAudioType;
+extern PyTypeObject OSSMixerType;
+}
 
 static PyObject *OSSAudioError;
 
@@ -956,7 +957,8 @@ static PyGetSetDef oss_getsetlist[] = {
     {NULL},
 };
 
-static PyTypeObject OSSAudioType = {
+namespace {
+PyTypeObject OSSAudioType = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "ossaudiodev.oss_audio_device", /*tp_name*/
     sizeof(oss_audio_t),        /*tp_basicsize*/
@@ -990,7 +992,7 @@ static PyTypeObject OSSAudioType = {
     oss_getsetlist,             /*tp_getset*/
 };
 
-static PyTypeObject OSSMixerType = {
+PyTypeObject OSSMixerType = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "ossaudiodev.oss_mixer_device", /*tp_name*/
     sizeof(oss_mixer_t),            /*tp_basicsize*/
@@ -1021,7 +1023,7 @@ static PyTypeObject OSSMixerType = {
     0,                              /*tp_iternext*/
     oss_mixer_methods,              /*tp_methods*/
 };
-
+}
 
 static PyObject *
 ossopen(PyObject *self, PyObject *args)

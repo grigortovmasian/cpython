@@ -100,7 +100,7 @@ swap_halfrows_pow2(mpd_uint_t *matrix, mpd_size_t rows, mpd_size_t cols, int dir
     m = cols - 1;
     hmax = rows; /* cycles start at odd halfrows */
     dbits = 8 * sizeof *done;
-    if ((done = mpd_calloc(hmax/(sizeof *done) + 1, sizeof *done)) == NULL) {
+    if ((done = (mpd_size_t*)mpd_calloc(hmax/(sizeof *done) + 1, sizeof *done)) == NULL) {
         return 0;
     }
 

@@ -91,7 +91,9 @@ get_random_state(PyObject *module)
     return (_randomstate *)state;
 }
 
-static struct PyModuleDef _randommodule;
+namespace {
+extern struct PyModuleDef _randommodule;
+}
 
 #define _randomstate_type(type) \
     (get_random_state(_PyType_GetModuleByDef(type, &_randommodule)))
@@ -565,8 +567,8 @@ PyDoc_STRVAR(random_doc,
 static PyType_Slot Random_Type_slots[] = {
     {Py_tp_doc, (void *)random_doc},
     {Py_tp_methods, random_methods},
-    {Py_tp_new, random_new},
-    {Py_tp_free, PyObject_Free},
+    {Py_tp_new, (void *)random_new},
+    {Py_tp_free, (void *)PyObject_Free},
     {0, 0},
 };
 
@@ -616,7 +618,7 @@ _random_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot _random_slots[] = {
-    {Py_mod_exec, _random_exec},
+    {Py_mod_exec, (void *)_random_exec},
     {0, NULL}
 };
 
@@ -641,7 +643,8 @@ _random_free(void *module)
     _random_clear((PyObject *)module);
 }
 
-static struct PyModuleDef _randommodule = {
+namespace {
+struct PyModuleDef _randommodule = {
     PyModuleDef_HEAD_INIT,
     "_random",
     module_doc,
@@ -652,6 +655,7 @@ static struct PyModuleDef _randommodule = {
     _random_clear,
     _random_free,
 };
+}
 
 PyMODINIT_FUNC
 PyInit__random(void)

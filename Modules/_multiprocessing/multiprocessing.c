@@ -262,7 +262,7 @@ multiprocessing_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot multiprocessing_slots[] = {
-    {Py_mod_exec, multiprocessing_exec},
+    {Py_mod_exec, (void*)multiprocessing_exec},
     {0, NULL}
 };
 

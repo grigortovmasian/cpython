@@ -361,7 +361,7 @@ static PyObject *
 MD5Type_copy_impl(MD5object *self, PyTypeObject *cls)
 /*[clinic end generated code: output=bf055e08244bf5ee input=d89087dcfb2a8620]*/
 {
-    MD5State *st = PyType_GetModuleState(cls);
+    MD5State *st = (MD5State *)PyType_GetModuleState(cls);
 
     MD5object *newobj;
     if ((newobj = newMD5object(st))==NULL)
@@ -426,7 +426,7 @@ MD5Type_update(MD5object *self, PyObject *obj)
 
     GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
 
-    md5_process(&self->hash_state, buf.buf, buf.len);
+    md5_process(&self->hash_state, (const unsigned char*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     Py_RETURN_NONE;
@@ -475,7 +475,7 @@ static PyGetSetDef MD5_getseters[] = {
 };
 
 static PyType_Slot md5_type_slots[] = {
-    {Py_tp_dealloc, MD5_dealloc},
+    {Py_tp_dealloc, (void*)MD5_dealloc},
     {Py_tp_methods, MD5_methods},
     {Py_tp_getset, MD5_getseters},
     {0,0}
@@ -504,33 +504,33 @@ static PyObject *
 _md5_md5_impl(PyObject *module, PyObject *string, int usedforsecurity)
 /*[clinic end generated code: output=587071f76254a4ac input=7a144a1905636985]*/
 {
-    MD5object *new;
+    MD5object *nw;
     Py_buffer buf;
 
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
     MD5State *st = md5_get_state(module);
-    if ((new = newMD5object(st)) == NULL) {
+    if ((nw = newMD5object(st)) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    md5_init(&new->hash_state);
+    md5_init(&nw->hash_state);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        md5_process(&new->hash_state, buf.buf, buf.len);
+        md5_process(&nw->hash_state, (const unsigned char*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 
@@ -586,7 +586,7 @@ md5_exec(PyObject *m)
 }
 
 static PyModuleDef_Slot _md5_slots[] = {
-    {Py_mod_exec, md5_exec},
+    {Py_mod_exec, (void*)md5_exec},
     {0, NULL}
 };
 

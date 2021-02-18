@@ -501,7 +501,7 @@ nis_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot nis_slots[] = {
-    {Py_mod_exec, nis_exec},
+    {Py_mod_exec, (void*)nis_exec},
     {0, NULL}
 };
 
@@ -514,10 +514,10 @@ static struct PyModuleDef nismodule = {
     .m_doc = nis__doc__,
     .m_size = sizeof(nis_state),
     .m_methods = nis_methods,
+    .m_slots = nis_slots,
     .m_traverse = nis_traverse,
     .m_clear = nis_clear,
     .m_free = nis_free,
-    .m_slots = nis_slots,
 };
 
 PyMODINIT_FUNC

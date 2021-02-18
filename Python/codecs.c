@@ -29,6 +29,12 @@ const char *Py_hexdigits = "0123456789abcdef";
 
 */
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 static int _PyCodecRegistry_Init(void); /* Forward */
 
 int PyCodec_Register(PyObject *search_function)
@@ -1535,3 +1541,7 @@ static int _PyCodecRegistry_Init(void)
     interp->codecs_initialized = 1;
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -11,6 +11,7 @@ extern PyTypeObject PyBufferedIOBase_Type;
 extern PyTypeObject PyTextIOBase_Type;
 
 /* Concrete classes */
+
 extern PyTypeObject PyFileIO_Type;
 extern PyTypeObject PyBytesIO_Type;
 extern PyTypeObject PyStringIO_Type;

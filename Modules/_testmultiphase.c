@@ -103,11 +103,11 @@ Example_setattr(ExampleObject *self, const char *name, PyObject *v)
 }
 
 static PyType_Slot Example_Type_slots[] = {
-    {Py_tp_doc, "The Example type"},
-    {Py_tp_finalize, Example_finalize},
-    {Py_tp_traverse, Example_traverse},
-    {Py_tp_getattro, Example_getattro},
-    {Py_tp_setattr, Example_setattr},
+    {Py_tp_doc, (void*)"The Example type"},
+    {Py_tp_finalize, (void*)Example_finalize},
+    {Py_tp_traverse, (void*)Example_traverse},
+    {Py_tp_getattro, (void*)Example_getattro},
+    {Py_tp_setattr, (void*)Example_setattr},
     {Py_tp_methods, Example_methods},
     {0, 0},
 };
@@ -120,8 +120,9 @@ static PyType_Spec Example_Type_spec = {
     Example_Type_slots
 };
 
-
-static PyModuleDef def_meth_state_access;
+namespace {
+extern PyModuleDef def_meth_state_access;
+}
 
 /*[clinic input]
 _testmultiphase.StateAccessType.get_defining_module
@@ -171,7 +172,7 @@ _testmultiphase_StateAccessType_increment_count_clinic_impl(StateAccessTypeObjec
                                                             int n, int twice)
 /*[clinic end generated code: output=3b34f86bc5473204 input=551d482e1fe0b8f5]*/
 {
-    meth_state *m_state = PyType_GetModuleState(cls);
+    meth_state *m_state = (meth_state*)PyType_GetModuleState(cls);
     if (twice) {
         n *= 2;
     }
@@ -220,7 +221,7 @@ _StateAccessType_increment_count_noclinic(StateAccessTypeObject *self,
         }
         n *= 2;
     }
-    meth_state *m_state = PyType_GetModuleState(defining_class);
+    meth_state *m_state = (meth_state*)PyType_GetModuleState(defining_class);
     m_state->counter += n;
 
     Py_RETURN_NONE;
@@ -239,7 +240,7 @@ _testmultiphase_StateAccessType_get_count_impl(StateAccessTypeObject *self,
                                                PyTypeObject *cls)
 /*[clinic end generated code: output=64600f95b499a319 input=d5d181f12384849f]*/
 {
-    meth_state *m_state = PyType_GetModuleState(cls);
+    meth_state *m_state = (meth_state*)PyType_GetModuleState(cls);
     return PyLong_FromLong(m_state->counter);
 }
 
@@ -257,7 +258,7 @@ static PyMethodDef StateAccessType_methods[] = {
 };
 
 static PyType_Slot StateAccessType_Type_slots[] = {
-    {Py_tp_doc, "Type for testing per-module state access from methods."},
+    {Py_tp_doc, (void*)"Type for testing per-module state access from methods."},
     {Py_tp_methods, StateAccessType_methods},
     {0, NULL}
 };
@@ -418,7 +419,7 @@ static int execfunc(PyObject *m)
 }
 
 static PyModuleDef_Slot main_slots[] = {
-    {Py_mod_exec, execfunc},
+    {Py_mod_exec, (void*)execfunc},
     {0, NULL},
 };
 
@@ -433,8 +434,10 @@ PyInit__testmultiphase(PyObject *spec)
 
 /**** Importing a non-module object ****/
 
-static PyModuleDef def_nonmodule;
-static PyModuleDef def_nonmodule_with_methods;
+namespace {
+extern PyModuleDef def_nonmodule;
+extern PyModuleDef def_nonmodule_with_methods;
+}
 
 /* Create a SimpleNamespace(three=3) */
 static PyObject*
@@ -465,12 +468,14 @@ createfunc_nonmodule(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_nonmodule[] = {
-    {Py_mod_create, createfunc_nonmodule},
+    {Py_mod_create, (void*)createfunc_nonmodule},
     {0, NULL},
 };
 
-static PyModuleDef def_nonmodule = TEST_MODULE_DEF(
+namespace {
+PyModuleDef def_nonmodule = TEST_MODULE_DEF(
     "_testmultiphase_nonmodule", slots_create_nonmodule, NULL);
+}
 
 PyMODINIT_FUNC
 PyInit__testmultiphase_nonmodule(PyObject *spec)
@@ -499,8 +504,10 @@ static PyMethodDef nonmodule_methods[] = {
     {NULL, NULL}           /* sentinel */
 };
 
-static PyModuleDef def_nonmodule_with_methods = TEST_MODULE_DEF(
+namespace {
+PyModuleDef def_nonmodule_with_methods = TEST_MODULE_DEF(
     "_testmultiphase_nonmodule_with_methods", slots_create_nonmodule, nonmodule_methods);
+}
 
 PyMODINIT_FUNC
 PyInit__testmultiphase_nonmodule_with_methods(PyObject *spec)
@@ -668,7 +675,7 @@ createfunc_null(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_null[] = {
-    {Py_mod_create, createfunc_null},
+    {Py_mod_create, (void*)createfunc_null},
     {0, NULL},
 };
 
@@ -689,7 +696,7 @@ createfunc_raise(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_raise[] = {
-    {Py_mod_create, createfunc_raise},
+    {Py_mod_create, (void*)createfunc_raise},
     {0, NULL},
 };
 
@@ -710,7 +717,7 @@ createfunc_unreported_exception(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_unreported_exception[] = {
-    {Py_mod_create, createfunc_unreported_exception},
+    {Py_mod_create, (void*)createfunc_unreported_exception},
     {0, NULL},
 };
 
@@ -724,8 +731,8 @@ PyInit__testmultiphase_create_unreported_exception(PyObject *spec)
 }
 
 static PyModuleDef_Slot slots_nonmodule_with_exec_slots[] = {
-    {Py_mod_create, createfunc_nonmodule},
-    {Py_mod_exec, execfunc},
+    {Py_mod_create, (void*)createfunc_nonmodule},
+    {Py_mod_exec, (void*)execfunc},
     {0, NULL},
 };
 
@@ -745,7 +752,7 @@ execfunc_err(PyObject *mod)
 }
 
 static PyModuleDef_Slot slots_exec_err[] = {
-    {Py_mod_exec, execfunc_err},
+    {Py_mod_exec, (void*)execfunc_err},
     {0, NULL},
 };
 
@@ -766,7 +773,7 @@ execfunc_raise(PyObject *spec)
 }
 
 static PyModuleDef_Slot slots_exec_raise[] = {
-    {Py_mod_exec, execfunc_raise},
+    {Py_mod_exec, (void*)execfunc_raise},
     {0, NULL},
 };
 
@@ -787,7 +794,7 @@ execfunc_unreported_exception(PyObject *mod)
 }
 
 static PyModuleDef_Slot slots_exec_unreported_exception[] = {
-    {Py_mod_exec, execfunc_unreported_exception},
+    {Py_mod_exec, (void*)execfunc_unreported_exception},
     {0, NULL},
 };
 
@@ -806,7 +813,7 @@ meth_state_access_exec(PyObject *m)
     PyObject *temp;
     meth_state *m_state;
 
-    m_state = PyModule_GetState(m);
+    m_state = (meth_state*)PyModule_GetState(m);
     if (m_state == NULL) {
         return -1;
     }
@@ -825,11 +832,12 @@ meth_state_access_exec(PyObject *m)
 }
 
 static PyModuleDef_Slot meth_state_access_slots[] = {
-    {Py_mod_exec, meth_state_access_exec},
+    {Py_mod_exec, (void*)meth_state_access_exec},
     {0, NULL}
 };
 
-static PyModuleDef def_meth_state_access = {
+namespace {
+PyModuleDef def_meth_state_access = {
     PyModuleDef_HEAD_INIT,
     .m_name = "_testmultiphase_meth_state_access",
     .m_doc = PyDoc_STR("Module testing access"
@@ -837,6 +845,7 @@ static PyModuleDef def_meth_state_access = {
     .m_size = sizeof(meth_state),
     .m_slots = meth_state_access_slots,
 };
+}
 
 PyMODINIT_FUNC
 PyInit__testmultiphase_meth_state_access(PyObject *spec)

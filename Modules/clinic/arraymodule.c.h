@@ -489,7 +489,7 @@ array__array_reconstructor(PyObject *module, PyObject *const *args, Py_ssize_t n
         goto exit;
     }
     typecode = PyUnicode_READ_CHAR(args[1], 0);
-    mformat_code = _PyLong_AsInt(args[2]);
+    mformat_code = (machine_format_code)_PyLong_AsInt(args[2]);
     if (mformat_code == -1 && PyErr_Occurred()) {
         goto exit;
     }

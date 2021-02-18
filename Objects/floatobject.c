@@ -1973,6 +1973,10 @@ PyTypeObject PyFloat_Type = {
     .tp_vectorcall = (vectorcallfunc)float_vectorcall,
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int
 _PyFloat_Init(void)
 {
@@ -2054,6 +2058,10 @@ _PyFloat_Fini(PyThreadState *tstate)
     state->numfree = -1;
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void

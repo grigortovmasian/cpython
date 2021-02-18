@@ -2850,6 +2850,9 @@ static struct PyModuleDef builtinsmodule = {
     NULL
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyObject *
 _PyBuiltin_Init(PyThreadState *tstate)
@@ -2927,3 +2930,7 @@ _PyBuiltin_Init(PyThreadState *tstate)
 #undef ADD_TO_ALL
 #undef SETBUILTIN
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -58,7 +58,9 @@ get_termios_state(PyObject *module)
     return (termiosmodulestate *)state;
 }
 
-static struct PyModuleDef termiosmodule;
+namespace {
+extern struct PyModuleDef termiosmodule;
+}
 
 /*[clinic input]
 termios.tcgetattr
@@ -80,7 +82,7 @@ static PyObject *
 termios_tcgetattr_impl(PyObject *module, int fd)
 /*[clinic end generated code: output=2b3da39db870e629 input=54dad9779ebe74b1]*/
 {
-    termiosmodulestate *state = PyModule_GetState(module);
+    termiosmodulestate *state = (termiosmodulestate *)PyModule_GetState(module);
     struct termios mode;
     if (tcgetattr(fd, &mode) == -1) {
         return PyErr_SetFromErrno(state->TermiosError);
@@ -167,7 +169,7 @@ termios_tcsetattr_impl(PyObject *module, int fd, int when, PyObject *term)
     }
 
     /* Get the old mode, in case there are any hidden fields... */
-    termiosmodulestate *state = PyModule_GetState(module);
+    termiosmodulestate *state = (termiosmodulestate *)PyModule_GetState(module);
     struct termios mode;
     if (tcgetattr(fd, &mode) == -1) {
         return PyErr_SetFromErrno(state->TermiosError);
@@ -234,7 +236,7 @@ static PyObject *
 termios_tcsendbreak_impl(PyObject *module, int fd, int duration)
 /*[clinic end generated code: output=5945f589b5d3ac66 input=dc2f32417691f8ed]*/
 {
-    termiosmodulestate *state = PyModule_GetState(module);
+    termiosmodulestate *state = (termiosmodulestate *)PyModule_GetState(module);
     if (tcsendbreak(fd, duration) == -1) {
         return PyErr_SetFromErrno(state->TermiosError);
     }
@@ -255,7 +257,7 @@ static PyObject *
 termios_tcdrain_impl(PyObject *module, int fd)
 /*[clinic end generated code: output=5fd86944c6255955 input=c99241b140b32447]*/
 {
-    termiosmodulestate *state = PyModule_GetState(module);
+    termiosmodulestate *state = (termiosmodulestate *)PyModule_GetState(module);
     if (tcdrain(fd) == -1) {
         return PyErr_SetFromErrno(state->TermiosError);
     }
@@ -281,7 +283,7 @@ static PyObject *
 termios_tcflush_impl(PyObject *module, int fd, int queue)
 /*[clinic end generated code: output=2424f80312ec2f21 input=0f7d08122ddc07b5]*/
 {
-    termiosmodulestate *state = PyModule_GetState(module);
+    termiosmodulestate *state = (termiosmodulestate *)PyModule_GetState(module);
     if (tcflush(fd, queue) == -1) {
         return PyErr_SetFromErrno(state->TermiosError);
     }
@@ -307,7 +309,7 @@ static PyObject *
 termios_tcflow_impl(PyObject *module, int fd, int action)
 /*[clinic end generated code: output=afd10928e6ea66eb input=c6aff0640b6efd9c]*/
 {
-    termiosmodulestate *state = PyModule_GetState(module);
+    termiosmodulestate *state = (termiosmodulestate *)PyModule_GetState(module);
     if (tcflow(fd, action) == -1) {
         return PyErr_SetFromErrno(state->TermiosError);
     }
@@ -1030,11 +1032,12 @@ termios_exec(PyObject *mod)
 }
 
 static PyModuleDef_Slot termios_slots[] = {
-    {Py_mod_exec, termios_exec},
+    {Py_mod_exec, (void*)termios_exec},
     {0, NULL}
 };
 
-static struct PyModuleDef termiosmodule = {
+namespace {
+struct PyModuleDef termiosmodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "termios",
     .m_doc = termios__doc__,
@@ -1045,6 +1048,7 @@ static struct PyModuleDef termiosmodule = {
     .m_clear = termiosmodule_clear,
     .m_free = termiosmodule_free,
 };
+}
 
 PyMODINIT_FUNC PyInit_termios(void)
 {

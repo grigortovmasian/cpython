@@ -53,6 +53,7 @@ PyDoc_STRVAR(textiobase_doc,
     "are immutable. There is no public constructor.\n"
     );
 
+
 static PyObject *
 _unsupported(const char *message)
 {

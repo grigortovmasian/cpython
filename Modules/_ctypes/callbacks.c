@@ -364,7 +364,7 @@ CThunkObject *_ctypes_alloc_callback(PyObject *callable,
 
     assert(CThunk_CheckExact((PyObject *)p));
 
-    p->pcl_write = Py_ffi_closure_alloc(sizeof(ffi_closure), &p->pcl_exec);
+    p->pcl_write = (ffi_closure*)Py_ffi_closure_alloc(sizeof(ffi_closure), &p->pcl_exec);
     if (p->pcl_write == NULL) {
         PyErr_NoMemory();
         goto error;

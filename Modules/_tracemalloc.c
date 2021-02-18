@@ -1477,6 +1477,7 @@ _tracemalloc__get_object_traceback(PyObject *module, PyObject *obj)
 }
 
 
+
 #define PUTS(fd, str) _Py_write_noraise(fd, str, (int)strlen(str))
 
 static void
@@ -1692,6 +1693,10 @@ static struct PyModuleDef module_def = {
     NULL,
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyMODINIT_FUNC
 PyInit__tracemalloc(void)
 {
@@ -1726,6 +1731,10 @@ _PyTraceMalloc_Fini(void)
     assert(PyGILState_Check());
     tracemalloc_deinit();
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 int
 PyTraceMalloc_Track(unsigned int domain, uintptr_t ptr,
@@ -1765,6 +1774,9 @@ PyTraceMalloc_Untrack(unsigned int domain, uintptr_t ptr)
     return 0;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* If the object memory block is already traced, update its trace
    with the current Python traceback.
@@ -1808,6 +1820,9 @@ _PyTraceMalloc_NewReference(PyObject *op)
     return res;
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 PyObject*
 _PyTraceMalloc_GetTraceback(unsigned int domain, uintptr_t ptr)

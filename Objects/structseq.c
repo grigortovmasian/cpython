@@ -540,6 +540,10 @@ PyStructSequence_NewType(PyStructSequence_Desc *desc)
     return type;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int _PyStructSequence_Init(void)
 {
     if (_PyUnicode_FromId(&PyId_n_sequence_fields) == NULL
@@ -549,3 +553,7 @@ int _PyStructSequence_Init(void)
 
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

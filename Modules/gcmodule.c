@@ -33,6 +33,11 @@
 #include "pydtrace.h"
 #include "pytime.h"             // _PyTime_GetMonotonicClock()
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _gc_runtime_state GCState;
 
 /*[clinic input]
@@ -2329,3 +2334,8 @@ PyObject_GC_IsFinalized(PyObject *obj)
     }
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
+

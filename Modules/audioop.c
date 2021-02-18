@@ -371,7 +371,9 @@ static const int stepsizeTable[89] = {
             SETINT32((cp), (i), (val));         \
     } while(0)
 
-static PyModuleDef audioopmodule;
+namespace {
+extern PyModuleDef audioopmodule;
+}
 
 typedef struct {
     PyObject *AudioopError;
@@ -979,7 +981,7 @@ audioop_tomono_impl(PyObject *module, Py_buffer *fragment, int width,
     double maxval, minval;
     PyObject *rv;
 
-    cp = fragment->buf;
+    cp = (signed char*)fragment->buf;
     len = fragment->len;
     if (!audioop_check_parameters(module, len, width))
         return NULL;
@@ -1439,7 +1441,7 @@ audioop_ratecv_impl(PyObject *module, Py_buffer *fragment, int width,
         goto exit;
     }
     ncp = PyBytes_AsString(str);
-    cp = fragment->buf;
+    cp = (char*)fragment->buf;
 
     for (;;) {
         while (d < 0) {
@@ -1563,7 +1565,7 @@ audioop_ulaw2lin_impl(PyObject *module, Py_buffer *fragment, int width)
         return NULL;
     ncp = (signed char *)PyBytes_AsString(rv);
 
-    cp = fragment->buf;
+    cp = (unsigned char*)fragment->buf;
     for (i = 0; i < fragment->len*width; i += width) {
         int val = st_ulaw2linear16(*cp++) << 16;
         SETSAMPLE32(width, ncp, i, val);
@@ -1636,7 +1638,7 @@ audioop_alaw2lin_impl(PyObject *module, Py_buffer *fragment, int width)
     if (rv == NULL)
         return NULL;
     ncp = (signed char *)PyBytes_AsString(rv);
-    cp = fragment->buf;
+    cp = (unsigned char*)fragment->buf;
 
     for (i = 0; i < fragment->len*width; i += width) {
         val = st_alaw2linear16(*cp++) << 16;
@@ -1832,7 +1834,7 @@ audioop_adpcm2lin_impl(PyObject *module, Py_buffer *fragment, int width,
     if (str == NULL)
         return NULL;
     ncp = (signed char *)PyBytes_AsString(str);
-    cp = fragment->buf;
+    cp =  (signed char*)fragment->buf;
 
     step = stepsizeTable[index];
     bufferstep = 0;
@@ -1963,11 +1965,12 @@ audioop_exec(PyObject* module)
 }
 
 static PyModuleDef_Slot audioop_slots[] = {
-    {Py_mod_exec, audioop_exec},
+    {Py_mod_exec, (void*)audioop_exec},
     {0, NULL}
 };
 
-static struct PyModuleDef audioopmodule = {
+namespace {
+struct PyModuleDef audioopmodule = {
     PyModuleDef_HEAD_INIT,
     "audioop",
     NULL,
@@ -1978,6 +1981,7 @@ static struct PyModuleDef audioopmodule = {
     audioop_clear,
     audioop_free
 };
+}
 
 PyMODINIT_FUNC
 PyInit_audioop(void)

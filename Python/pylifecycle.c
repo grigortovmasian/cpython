@@ -39,6 +39,9 @@
        (PyObject_TypeCheck((op), &PyWindowsConsoleIO_Type))
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define PUTS(fd, str) _Py_write_noraise(fd, str, (int)strlen(str))
 
@@ -49,10 +52,6 @@ _Py_IDENTIFIER(stdin);
 _Py_IDENTIFIER(stdout);
 _Py_IDENTIFIER(stderr);
 _Py_IDENTIFIER(threading);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 /* Forward declarations */

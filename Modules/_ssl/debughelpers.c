@@ -138,7 +138,7 @@ _PySSL_keylog_callback(const SSL *ssl, const char *line)
      * critical debug helper.
      */
     if (lock == NULL) {
-        lock = PyThread_allocate_lock();
+        lock = (void**)PyThread_allocate_lock();
         if (lock == NULL) {
             PyErr_SetString(PyExc_MemoryError, "Unable to allocate lock");
             PyErr_Fetch(&ssl_obj->exc_type, &ssl_obj->exc_value,

@@ -2530,6 +2530,10 @@ SimpleExtendsException(PyExc_Warning, ResourceWarning,
 #endif
 #endif /* MS_WINDOWS */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyStatus
 _PyExc_Init(PyThreadState *tstate)
 {
@@ -2661,6 +2665,13 @@ _PyExc_Init(PyThreadState *tstate)
 #undef ADD_ERRNO
 }
 
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Add exception types to the builtins module */
 PyStatus
@@ -2767,6 +2778,7 @@ _PyBuiltins_AddExceptions(PyObject *bltinmod)
 #undef INIT_ALIAS
 }
 
+
 void
 _PyExc_Fini(PyThreadState *tstate)
 {
@@ -2774,6 +2786,11 @@ _PyExc_Fini(PyThreadState *tstate)
     free_preallocated_memerrors(state);
     Py_CLEAR(state->errnomap);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 
 /* Helper to do the equivalent of "raise X from Y" in C, but always using
  * the current exception rather than passing one in.

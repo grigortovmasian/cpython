@@ -5702,6 +5702,10 @@ PyLong_GetInfo(void)
     return int_info;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int
 _PyLong_Init(PyThreadState *tstate)
 {
@@ -5739,3 +5743,8 @@ _PyLong_Fini(PyThreadState *tstate)
         Py_CLEAR(tstate->interp->small_ints[i]);
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
+

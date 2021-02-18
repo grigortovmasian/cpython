@@ -519,7 +519,9 @@ static PyObject *socket_gaierror;
    The sock_type variable contains pointers to various functions,
    some of which call new_sockobject(), which uses sock_type, so
    there has to be a circular reference. */
-static PyTypeObject sock_type;
+namespace {
+extern PyTypeObject sock_type;
+}
 
 #if defined(HAVE_POLL_H)
 #include <poll.h>
@@ -1615,7 +1617,7 @@ idna_converter(PyObject *obj, struct maybe_idna *data)
             return 0;
         }
         if (PyUnicode_IS_COMPACT_ASCII(obj)) {
-            data->buf = PyUnicode_DATA(obj);
+            data->buf = (char*)PyUnicode_DATA(obj);
             len = PyUnicode_GET_LENGTH(obj);
         }
         else {
@@ -2663,7 +2665,7 @@ static int accept4_works = -1;
 static int
 sock_accept_impl(PySocketSockObject *s, void *data)
 {
-    struct sock_accept *ctx = data;
+    struct sock_accept *ctx = (sock_accept*)data;
     struct sockaddr *addr = SAS2SA(ctx->addrbuf);
     socklen_t *paddrlen = ctx->addrlen;
 #ifdef HAVE_SOCKADDR_ALG
@@ -3444,7 +3446,7 @@ struct sock_recv {
 static int
 sock_recv_impl(PySocketSockObject *s, void *data)
 {
-    struct sock_recv *ctx = data;
+    struct sock_recv *ctx = (sock_recv*)data;
 
 #ifdef MS_WINDOWS
     if (ctx->len > INT_MAX)
@@ -3555,7 +3557,7 @@ sock_recv_into(PySocketSockObject *s, PyObject *args, PyObject *kwds)
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "w*|ni:recv_into", kwlist,
                                      &pbuf, &recvlen, &flags))
         return NULL;
-    buf = pbuf.buf;
+    buf = (char*)pbuf.buf;
     buflen = pbuf.len;
 
     if (recvlen < 0) {
@@ -3612,7 +3614,7 @@ struct sock_recvfrom {
 static int
 sock_recvfrom_impl(PySocketSockObject *s, void *data)
 {
-    struct sock_recvfrom *ctx = data;
+    struct sock_recvfrom *ctx = (sock_recvfrom*)data;
 
     memset(ctx->addrbuf, 0, *ctx->addrlen);
 
@@ -3744,7 +3746,7 @@ sock_recvfrom_into(PySocketSockObject *s, PyObject *args, PyObject* kwds)
                                      kwlist, &pbuf,
                                      &recvlen, &flags))
         return NULL;
-    buf = pbuf.buf;
+    buf = (char*)pbuf.buf;
     buflen = pbuf.len;
 
     if (recvlen < 0) {
@@ -3794,7 +3796,7 @@ struct sock_recvmsg {
 static int
 sock_recvmsg_impl(PySocketSockObject *s, void *data)
 {
-    struct sock_recvmsg *ctx = data;
+    struct sock_recvmsg *ctx = (sock_recvmsg*)data;
 
     ctx->result = recvmsg(s->sock_fd, ctx->msg, ctx->flags);
     return  (ctx->result >= 0);
@@ -3946,7 +3948,7 @@ err_closefds:
 static PyObject *
 makeval_recvmsg(ssize_t received, void *data)
 {
-    PyObject **buf = data;
+    PyObject **buf = (PyObject**)data;
 
     if (received < PyBytes_GET_SIZE(*buf))
         _PyBytes_Resize(buf, received);
@@ -4120,7 +4122,7 @@ struct sock_send {
 static int
 sock_send_impl(PySocketSockObject *s, void *data)
 {
-    struct sock_send *ctx = data;
+    struct sock_send *ctx = (sock_send*)data;
 
 #ifdef MS_WINDOWS
     if (ctx->len > INT_MAX)
@@ -4148,7 +4150,7 @@ sock_send(PySocketSockObject *s, PyObject *args)
         PyBuffer_Release(&pbuf);
         return select_error();
     }
-    ctx.buf = pbuf.buf;
+    ctx.buf = (char*)pbuf.buf;
     ctx.len = pbuf.len;
     ctx.flags = flags;
     if (sock_call(s, 1, sock_send_impl, &ctx) < 0) {
@@ -4186,7 +4188,7 @@ sock_sendall(PySocketSockObject *s, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "y*|i:sendall", &pbuf, &flags))
         return NULL;
-    buf = pbuf.buf;
+    buf = (char*)pbuf.buf;
     len = pbuf.len;
 
     if (!IS_SELECTABLE(s)) {
@@ -4259,7 +4261,7 @@ struct sock_sendto {
 static int
 sock_sendto_impl(PySocketSockObject *s, void *data)
 {
-    struct sock_sendto *ctx = data;
+    struct sock_sendto *ctx = (sock_sendto*)data;
 
 #ifdef MS_WINDOWS
     if (ctx->len > INT_MAX)
@@ -4320,7 +4322,7 @@ sock_sendto(PySocketSockObject *s, PyObject *args)
         return NULL;
     }
 
-    ctx.buf = pbuf.buf;
+    ctx.buf = (char*)pbuf.buf;
     ctx.len = pbuf.len;
     ctx.flags = flags;
     ctx.addrlen = addrlen;
@@ -4410,7 +4412,7 @@ sock_sendmsg_iovec(PySocketSockObject *s, PyObject *data_arg,
 static int
 sock_sendmsg_impl(PySocketSockObject *s, void *data)
 {
-    struct sock_sendmsg *ctx = data;
+    struct sock_sendmsg *ctx = (sock_sendmsg*)data;
 
     ctx->result = sendmsg(s->sock_fd, ctx->msg, ctx->flags);
     return (ctx->result >= 0);
@@ -4725,7 +4727,7 @@ sock_sendmsg_afalg(PySocketSockObject *self, PyObject *args, PyObject *kwds)
     header->cmsg_level = SOL_ALG;
     header->cmsg_type = ALG_SET_OP;
     header->cmsg_len = CMSG_LEN(4);
-    uiptr = (void*)CMSG_DATA(header);
+    uiptr = (unsigned int*)CMSG_DATA(header);
     *uiptr = (unsigned int)op;
 
     /* set initialization vector */
@@ -4739,7 +4741,7 @@ sock_sendmsg_afalg(PySocketSockObject *self, PyObject *args, PyObject *kwds)
         header->cmsg_level = SOL_ALG;
         header->cmsg_type = ALG_SET_IV;
         header->cmsg_len = CMSG_SPACE(sizeof(*alg_iv) + iv.len);
-        alg_iv = (void*)CMSG_DATA(header);
+        alg_iv = (af_alg_iv*)CMSG_DATA(header);
         alg_iv->ivlen = iv.len;
         memcpy(alg_iv->iv, iv.buf, iv.len);
     }
@@ -4755,7 +4757,7 @@ sock_sendmsg_afalg(PySocketSockObject *self, PyObject *args, PyObject *kwds)
         header->cmsg_level = SOL_ALG;
         header->cmsg_type = ALG_SET_AEAD_ASSOCLEN;
         header->cmsg_len = CMSG_LEN(4);
-        uiptr = (void*)CMSG_DATA(header);
+        uiptr = (unsigned int*)CMSG_DATA(header);
         *uiptr = (unsigned int)assoclen;
     }
 
@@ -5067,15 +5069,15 @@ sock_repr(PySocketSockObject *s)
 static PyObject *
 sock_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    PyObject *new;
+    PyObject *nw;
 
-    new = type->tp_alloc(type, 0);
-    if (new != NULL) {
-        ((PySocketSockObject *)new)->sock_fd = INVALID_SOCKET;
-        ((PySocketSockObject *)new)->sock_timeout = _PyTime_FromSeconds(-1);
-        ((PySocketSockObject *)new)->errorhandler = &set_error;
+    nw = type->tp_alloc(type, 0);
+    if (nw != NULL) {
+        ((PySocketSockObject *)nw)->sock_fd = INVALID_SOCKET;
+        ((PySocketSockObject *)nw)->sock_timeout = _PyTime_FromSeconds(-1);
+        ((PySocketSockObject *)nw)->errorhandler = &set_error;
     }
-    return new;
+    return nw;
 }
 
 
@@ -5314,8 +5316,8 @@ sock_initobj(PyObject *self, PyObject *args, PyObject *kwds)
 
 
 /* Type object for socket objects. */
-
-static PyTypeObject sock_type = {
+namespace {
+PyTypeObject sock_type = {
     PyVarObject_HEAD_INIT(0, 0)         /* Must fill in type value later */
     "_socket.socket",                           /* tp_name */
     sizeof(PySocketSockObject),                 /* tp_basicsize */
@@ -5365,7 +5367,7 @@ static PyTypeObject sock_type = {
     0,                                          /* tp_version_tag */
     (destructor)sock_finalize,                  /* tp_finalize */
 };
-
+}
 
 /* Python interface to gethostname(). */
 
@@ -5462,7 +5464,7 @@ extern int sethostname(const char *, size_t);
 
     res = PyObject_GetBuffer(hnobj, &buf, PyBUF_SIMPLE);
     if (!res) {
-        res = sethostname(buf.buf, buf.len);
+        res = sethostname((const char*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
     if (flag)
@@ -7046,13 +7048,13 @@ static void
 sock_destroy_api(PyObject *capsule)
 {
     void *capi = PyCapsule_GetPointer(capsule, PySocket_CAPSULE_NAME);
-    sock_free_api(capi);
+    sock_free_api((PySocketModule_APIObject*)capi);
 }
 
 static PySocketModule_APIObject *
 sock_get_api(void)
 {
-    PySocketModule_APIObject *capi = PyMem_Malloc(sizeof(PySocketModule_APIObject));
+    PySocketModule_APIObject *capi = (PySocketModule_APIObject*)PyMem_Malloc(sizeof(PySocketModule_APIObject));
     if (capi == NULL) {
         PyErr_NoMemory();
         return NULL;

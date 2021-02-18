@@ -219,10 +219,10 @@ py_blake2s_new_impl(PyTypeObject *type, PyObject *data, int digest_size,
 
         if (buf.len >= HASHLIB_GIL_MINSIZE) {
             Py_BEGIN_ALLOW_THREADS
-            blake2s_update(&self->state, buf.buf, buf.len);
+            blake2s_update(&self->state, (const uint8_t*)buf.buf, buf.len);
             Py_END_ALLOW_THREADS
         } else {
-            blake2s_update(&self->state, buf.buf, buf.len);
+            blake2s_update(&self->state, (const uint8_t*)buf.buf, buf.len);
         }
         PyBuffer_Release(&buf);
     }
@@ -281,11 +281,11 @@ _blake2_blake2s_update(BLAKE2sObject *self, PyObject *data)
     if (self->lock != NULL) {
        Py_BEGIN_ALLOW_THREADS
        PyThread_acquire_lock(self->lock, 1);
-       blake2s_update(&self->state, buf.buf, buf.len);
+       blake2s_update(&self->state, (const uint8_t*)buf.buf, buf.len);
        PyThread_release_lock(self->lock);
        Py_END_ALLOW_THREADS
     } else {
-        blake2s_update(&self->state, buf.buf, buf.len);
+        blake2s_update(&self->state, (const uint8_t*)buf.buf, buf.len);
     }
     PyBuffer_Release(&buf);
 
@@ -397,11 +397,11 @@ py_blake2s_dealloc(PyObject *self)
 }
 
 static PyType_Slot blake2s_type_slots[] = {
-    {Py_tp_dealloc, py_blake2s_dealloc},
+    {Py_tp_dealloc, (void*)py_blake2s_dealloc},
     {Py_tp_doc, (char *)py_blake2s_new__doc__},
     {Py_tp_methods, py_blake2s_methods},
     {Py_tp_getset, py_blake2s_getsetters},
-    {Py_tp_new, py_blake2s_new},
+    {Py_tp_new, (void*)py_blake2s_new},
     {0,0}
 };
 

@@ -69,9 +69,7 @@ typedef struct {
     PyObject *dict;
 } fileio;
 
-namespace {
 extern PyTypeObject PyFileIO_Type;
-}
 
 _Py_IDENTIFIER(name);
 
@@ -1189,7 +1187,7 @@ static PyMemberDef fileio_members[] = {
     {NULL}
 };
 
-namespace {
+
 PyTypeObject PyFileIO_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_io.FileIO",
@@ -1241,4 +1239,3 @@ PyTypeObject PyFileIO_Type = {
     0,                                          /* tp_version_tag */
     0,                                          /* tp_finalize */
 };
-}

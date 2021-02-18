@@ -309,6 +309,10 @@ exit:
     return res;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int
 _PySys_Audit(PyThreadState *tstate, const char *event,
              const char *argFormat, ...)
@@ -338,6 +342,7 @@ PySys_Audit(const char *event, const char *argFormat, ...)
     va_end(vargs);
     return res;
 }
+
 
 /* We expose this function primarily for our own cleanup during
  * finalization. In general, it should not need to be called,
@@ -377,6 +382,10 @@ _PySys_ClearAuditHooks(PyThreadState *ts)
         e = n;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 int
 PySys_AddAuditHook(Py_AuditHookFunction hook, void *userData)

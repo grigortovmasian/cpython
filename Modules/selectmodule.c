@@ -67,7 +67,9 @@ typedef struct {
     PyTypeObject *kqueue_queue_Type;
 } _selectstate;
 
-static struct PyModuleDef selectmodule;
+namespace {
+extern struct PyModuleDef selectmodule;
+}
 
 static inline _selectstate*
 get_select_state(PyObject *module)
@@ -1265,7 +1267,7 @@ newPyEpoll_Object(PyTypeObject *type, int sizehint, SOCKET fd)
 {
     pyEpoll_Object *self;
     assert(type != NULL);
-    allocfunc epoll_alloc = PyType_GetSlot(type, Py_tp_alloc);
+    allocfunc epoll_alloc = (allocfunc)PyType_GetSlot(type, Py_tp_alloc);
     assert(epoll_alloc != NULL);
     self = (pyEpoll_Object *) epoll_alloc(type, 0);
     if (self == NULL)
@@ -1344,7 +1346,7 @@ pyepoll_dealloc(pyEpoll_Object *self)
 {
     PyTypeObject* type = Py_TYPE(self);
     (void)pyepoll_internal_close(self);
-    freefunc epoll_free = PyType_GetSlot(type, Py_tp_free);
+    freefunc epoll_free = (freefunc)PyType_GetSlot(type, Py_tp_free);
     epoll_free((PyObject *)self);
     Py_DECREF((PyObject *)type);
 }
@@ -2273,9 +2275,9 @@ static PyMethodDef poll_methods[] = {
 
 
 static PyType_Slot poll_Type_slots[] = {
-    {Py_tp_dealloc, poll_dealloc},
+    {Py_tp_dealloc, (void*)poll_dealloc},
     {Py_tp_methods, poll_methods},
-    {Py_tp_new, poll_new},
+    {Py_tp_new, (void*)poll_new},
     {0, 0},
 };
 
@@ -2319,12 +2321,12 @@ static PyMethodDef pyepoll_methods[] = {
 };
 
 static PyType_Slot pyEpoll_Type_slots[] = {
-    {Py_tp_dealloc, pyepoll_dealloc},
+    {Py_tp_dealloc, (void*)pyepoll_dealloc},
     {Py_tp_doc, (void*)pyepoll_doc},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
     {Py_tp_getset, pyepoll_getsetlist},
     {Py_tp_methods, pyepoll_methods},
-    {Py_tp_new, select_epoll},
+    {Py_tp_new, (void*)select_epoll},
     {0, 0},
 };
 
@@ -2644,11 +2646,12 @@ _select_exec(PyObject *m)
 }
 
 static PyModuleDef_Slot _select_slots[] = {
-    {Py_mod_exec, _select_exec},
+    {Py_mod_exec, (void*)_select_exec},
     {0, NULL}
 };
 
-static struct PyModuleDef selectmodule = {
+namespace {
+struct PyModuleDef selectmodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "select",
     .m_doc = module_doc,
@@ -2659,6 +2662,7 @@ static struct PyModuleDef selectmodule = {
     .m_clear = _select_clear,
     .m_free = _select_free,
 };
+}
 
 PyMODINIT_FUNC
 PyInit_select(void)

@@ -14,7 +14,7 @@ _copy_raw_string(PyObject *strobj)
     if (str == NULL) {
         return NULL;
     }
-    char *copied = PyMem_Malloc(strlen(str)+1);
+    char *copied = (char*)PyMem_Malloc(strlen(str)+1);
     if (copied == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -205,8 +205,8 @@ _sharedexception_bind(PyObject *exctype, PyObject *exc, PyObject *tb)
 {
     assert(exctype != NULL);
     char *failure = NULL;
-
     _sharedexception *err = _sharedexception_new();
+    {
     if (err == NULL) {
         goto finally;
     }
@@ -244,7 +244,7 @@ _sharedexception_bind(PyObject *exctype, PyObject *exc, PyObject *tb)
             goto finally;
         }
     }
-
+    }
 finally:
     if (failure != NULL) {
         PyErr_Clear();
@@ -1002,6 +1002,7 @@ _channels_add(_channels *channels, _PyChannelState *chan)
 
     // Create a new ref.
     int64_t id = _channels_next_id(channels);
+    {
     if (id < 0) {
         goto done;
     }
@@ -1017,6 +1018,7 @@ _channels_add(_channels *channels, _PyChannelState *chan)
     channels->numopen += 1;
 
     cid = id;
+    }
 done:
     PyThread_release_lock(channels->mutex);
     return cid;
@@ -1180,6 +1182,7 @@ _channels_list_all(_channels *channels, int64_t *count)
     int64_t *cids = NULL;
     PyThread_acquire_lock(channels->mutex, WAIT_LOCK);
     int64_t *ids = PyMem_NEW(int64_t, (Py_ssize_t)(channels->numopen));
+    {
     if (ids == NULL) {
         goto done;
     }
@@ -1190,6 +1193,7 @@ _channels_list_all(_channels *channels, int64_t *count)
     *count = channels->numopen;
 
     cids = ids;
+    }
 done:
     PyThread_release_lock(channels->mutex);
     return cids;
@@ -1407,7 +1411,9 @@ _channel_is_associated(_channels *channels, int64_t cid, int64_t interp,
 
 /* ChannelID class */
 
-static PyTypeObject ChannelIDtype;
+namespace {
+extern PyTypeObject ChannelIDtype;
+}
 
 typedef struct channelid {
     PyObject_HEAD
@@ -1760,7 +1766,8 @@ static PyGetSetDef channelid_getsets[] = {
 PyDoc_STRVAR(channelid_doc,
 "A channel ID identifies a channel and may be used as an int.");
 
-static PyTypeObject ChannelIDtype = {
+namespace {
+PyTypeObject ChannelIDtype = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "_xxsubinterpreters.ChannelID", /* tp_name */
     sizeof(channelid),              /* tp_basicsize */
@@ -1805,7 +1812,7 @@ static PyTypeObject ChannelIDtype = {
     // related complications.
     NULL,                           /* tp_new */
 };
-
+}
 
 /* interpreter-specific code ************************************************/
 
@@ -1876,6 +1883,7 @@ _run_script(PyInterpreterState *interp, const char *codestr,
     PyObject *tb = NULL;
 
     PyObject *main_mod = _PyInterpreterState_GetMainModule(interp);
+    {
     if (main_mod == NULL) {
         goto error;
     }
@@ -1906,7 +1914,7 @@ _run_script(PyInterpreterState *interp, const char *codestr,
 
     *exc = NULL;
     return 0;
-
+    }
 error:
     PyErr_Fetch(&exctype, &excval, &tb);
 
@@ -2326,6 +2334,7 @@ channel_list_all(PyObject *self, PyObject *Py_UNUSED(ignored))
 {
     int64_t count = 0;
     int64_t *cids = _channels_list_all(&_globals.channels, &count);
+
     if (cids == NULL) {
         if (count == 0) {
             return PyList_New(0);
@@ -2333,6 +2342,7 @@ channel_list_all(PyObject *self, PyObject *Py_UNUSED(ignored))
         return NULL;
     }
     PyObject *ids = PyList_New((Py_ssize_t)count);
+    {
     if (ids == NULL) {
         goto finally;
     }
@@ -2347,7 +2357,7 @@ channel_list_all(PyObject *self, PyObject *Py_UNUSED(ignored))
         }
         PyList_SET_ITEM(ids, i, id);
     }
-
+    }
 finally:
     PyMem_Free(cids);
     return ids;

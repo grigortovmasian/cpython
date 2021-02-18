@@ -75,7 +75,9 @@ typedef struct {
     PyObject* isenabled;
 } _posixsubprocessstate;
 
-static struct PyModuleDef _posixsubprocessmodule;
+namespace {
+extern struct PyModuleDef _posixsubprocessmodule;
+}
 
 static inline _posixsubprocessstate*
 get_posixsubprocess_state(PyObject *module)
@@ -423,7 +425,8 @@ _close_open_fds_maybe_unsafe(long start_fd, PyObject* py_fds_to_keep)
 static void
 reset_signal_handlers(const sigset_t *child_sigmask)
 {
-    struct sigaction sa_dfl = {.sa_handler = SIG_DFL};
+    struct sigaction sa_dfl;
+    sa_dfl.sa_handler = SIG_DFL;
     for (int sig = 1; sig < _NSIG; sig++) {
         /* Dispositions for SIGKILL and SIGSTOP can't be changed. */
         if (sig == SIGKILL || sig == SIGSTOP) {
@@ -582,8 +585,8 @@ child_exec(char *const exec_array[],
 
 #ifdef VFORK_USABLE
     if (child_sigmask) {
-        reset_signal_handlers(child_sigmask);
-        if ((errno = pthread_sigmask(SIG_SETMASK, child_sigmask, NULL))) {
+        reset_signal_handlers((const sigset_t*)child_sigmask);
+        if ((errno = pthread_sigmask(SIG_SETMASK, (const sigset_t*)child_sigmask, NULL))) {
             goto error;
         }
     }
@@ -847,6 +850,7 @@ subprocess_fork_exec(PyObject *module, PyObject *args)
     }
 
     exec_array = _PySequence_BytesToCharpArray(executable_list);
+    {
     if (!exec_array)
         goto cleanup;
 
@@ -917,7 +921,7 @@ subprocess_fork_exec(PyObject *module, PyObject *args)
             goto cleanup;
         }
 
-        if ((groups = PyMem_RawMalloc(num_groups * sizeof(gid_t))) == NULL) {
+        if ((groups = (gid_t*)PyMem_RawMalloc(num_groups * sizeof(gid_t))) == NULL) {
             PyErr_SetString(PyExc_MemoryError,
                     "failed to allocate memory for group list");
             goto cleanup;
@@ -1041,13 +1045,13 @@ subprocess_fork_exec(PyObject *module, PyObject *args)
          * if valid arguments are given, and because there is no good
          * way for the caller to deal with a failure to restore
          * the thread signal mask. */
-        (void) pthread_sigmask(SIG_SETMASK, old_sigmask, NULL);
+        (void) pthread_sigmask(SIG_SETMASK, (const __sigset_t*)old_sigmask, NULL);
     }
 #endif
 
     if (need_after_fork)
         PyOS_AfterFork_Parent();
-
+     }
 cleanup:
     if (saved_errno != 0) {
         errno = saved_errno;
@@ -1137,7 +1141,7 @@ static PyMethodDef module_methods[] = {
 };
 
 static PyModuleDef_Slot _posixsubprocess_slots[] = {
-    {Py_mod_exec, _posixsubprocess_exec},
+    {Py_mod_exec, (void*)_posixsubprocess_exec},
     {0, NULL}
 };
 
@@ -1159,7 +1163,8 @@ static void _posixsubprocess_free(void *m) {
     _posixsubprocess_clear((PyObject *)m);
 }
 
-static struct PyModuleDef _posixsubprocessmodule = {
+namespace {
+struct PyModuleDef _posixsubprocessmodule = {
         PyModuleDef_HEAD_INIT,
         .m_name = "_posixsubprocess",
         .m_doc = module_doc,
@@ -1170,6 +1175,7 @@ static struct PyModuleDef _posixsubprocessmodule = {
         .m_clear = _posixsubprocess_clear,
         .m_free = _posixsubprocess_free,
 };
+}
 
 PyMODINIT_FUNC
 PyInit__posixsubprocess(void)

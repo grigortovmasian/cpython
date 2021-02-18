@@ -100,7 +100,7 @@ static int init_struct_unpack() {
 static int fuzz_struct_unpack(const char* data, size_t size) {
     /* Everything up to the first null byte is considered the
        format. Everything after is the buffer */
-    const char* first_null = memchr(data, '\0', size);
+    const char* first_null = (const char*)memchr(data, '\0', size);
     if (first_null == NULL) {
         return 0;
     }

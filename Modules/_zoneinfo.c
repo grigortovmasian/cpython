@@ -79,7 +79,9 @@ struct StrongCacheNode {
     PyObject *zone;
 };
 
-static PyTypeObject PyZoneInfo_ZoneInfoType;
+namespace {
+extern  PyTypeObject PyZoneInfo_ZoneInfoType;
+}
 
 // Globals
 static PyObject *TIMEDELTA_CACHE = NULL;
@@ -193,6 +195,7 @@ zoneinfo_new_instance(PyTypeObject *type, PyObject *key)
     }
 
     PyObject *self = (PyObject *)(type->tp_alloc(type, 0));
+    { {
     if (self == NULL) {
         goto error;
     }
@@ -215,14 +218,16 @@ zoneinfo_new_instance(PyTypeObject *type, PyObject *key)
         goto error;
     }
     Py_DECREF(rv);
-
+     
     ((PyZoneInfo_ZoneInfo *)self)->key = key;
     Py_INCREF(key);
-
+ 
     goto cleanup;
+    }
 error:
     Py_XDECREF(self);
     self = NULL;
+    }
 cleanup:
     if (file_obj != NULL) {
         PyObject *exc, *val, *tb;
@@ -841,11 +846,12 @@ load_data(PyZoneInfo_ZoneInfo *self, PyObject *file_obj)
     self->trans_ttinfos = NULL;
     self->_ttinfos = NULL;
     self->file_repr = NULL;
+    int rv = 0; 
 
     size_t ttinfos_allocated = 0;
 
     data_tuple = PyObject_CallMethod(_common_mod, "load_data", "O", file_obj);
-
+    { {
     if (data_tuple == NULL) {
         goto error;
     }
@@ -903,14 +909,15 @@ load_data(PyZoneInfo_ZoneInfo *self, PyObject *file_obj)
 
     // Load the transition indices and list
     self->trans_list_utc =
-        PyMem_Malloc(self->num_transitions * sizeof(int64_t));
+        (int64_t*)PyMem_Malloc(self->num_transitions * sizeof(int64_t));
     if (self->trans_list_utc == NULL) {
         goto error;
     }
-    trans_idx = PyMem_Malloc(self->num_transitions * sizeof(Py_ssize_t));
+    trans_idx = (size_t*)PyMem_Malloc(self->num_transitions * sizeof(Py_ssize_t));
     if (trans_idx == NULL) {
         goto error;
     }
+
 
     for (size_t i = 0; i < self->num_transitions; ++i) {
         PyObject *num = PyTuple_GetItem(trans_utc, i);
@@ -944,8 +951,8 @@ load_data(PyZoneInfo_ZoneInfo *self, PyObject *file_obj)
     }
 
     // Load UTC offsets and isdst (size num_ttinfos)
-    utcoff = PyMem_Malloc(self->num_ttinfos * sizeof(long));
-    isdst = PyMem_Malloc(self->num_ttinfos * sizeof(unsigned char));
+    utcoff = (long int*)PyMem_Malloc(self->num_ttinfos * sizeof(long));
+    isdst = (unsigned char*)PyMem_Malloc(self->num_ttinfos * sizeof(unsigned char));
 
     if (utcoff == NULL || isdst == NULL) {
         goto error;
@@ -975,7 +982,7 @@ load_data(PyZoneInfo_ZoneInfo *self, PyObject *file_obj)
         }
     }
 
-    dstoff = PyMem_Calloc(self->num_ttinfos, sizeof(long));
+    dstoff = (long int*)PyMem_Calloc(self->num_ttinfos, sizeof(long));
     if (dstoff == NULL) {
         goto error;
     }
@@ -991,7 +998,7 @@ load_data(PyZoneInfo_ZoneInfo *self, PyObject *file_obj)
     }
 
     // Build _ttinfo objects from utcoff, dstoff and abbr
-    self->_ttinfos = PyMem_Malloc(self->num_ttinfos * sizeof(_ttinfo));
+    self->_ttinfos = (_ttinfo*)PyMem_Malloc(self->num_ttinfos * sizeof(_ttinfo));
     if (self->_ttinfos == NULL) {
         goto error;
     }
@@ -1009,7 +1016,7 @@ load_data(PyZoneInfo_ZoneInfo *self, PyObject *file_obj)
 
     // Build our mapping from transition to the ttinfo that applies
     self->trans_ttinfos =
-        PyMem_Calloc(self->num_transitions, sizeof(_ttinfo *));
+        (_ttinfo**)PyMem_Calloc(self->num_transitions, sizeof(_ttinfo *));
     if (self->trans_ttinfos == NULL) {
         goto error;
     }
@@ -1102,9 +1109,9 @@ load_data(PyZoneInfo_ZoneInfo *self, PyObject *file_obj)
             self->fixed_offset = constant_offset;
         }
     }
-
-    int rv = 0;
+    
     goto cleanup;
+}
 error:
     // These resources only need to be freed if we have failed, if we succeed
     // in initializing a PyZoneInfo_ZoneInfo object, we can rely on its dealloc
@@ -1135,6 +1142,7 @@ error:
     }
 
     rv = -1;
+    }
 cleanup:
     Py_XDECREF(data_tuple);
 
@@ -1470,6 +1478,7 @@ parse_tz_str(PyObject *tz_str_obj, _tzrule *out)
         return -1;
     }
     char *p = tz_str;
+    {{
 
     // Read the `std` abbreviation, which must be at least 3 characters long.
     Py_ssize_t num_chars = parse_abbr(p, &std_abbr);
@@ -1545,13 +1554,14 @@ parse_tz_str(PyObject *tz_str_obj, _tzrule *out)
                      tz_str_obj);
         goto error;
     }
-
+    }
 complete:
     build_tzrule(std_abbr, dst_abbr, std_offset, dst_offset, start, end, out);
     Py_DECREF(std_abbr);
     Py_XDECREF(dst_abbr);
 
     return 0;
+    }
 error:
     Py_XDECREF(std_abbr);
     if (dst_abbr != NULL && dst_abbr != Py_None) {
@@ -1782,7 +1792,7 @@ parse_transition_rule(const char *const p, TransitionRuleType **out)
             ptr += num_chars;
         }
 
-        CalendarRule *rv = PyMem_Calloc(1, sizeof(CalendarRule));
+        CalendarRule *rv = (CalendarRule*)PyMem_Calloc(1, sizeof(CalendarRule));
         if (rv == NULL) {
             return -1;
         }
@@ -1824,7 +1834,7 @@ parse_transition_rule(const char *const p, TransitionRuleType **out)
             ptr += num_chars;
         }
 
-        DayRule *rv = PyMem_Calloc(1, sizeof(DayRule));
+        DayRule *rv = (DayRule*)PyMem_Calloc(1, sizeof(DayRule));
         if (rv == NULL) {
             return -1;
         }
@@ -2061,7 +2071,7 @@ ts_to_local(size_t *trans_idx, int64_t *trans_utc, long *utcoff,
 
     // Copy the UTC transitions into each array to be modified in place later
     for (size_t i = 0; i < 2; ++i) {
-        trans_local[i] = PyMem_Malloc(num_transitions * sizeof(int64_t));
+        trans_local[i] = (int64_t*)PyMem_Malloc(num_transitions * sizeof(int64_t));
         if (trans_local[i] == NULL) {
             return -1;
         }
@@ -2261,7 +2271,7 @@ get_local_timestamp(PyObject *dt, int64_t *local_ts)
 static StrongCacheNode *
 strong_cache_node_new(PyObject *key, PyObject *zone)
 {
-    StrongCacheNode *node = PyMem_Malloc(sizeof(StrongCacheNode));
+    StrongCacheNode *node = (StrongCacheNode*)PyMem_Malloc(sizeof(StrongCacheNode));
     if (node == NULL) {
         return NULL;
     }
@@ -2566,28 +2576,30 @@ static PyMethodDef zoneinfo_methods[] = {
 
 static PyMemberDef zoneinfo_members[] = {
     {.name = "key",
-     .offset = offsetof(PyZoneInfo_ZoneInfo, key),
      .type = T_OBJECT_EX,
+     .offset = offsetof(PyZoneInfo_ZoneInfo, key),
      .flags = READONLY,
      .doc = NULL},
     {NULL}, /* Sentinel */
 };
 
-static PyTypeObject PyZoneInfo_ZoneInfoType = {
+namespace {
+PyTypeObject PyZoneInfo_ZoneInfoType = {
     PyVarObject_HEAD_INIT(NULL, 0)  //
-        .tp_name = "zoneinfo.ZoneInfo",
+    .tp_name = "zoneinfo.ZoneInfo",
     .tp_basicsize = sizeof(PyZoneInfo_ZoneInfo),
-    .tp_weaklistoffset = offsetof(PyZoneInfo_ZoneInfo, weakreflist),
+    .tp_dealloc = zoneinfo_dealloc,
     .tp_repr = (reprfunc)zoneinfo_repr,
     .tp_str = (reprfunc)zoneinfo_str,
     .tp_getattro = PyObject_GenericGetAttr,
     .tp_flags = (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE),
     /* .tp_doc = zoneinfo_doc, */
+    .tp_weaklistoffset = offsetof(PyZoneInfo_ZoneInfo, weakreflist),
     .tp_methods = zoneinfo_methods,
     .tp_members = zoneinfo_members,
     .tp_new = zoneinfo_new,
-    .tp_dealloc = zoneinfo_dealloc,
 };
+}
 
 /////
 // Specify the _zoneinfo module
@@ -2626,10 +2638,11 @@ zoneinfomodule_exec(PyObject *m)
 {
     PyDateTime_IMPORT;
     PyZoneInfo_ZoneInfoType.tp_base = PyDateTimeAPI->TZInfoType;
+    {
     if (PyType_Ready(&PyZoneInfo_ZoneInfoType) < 0) {
         goto error;
     }
-
+ 
     Py_INCREF(&PyZoneInfo_ZoneInfoType);
     PyModule_AddObject(m, "ZoneInfo", (PyObject *)&PyZoneInfo_ZoneInfoType);
 
@@ -2677,13 +2690,13 @@ zoneinfomodule_exec(PyObject *m)
     }
 
     return 0;
-
+    }
 error:
     return -1;
 }
 
 static PyModuleDef_Slot zoneinfomodule_slots[] = {
-    {Py_mod_exec, zoneinfomodule_exec}, {0, NULL}};
+    {Py_mod_exec, (void*)zoneinfomodule_exec}, {0, NULL}};
 
 static struct PyModuleDef zoneinfomodule = {
     PyModuleDef_HEAD_INIT,

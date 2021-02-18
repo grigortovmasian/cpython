@@ -1341,6 +1341,9 @@ faulthandler_init_enable(void)
 
     return 0;
 }
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyStatus
 _PyFaulthandler_Init(int enable)
@@ -1415,3 +1418,7 @@ void _PyFaulthandler_Fini(void)
     }
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif

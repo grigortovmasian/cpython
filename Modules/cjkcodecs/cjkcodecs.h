@@ -60,8 +60,10 @@ struct pair_encodemap {
     DBCHAR code;
 };
 
-static const MultibyteCodec *codec_list;
-static const struct dbcs_map *mapping_list;
+namespace {
+extern const MultibyteCodec *codec_list;
+extern const struct dbcs_map *mapping_list;
+}
 
 #define CODEC_INIT(encoding)                                            \
     static int encoding##_codec_init(const void *config)
@@ -203,13 +205,14 @@ static const struct dbcs_map *mapping_list;
     _TRYMAP_DEC(&charset##_decmap[c1], assi, c2)
 
 #define BEGIN_MAPPINGS_LIST static const struct dbcs_map _mapping_list[] = {
-#define MAPPING_ENCONLY(enc) {#enc, (void*)enc##_encmap, NULL},
-#define MAPPING_DECONLY(enc) {#enc, NULL, (void*)enc##_decmap},
-#define MAPPING_ENCDEC(enc) {#enc, (void*)enc##_encmap, (void*)enc##_decmap},
+#define MAPPING_ENCONLY(enc) {#enc, enc##_encmap, NULL},
+#define MAPPING_DECONLY(enc) {#enc, NULL, enc##_decmap},
+#define MAPPING_ENCDEC(enc) {#enc, enc##_encmap, enc##_decmap},
 #define END_MAPPINGS_LIST                               \
     {"", NULL, NULL} };                                 \
-    static const struct dbcs_map *mapping_list =        \
-        (const struct dbcs_map *)_mapping_list;
+    namespace {                                         \
+    const struct dbcs_map *mapping_list =               \
+        (const struct dbcs_map *)_mapping_list;}
 
 #define BEGIN_CODECS_LIST static const MultibyteCodec _codec_list[] = {
 #define _STATEFUL_METHODS(enc)          \
@@ -237,8 +240,9 @@ static const struct dbcs_map *mapping_list;
 },
 #define END_CODECS_LIST                                 \
     {"", NULL,} };                                      \
-    static const MultibyteCodec *codec_list =           \
-        (const MultibyteCodec *)_codec_list;
+    namespace {                                         \
+    const MultibyteCodec *codec_list =           \
+        (const MultibyteCodec *)_codec_list;}        
 
 
 
@@ -378,7 +382,7 @@ importmap(const char *modname, const char *symbol,
     }
     else {
         struct dbcs_map *map;
-        map = PyCapsule_GetPointer(o, PyMultibyteCodec_CAPSULE_NAME);
+        map = (dbcs_map*)PyCapsule_GetPointer(o, PyMultibyteCodec_CAPSULE_NAME);
         if (encmap != NULL)
             *encmap = map->encmap;
         if (decmap != NULL)
@@ -408,7 +412,7 @@ static struct PyMethodDef _cjk_methods[] = {
 };
 
 static PyModuleDef_Slot _cjk_slots[] = {
-    {Py_mod_exec, _cjk_exec},
+    {Py_mod_exec, (void*)_cjk_exec},
     {0, NULL}
 };
 

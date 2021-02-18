@@ -339,7 +339,7 @@ static PyObject *
 SHA1Type_copy_impl(SHA1object *self, PyTypeObject *cls)
 /*[clinic end generated code: output=b32d4461ce8bc7a7 input=6c22e66fcc34c58e]*/
 {
-    SHA1State *st = PyType_GetModuleState(cls);
+    SHA1State *st = (SHA1State *)PyType_GetModuleState(cls);
 
     SHA1object *newobj;
     if ((newobj = newSHA1object(st)) == NULL)
@@ -404,7 +404,7 @@ SHA1Type_update(SHA1object *self, PyObject *obj)
 
     GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
 
-    sha1_process(&self->hash_state, buf.buf, buf.len);
+    sha1_process(&self->hash_state, (const unsigned char*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     Py_RETURN_NONE;
@@ -453,7 +453,7 @@ static PyGetSetDef SHA1_getseters[] = {
 };
 
 static PyType_Slot sha1_type_slots[] = {
-    {Py_tp_dealloc, SHA1_dealloc},
+    {Py_tp_dealloc, (void*)SHA1_dealloc},
     {Py_tp_methods, SHA1_methods},
     {Py_tp_getset, SHA1_getseters},
     {0,0}
@@ -482,33 +482,33 @@ static PyObject *
 _sha1_sha1_impl(PyObject *module, PyObject *string, int usedforsecurity)
 /*[clinic end generated code: output=6f8b3af05126e18e input=bd54b68e2bf36a8a]*/
 {
-    SHA1object *new;
+    SHA1object *nw;
     Py_buffer buf;
 
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
     SHA1State *st = sha1_get_state(module);
-    if ((new = newSHA1object(st)) == NULL) {
+    if ((nw = newSHA1object(st)) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    sha1_init(&new->hash_state);
+    sha1_init(&nw->hash_state);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        sha1_process(&new->hash_state, buf.buf, buf.len);
+        sha1_process(&nw->hash_state, (const unsigned char*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 
@@ -568,7 +568,7 @@ _sha1_exec(PyObject *module)
 /* Initialize this module. */
 
 static PyModuleDef_Slot _sha1_slots[] = {
-    {Py_mod_exec, _sha1_exec},
+    {Py_mod_exec, (void*)_sha1_exec},
     {0, NULL}
 };
 

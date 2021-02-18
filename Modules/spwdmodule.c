@@ -71,7 +71,9 @@ get_spwd_state(PyObject *module)
     return (spwdmodulestate *)state;
 }
 
-static struct PyModuleDef spwdmodule;
+namespace {
+extern struct PyModuleDef spwdmodule;
+}
 
 static void
 sets(PyObject *v, int i, const char* val)
@@ -223,7 +225,7 @@ spwdmodule_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot spwdmodule_slots[] = {
-    {Py_mod_exec, spwdmodule_exec},
+    {Py_mod_exec, (void*)spwdmodule_exec},
     {0, NULL}
 };
 
@@ -241,7 +243,8 @@ static void spwdmodule_free(void *m) {
     spwdmodule_clear((PyObject *)m);
 }
 
-static struct PyModuleDef spwdmodule = {
+namespace {
+struct PyModuleDef spwdmodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "spwd",
     .m_doc = spwd__doc__,
@@ -252,6 +255,7 @@ static struct PyModuleDef spwdmodule = {
     .m_clear = spwdmodule_clear,
     .m_free = spwdmodule_free,
 };
+}
 
 PyMODINIT_FUNC
 PyInit_spwd(void)

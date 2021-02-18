@@ -417,7 +417,7 @@ SHA256Type_copy_impl(SHAobject *self, PyTypeObject *cls)
 /*[clinic end generated code: output=9273f92c382be12f input=3137146fcb88e212]*/
 {
     SHAobject *newobj;
-    _sha256_state *state = PyType_GetModuleState(cls);
+    _sha256_state *state = (_sha256_state*)PyType_GetModuleState(cls);
     if (Py_IS_TYPE(self, state->sha256_type)) {
         if ( (newobj = newSHA256object(state)) == NULL) {
             return NULL;
@@ -487,7 +487,7 @@ SHA256Type_update(SHAobject *self, PyObject *obj)
 
     GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
 
-    sha_update(self, buf.buf, buf.len);
+    sha_update(self, (SHA_BYTE*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     Py_RETURN_NONE;
@@ -534,7 +534,7 @@ static PyMemberDef SHA_members[] = {
 };
 
 static PyType_Slot sha256_types_slots[] = {
-    {Py_tp_dealloc, SHA_dealloc},
+    {Py_tp_dealloc, (void*)SHA_dealloc},
     {Py_tp_methods, SHA_methods},
     {Py_tp_members, SHA_members},
     {Py_tp_getset, SHA_getseters},
@@ -577,31 +577,31 @@ _sha256_sha256_impl(PyObject *module, PyObject *string, int usedforsecurity)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
     }
 
-    _sha256_state *state = PyModule_GetState(module);
+    _sha256_state *state = (_sha256_state *)PyModule_GetState(module);
 
-    SHAobject *new;
-    if ((new = newSHA256object(state)) == NULL) {
+    SHAobject *nw;
+    if ((nw = newSHA256object(state)) == NULL) {
         if (string) {
             PyBuffer_Release(&buf);
         }
         return NULL;
     }
 
-    sha_init(new);
+    sha_init(nw);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string) {
             PyBuffer_Release(&buf);
         }
         return NULL;
     }
     if (string) {
-        sha_update(new, buf.buf, buf.len);
+        sha_update(nw, (SHA_BYTE*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 /*[clinic input]
@@ -623,30 +623,30 @@ _sha256_sha224_impl(PyObject *module, PyObject *string, int usedforsecurity)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
     }
 
-    _sha256_state *state = PyModule_GetState(module);
-    SHAobject *new;
-    if ((new = newSHA224object(state)) == NULL) {
+    _sha256_state *state = (_sha256_state*)PyModule_GetState(module);
+    SHAobject *nw;
+    if ((nw = newSHA224object(state)) == NULL) {
         if (string) {
             PyBuffer_Release(&buf);
         }
         return NULL;
     }
 
-    sha224_init(new);
+    sha224_init(nw);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string) {
             PyBuffer_Release(&buf);
         }
         return NULL;
     }
     if (string) {
-        sha_update(new, buf.buf, buf.len);
+        sha_update(nw, (SHA_BYTE*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 
@@ -714,7 +714,7 @@ static int sha256_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot _sha256_slots[] = {
-    {Py_mod_exec, sha256_exec},
+    {Py_mod_exec, (void*)sha256_exec},
     {0, NULL}
 };
 

@@ -32,6 +32,12 @@
 #include "opcode.h"
 #include "wordcode_helpers.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #define DEFAULT_BLOCK_SIZE 16
 #define DEFAULT_BLOCKS 8
 #define DEFAULT_CODE_SIZE 128
@@ -2037,6 +2043,7 @@ error:
     Py_XDECREF(keys);
     return 0;
 }
+
 
 static int
 compiler_visit_annexpr(struct compiler *c, expr_ty annotation)
@@ -6671,4 +6678,9 @@ PyCode_Optimize(PyObject *code, PyObject* Py_UNUSED(consts),
     Py_INCREF(code);
     return code;
 }
+
+
+#ifdef __cplusplus
+}
+#endif
 

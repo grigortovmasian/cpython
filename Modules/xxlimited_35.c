@@ -104,11 +104,11 @@ Xxo_setattr(XxoObject *self, const char *name, PyObject *v)
 }
 
 static PyType_Slot Xxo_Type_slots[] = {
-    {Py_tp_doc, "The Xxo type"},
-    {Py_tp_traverse, Xxo_traverse},
-    {Py_tp_finalize, Xxo_finalize},
-    {Py_tp_getattro, Xxo_getattro},
-    {Py_tp_setattr, Xxo_setattr},
+    {Py_tp_doc, (void*)"The Xxo type"},
+    {Py_tp_traverse, (void*)Xxo_traverse},
+    {Py_tp_finalize,(void*)Xxo_finalize},
+    {Py_tp_getattro, (void*)Xxo_getattro},
+    {Py_tp_setattr, (void*)Xxo_setattr},
     {Py_tp_methods, Xxo_methods},
     {0, 0},
 };
@@ -197,7 +197,7 @@ null_richcompare(PyObject *self, PyObject *other, int op)
 static PyType_Slot Null_Type_slots[] = {
     {Py_tp_base, NULL}, /* filled out in module init */
     {Py_tp_new, NULL},
-    {Py_tp_richcompare, null_richcompare},
+    {Py_tp_richcompare, (void*)null_richcompare},
     {0, 0}
 };
 
@@ -235,7 +235,7 @@ xx_modexec(PyObject *m)
      * here. It's required for portability to Windows without requiring
      * C++. */
     Null_Type_slots[0].pfunc = &PyBaseObject_Type;
-    Null_Type_slots[1].pfunc = PyType_GenericNew;
+    Null_Type_slots[1].pfunc = (void*)PyType_GenericNew;
     Str_Type_slots[0].pfunc = &PyUnicode_Type;
 
     Xxo_Type = PyType_FromSpec(&Xxo_Type_spec);
@@ -276,7 +276,7 @@ xx_modexec(PyObject *m)
 
 
 static PyModuleDef_Slot xx_slots[] = {
-    {Py_mod_exec, xx_modexec},
+    {Py_mod_exec, (void*)xx_modexec},
     {0, NULL}
 };
 

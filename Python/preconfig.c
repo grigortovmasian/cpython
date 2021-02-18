@@ -24,6 +24,10 @@ int Py_HasFileSystemDefaultEncoding = 0;
 const char *Py_FileSystemDefaultEncodeErrors = NULL;
 int _Py_HasFileSystemDefaultEncodeErrors = 0;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 _Py_ClearFileSystemEncoding(void)
 {
@@ -66,6 +70,10 @@ _Py_SetFileSystemEncoding(const char *encoding, const char *errors)
     _Py_HasFileSystemDefaultEncodeErrors = 0;
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 
 /* --- _PyArgv ---------------------------------------------------- */

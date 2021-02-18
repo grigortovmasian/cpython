@@ -23,7 +23,10 @@ static PyObject *simple_format = NULL;
 /*                             NDArray Object                             */
 /**************************************************************************/
 
-static PyTypeObject NDArray_Type;
+namespace {
+extern PyTypeObject NDArray_Type;
+}
+
 #define NDArray_Check(v) Py_IS_TYPE(v, &NDArray_Type)
 
 #define CHECK_LIST_OR_TUPLE(v) \
@@ -80,11 +83,6 @@ static PyTypeObject NDArray_Type;
 #define REQ_WRITABLE(flags) (flags&PyBUF_WRITABLE)
 #define REQ_FORMAT(flags) (flags&PyBUF_FORMAT)
 
-
-/* Single node of a list of base buffers. The list is needed to implement
-   changes in memory layout while exported buffers are active. */
-static PyTypeObject NDArray_Type;
-
 struct ndbuf;
 typedef struct ndbuf {
     struct ndbuf *next;
@@ -123,7 +121,7 @@ ndbuf_new(Py_ssize_t nitems, Py_ssize_t itemsize, Py_ssize_t offset, int flags)
         return NULL;
     }
 
-    ndbuf = PyMem_Malloc(sizeof *ndbuf);
+    ndbuf = (ndbuf_t*)PyMem_Malloc(sizeof *ndbuf);
     if (ndbuf == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -134,7 +132,7 @@ ndbuf_new(Py_ssize_t nitems, Py_ssize_t itemsize, Py_ssize_t offset, int flags)
     ndbuf->len = len;
     ndbuf->offset= offset;
 
-    ndbuf->data = PyMem_Malloc(len);
+    ndbuf->data = (char*)PyMem_Malloc(len);
     if (ndbuf->data == NULL) {
         PyErr_NoMemory();
         PyMem_Free(ndbuf);
@@ -550,7 +548,7 @@ copy_buffer(Py_buffer *dest, Py_buffer *src)
         (src->suboffsets && src->suboffsets[src->ndim-1] >= 0) ||
         dest->strides[dest->ndim-1] != dest->itemsize ||
         src->strides[src->ndim-1] != src->itemsize) {
-        mem = PyMem_Malloc(dest->shape[dest->ndim-1] * dest->itemsize);
+        mem = (char*)PyMem_Malloc(dest->shape[dest->ndim-1] * dest->itemsize);
         if (mem == NULL) {
             PyErr_NoMemory();
             return -1;
@@ -558,8 +556,8 @@ copy_buffer(Py_buffer *dest, Py_buffer *src)
     }
 
     copy_rec(dest->shape, dest->ndim, dest->itemsize,
-             dest->buf, dest->strides, dest->suboffsets,
-             src->buf, src->strides, src->suboffsets,
+             (char*)dest->buf, dest->strides, dest->suboffsets,
+             (char*)src->buf, src->strides, src->suboffsets,
              mem);
 
     PyMem_XFree(mem);
@@ -705,7 +703,7 @@ ndarray_as_list(NDArrayObject *nd)
     if (unpack_from == NULL)
         goto out;
 
-    item = PyMem_Malloc(base->itemsize);
+    item = (char*)PyMem_Malloc(base->itemsize);
     if (item == NULL) {
         PyErr_NoMemory();
         goto out;
@@ -715,7 +713,7 @@ ndarray_as_list(NDArrayObject *nd)
     if (mview == NULL)
         goto out;
 
-    lst = unpack_rec(unpack_from, base->buf, mview, item,
+    lst = unpack_rec(unpack_from, (char*)base->buf, mview, item,
                      shape, strides, base->suboffsets,
                      base->ndim, base->itemsize);
 
@@ -806,7 +804,7 @@ get_format(PyObject *format)
     tmp = PyUnicode_AsASCIIString(format);
     if (tmp == NULL)
         return NULL;
-    fmt = PyMem_Malloc(PyBytes_GET_SIZE(tmp)+1);
+    fmt = (char*)PyMem_Malloc(PyBytes_GET_SIZE(tmp)+1);
     if (fmt == NULL) {
         PyErr_NoMemory();
         Py_DECREF(tmp);
@@ -889,7 +887,7 @@ strides_from_shape(const ndbuf_t *ndbuf, int flags)
     const Py_buffer *base = &ndbuf->base;
     Py_ssize_t *s, i;
 
-    s = PyMem_Malloc(base->ndim * (sizeof *s));
+    s = (Py_ssize_t*)PyMem_Malloc(base->ndim * (sizeof *s));
     if (s == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -1045,7 +1043,7 @@ init_suboffsets(ndbuf_t *ndbuf)
     /* Align array start to a multiple of 8. */
     addsize = 8 * ((addsize + 7) / 8);
 
-    data = PyMem_Malloc(ndbuf->len + addsize);
+    data = (char*)PyMem_Malloc(ndbuf->len + addsize);
     if (data == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1080,7 +1078,7 @@ init_suboffsets(ndbuf_t *ndbuf)
         ((char **)base->buf)[n] = (char *)base->buf + start + n*step;
 
     /* Initialize suboffsets. */
-    base->suboffsets = PyMem_Malloc(base->ndim * (sizeof *base->suboffsets));
+    base->suboffsets = (Py_ssize_t*)PyMem_Malloc(base->ndim * (sizeof *base->suboffsets));
     if (base->suboffsets == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1535,7 +1533,7 @@ static void
 ndarray_releasebuf(NDArrayObject *self, Py_buffer *view)
 {
     if (!ND_IS_CONSUMER(self)) {
-        ndbuf_t *ndbuf = view->internal;
+        ndbuf_t *ndbuf = (ndbuf_t *)view->internal;
         if (--ndbuf->exports == 0 && ndbuf != self->head)
             ndbuf_delete(self, ndbuf);
     }
@@ -1743,14 +1741,14 @@ copy_structure(Py_buffer *base)
     Py_ssize_t *shape = NULL, *strides = NULL, *suboffsets = NULL;
     Py_ssize_t i;
 
-    shape = PyMem_Malloc(base->ndim * (sizeof *shape));
-    strides = PyMem_Malloc(base->ndim * (sizeof *strides));
+    shape = (Py_ssize_t*)PyMem_Malloc(base->ndim * (sizeof *shape));
+    strides = (Py_ssize_t*)PyMem_Malloc(base->ndim * (sizeof *strides));
     if (shape == NULL || strides == NULL)
         goto err_nomem;
 
     suboffsets = NULL;
     if (base->suboffsets) {
-        suboffsets = PyMem_Malloc(base->ndim * (sizeof *suboffsets));
+        suboffsets = (Py_ssize_t*)PyMem_Malloc(base->ndim * (sizeof *suboffsets));
         if (suboffsets == NULL)
             goto err_nomem;
     }
@@ -1785,7 +1783,7 @@ ndarray_subscript(NDArrayObject *self, PyObject *key)
 
     if (base->ndim == 0) {
         if (PyTuple_Check(key) && PyTuple_GET_SIZE(key) == 0) {
-            return unpack_single(base->buf, base->format, base->itemsize);
+            return unpack_single((char*)base->buf, base->format, base->itemsize);
         }
         else if (key == Py_Ellipsis) {
             Py_INCREF(self);
@@ -2162,13 +2160,13 @@ ndarray_tobytes(PyObject *self, PyObject *dummy)
     char *mem;
 
     if (ND_C_CONTIGUOUS(ndbuf->flags))
-        return PyBytes_FromStringAndSize(src->buf, src->len);
+        return PyBytes_FromStringAndSize((const char*)src->buf, src->len);
 
     assert(src->shape != NULL);
     assert(src->strides != NULL);
     assert(src->ndim > 0);
 
-    mem = PyMem_Malloc(src->len);
+    mem = (char*)PyMem_Malloc(src->len);
     if (mem == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -2210,7 +2208,7 @@ ndarray_add_suboffsets(PyObject *self, PyObject *dummy)
             return NULL;
     }
 
-    base->suboffsets = PyMem_Malloc(base->ndim * (sizeof *base->suboffsets));
+    base->suboffsets = (Py_ssize_t*)PyMem_Malloc(base->ndim * (sizeof *base->suboffsets));
     if (base->suboffsets == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -2254,7 +2252,7 @@ ndarray_memoryview_from_buffer(PyObject *self, PyObject *dummy)
     }
 
     info = *view;
-    p = PyMem_Realloc(infobuf, ndbuf->len);
+    p = (char*)PyMem_Realloc(infobuf, ndbuf->len);
     if (p == NULL) {
         PyMem_Free(infobuf);
         PyErr_NoMemory();
@@ -2344,7 +2342,7 @@ get_pointer(PyObject *self, PyObject *args)
     }
 
     ptr = PyBuffer_GetPointer(&view, indices);
-    ret = unpack_single(ptr, view.format, view.itemsize);
+    ret = unpack_single((char*)ptr, view.format, view.itemsize);
 
 out:
     PyBuffer_Release(&view);
@@ -2448,7 +2446,7 @@ py_buffer_to_contiguous(PyObject *self, PyObject *args)
         goto out;
     }
 
-    buf = PyMem_Malloc(view.len);
+    buf = (char*)PyMem_Malloc(view.len);
     if (buf == NULL) {
         PyErr_NoMemory();
         goto out;
@@ -2640,7 +2638,8 @@ static PyMethodDef ndarray_methods [] =
     {NULL}
 };
 
-static PyTypeObject NDArray_Type = {
+namespace {
+PyTypeObject NDArray_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "ndarray",                   /* Name of this type */
     sizeof(NDArrayObject),       /* Basic object size */
@@ -2680,12 +2679,14 @@ static PyTypeObject NDArray_Type = {
     0,                           /* tp_alloc */
     ndarray_new,                 /* tp_new */
 };
-
+}
 /**************************************************************************/
 /*                          StaticArray Object                            */
 /**************************************************************************/
 
-static PyTypeObject StaticArray_Type;
+namespace {
+extern PyTypeObject StaticArray_Type;
+}
 
 typedef struct {
     PyObject_HEAD
@@ -2760,7 +2761,8 @@ static PyBufferProcs staticarray_as_buffer = {
     NULL,                              /* bf_releasebuffer */
 };
 
-static PyTypeObject StaticArray_Type = {
+namespace {
+PyTypeObject StaticArray_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "staticarray",                   /* Name of this type */
     sizeof(StaticArrayObject),       /* Basic object size */
@@ -2800,6 +2802,7 @@ static PyTypeObject StaticArray_Type = {
     0,                               /* tp_alloc */
     staticarray_new,                 /* tp_new */
 };
+}
 
 
 static struct PyMethodDef _testbuffer_functions[] = {

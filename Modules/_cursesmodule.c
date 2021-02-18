@@ -550,8 +550,9 @@ static int func_PyCursesInitialisedColor(void)
 ******************************************************************************/
 
 /* Definition of the window type */
-
-PyTypeObject PyCursesWindow_Type;
+namespace {
+extern PyTypeObject PyCursesWindow_Type;
+}
 
 /* Function prototype macros for Window object
 
@@ -2566,6 +2567,7 @@ static PyGetSetDef PyCursesWindow_getsets[] = {
 
 /* -------------------------------------------------------*/
 
+namespace {
 PyTypeObject PyCursesWindow_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_curses.window",           /*tp_name*/
@@ -2599,6 +2601,7 @@ PyTypeObject PyCursesWindow_Type = {
     0,                          /* tp_members */
     PyCursesWindow_getsets,     /* tp_getset */
 };
+}
 
 /* Function Prototype Macros - They are ugly but very, very useful. ;-)
 
@@ -4896,7 +4899,7 @@ PyInit__curses(void)
                 continue;
             if (strncmp(key_n,"KEY_F(",6)==0) {
                 char *p1, *p2;
-                key_n2 = PyMem_Malloc(strlen(key_n)+1);
+                key_n2 = (char*)PyMem_Malloc(strlen(key_n)+1);
                 if (!key_n2) {
                     PyErr_NoMemory();
                     break;

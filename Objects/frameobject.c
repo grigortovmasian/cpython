@@ -1183,6 +1183,10 @@ _PyFrame_ClearFreeList(PyThreadState *tstate)
     assert(state->numfree == 0);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 _PyFrame_Fini(PyThreadState *tstate)
 {
@@ -1192,6 +1196,10 @@ _PyFrame_Fini(PyThreadState *tstate)
     state->numfree = -1;
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void

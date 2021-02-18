@@ -1391,9 +1391,17 @@ _PyWarnings_Init(void)
     return PyModuleDef_Init(&warnings_module);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // We need this to ensure that warnings still work until late in finalization.
 void
 _PyWarnings_Fini(PyInterpreterState *interp)
 {
     warnings_clear_state(&interp->warnings);
 }
+
+#ifdef __cplusplus
+}
+#endif

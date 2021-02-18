@@ -1624,6 +1624,9 @@ PyInit__signal(void)
     return PyModuleDef_Init(&signal_module);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 _PySignal_Fini(void)
@@ -1656,7 +1659,6 @@ _PySignal_Fini(void)
     Py_CLEAR(ItimerError);
 #endif
 }
-
 
 /* Declared in pyerrors.h */
 int
@@ -1848,6 +1850,10 @@ _PySignal_Init(int install_signal_handlers)
 
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 
 // The caller doesn't have to hold the GIL

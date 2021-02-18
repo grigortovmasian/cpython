@@ -78,7 +78,7 @@ typedef struct {
 static XxoObject *
 newXxoObject(PyObject *module)
 {
-    xx_state *state = PyModule_GetState(module);
+    xx_state *state = (xx_state*)PyModule_GetState(module);
     if (state == NULL) {
         return NULL;
     }
@@ -115,7 +115,7 @@ Xxo_dealloc(XxoObject *self)
 {
     Xxo_finalize(self);
     PyTypeObject *tp = Py_TYPE(self);
-    freefunc free = PyType_GetSlot(tp, Py_tp_free);
+    freefunc free = (freefunc)PyType_GetSlot(tp, Py_tp_free);
     free(self);
     Py_DECREF(tp);
 }
@@ -211,11 +211,11 @@ PyDoc_STRVAR(Xxo_doc,
 
 static PyType_Slot Xxo_Type_slots[] = {
     {Py_tp_doc, (char *)Xxo_doc},
-    {Py_tp_traverse, Xxo_traverse},
-    {Py_tp_finalize, Xxo_finalize},
-    {Py_tp_dealloc, Xxo_dealloc},
-    {Py_tp_getattro, Xxo_getattro},
-    {Py_tp_setattro, Xxo_setattro},
+    {Py_tp_traverse, (void*)Xxo_traverse},
+    {Py_tp_finalize, (void*)Xxo_finalize},
+    {Py_tp_dealloc, (void*)Xxo_dealloc},
+    {Py_tp_getattro, (void*)Xxo_getattro},
+    {Py_tp_setattro, (void*)Xxo_setattro},
     {Py_tp_methods, Xxo_methods},
     {0, 0},  /* sentinel */
 };
@@ -295,7 +295,7 @@ PyDoc_STRVAR(module_doc,
 static int
 xx_modexec(PyObject *m)
 {
-    xx_state *state = PyModule_GetState(m);
+    xx_state *state = (xx_state*)PyModule_GetState(m);
 
     state->Error_Type = PyErr_NewException("xxlimited.Error", NULL, NULL);
     if (state->Error_Type == NULL) {
@@ -331,14 +331,14 @@ xx_modexec(PyObject *m)
 }
 
 static PyModuleDef_Slot xx_slots[] = {
-    {Py_mod_exec, xx_modexec},
+    {Py_mod_exec, (void*)xx_modexec},
     {0, NULL}
 };
 
 static int
 xx_traverse(PyObject *module, visitproc visit, void *arg)
 {
-    xx_state *state = PyModule_GetState(module);
+    xx_state *state = (xx_state*)PyModule_GetState(module);
     Py_VISIT(state->Xxo_Type);
     Py_VISIT(state->Error_Type);
     return 0;
@@ -347,7 +347,7 @@ xx_traverse(PyObject *module, visitproc visit, void *arg)
 static int
 xx_clear(PyObject *module)
 {
-    xx_state *state = PyModule_GetState(module);
+    xx_state *state = (xx_state*)PyModule_GetState(module);
     Py_CLEAR(state->Xxo_Type);
     Py_CLEAR(state->Error_Type);
     return 0;

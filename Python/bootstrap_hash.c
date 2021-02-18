@@ -568,6 +568,9 @@ _PyOS_URandomNonblock(void *buffer, Py_ssize_t size)
     return pyurandom(buffer, size, 0, 1);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyStatus
 _Py_HashRandomization_Init(const PyConfig *config)
@@ -621,3 +624,7 @@ _Py_HashRandomization_Fini(void)
     dev_urandom_close();
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif

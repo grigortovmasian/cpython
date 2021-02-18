@@ -123,7 +123,7 @@ blake2_exec(PyObject *m)
 }
 
 static PyModuleDef_Slot _blake2_slots[] = {
-    {Py_mod_exec, blake2_exec},
+    {Py_mod_exec, (void*)blake2_exec},
     {0, NULL}
 };
 

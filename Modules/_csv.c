@@ -24,7 +24,9 @@ typedef struct {
     long field_limit;   /* max parsed field size */
 } _csvstate;
 
-static struct PyModuleDef _csvmodule;
+namespace {
+extern struct PyModuleDef _csvmodule;
+}
 
 static inline _csvstate*
 get_csv_state(PyObject *module)
@@ -37,7 +39,7 @@ get_csv_state(PyObject *module)
 static int
 _csv_clear(PyObject *module)
 {
-    _csvstate *module_state = PyModule_GetState(module);
+    _csvstate *module_state = (_csvstate*)PyModule_GetState(module);
     Py_CLEAR(module_state->error_obj);
     Py_CLEAR(module_state->dialects);
     Py_CLEAR(module_state->dialect_type);
@@ -49,7 +51,7 @@ _csv_clear(PyObject *module)
 static int
 _csv_traverse(PyObject *module, visitproc visit, void *arg)
 {
-    _csvstate *module_state = PyModule_GetState(module);
+    _csvstate *module_state = (_csvstate*)PyModule_GetState(module);
     Py_VISIT(module_state->error_obj);
     Py_VISIT(module_state->dialects);
     Py_VISIT(module_state->dialect_type);
@@ -84,7 +86,7 @@ static const StyleDesc quote_styles[] = {
     { QUOTE_ALL,        "QUOTE_ALL" },
     { QUOTE_NONNUMERIC, "QUOTE_NONNUMERIC" },
     { QUOTE_NONE,       "QUOTE_NONE" },
-    { 0 }
+    { (QuoteStyle)0 }
 };
 
 typedef struct {
@@ -347,7 +349,7 @@ _csv_state_from_type(PyTypeObject *type, const char *name)
     if (module == NULL) {
         return NULL;
     }
-    _csvstate *module_state = PyModule_GetState(module);
+    _csvstate *module_state = (_csvstate*)PyModule_GetState(module);
     if (module_state == NULL) {
         PyErr_Format(PyExc_SystemError,
                      "%s: No _csv module state found", name);
@@ -516,10 +518,10 @@ static PyType_Slot Dialect_Type_slots[] = {
     {Py_tp_doc, (char*)Dialect_Type_doc},
     {Py_tp_members, Dialect_memberlist},
     {Py_tp_getset, Dialect_getsetlist},
-    {Py_tp_new, dialect_new},
+    {Py_tp_new, (void*)dialect_new},
     {Py_tp_methods, dialect_methods},
-    {Py_tp_finalize, Dialect_finalize},
-    {Py_tp_dealloc, Dialect_dealloc},
+    {Py_tp_finalize, (void*)Dialect_finalize},
+    {Py_tp_dealloc, (void*)Dialect_dealloc},
     {0, NULL}
 };
 
@@ -947,14 +949,14 @@ static struct PyMemberDef Reader_memberlist[] = {
 
 static PyType_Slot Reader_Type_slots[] = {
     {Py_tp_doc, (char*)Reader_Type_doc},
-    {Py_tp_traverse, Reader_traverse},
-    {Py_tp_clear, Reader_clear},
-    {Py_tp_iter, PyObject_SelfIter},
-    {Py_tp_iternext, Reader_iternext},
+    {Py_tp_traverse, (void*)Reader_traverse},
+    {Py_tp_clear, (void*)Reader_clear},
+    {Py_tp_iter, (void*)PyObject_SelfIter},
+    {Py_tp_iternext, (void*)Reader_iternext},
     {Py_tp_methods, Reader_methods},
     {Py_tp_members, Reader_memberlist},
-    {Py_tp_finalize, Reader_finalize},
-    {Py_tp_dealloc, Reader_dealloc},
+    {Py_tp_finalize, (void*)Reader_finalize},
+    {Py_tp_dealloc, (void*)Reader_dealloc},
     {0, NULL}
 };
 
@@ -1368,10 +1370,10 @@ PyDoc_STRVAR(Writer_Type_doc,
 );
 
 static PyType_Slot Writer_Type_slots[] = {
-    {Py_tp_finalize, Writer_finalize},
+    {Py_tp_finalize, (void*)Writer_finalize},
     {Py_tp_doc, (char*)Writer_Type_doc},
-    {Py_tp_traverse, Writer_traverse},
-    {Py_tp_clear, Writer_clear},
+    {Py_tp_traverse, (void*)Writer_traverse},
+    {Py_tp_clear, (void*)Writer_clear},
     {Py_tp_methods, Writer_methods},
     {Py_tp_members, Writer_memberlist},
     {0, NULL}
@@ -1716,11 +1718,12 @@ csv_exec(PyObject *module) {
 }
 
 static PyModuleDef_Slot csv_slots[] = {
-    {Py_mod_exec, csv_exec},
+    {Py_mod_exec, (void*)csv_exec},
     {0, NULL}
 };
 
-static struct PyModuleDef _csvmodule = {
+namespace {
+struct PyModuleDef _csvmodule = {
     PyModuleDef_HEAD_INIT,
     "_csv",
     csv_module_doc,
@@ -1731,6 +1734,7 @@ static struct PyModuleDef _csvmodule = {
     _csv_clear,
     _csv_free
 };
+}
 
 PyMODINIT_FUNC
 PyInit__csv(void)

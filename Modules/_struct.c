@@ -29,7 +29,9 @@ get_struct_state(PyObject *module)
     return (_structmodulestate *)state;
 }
 
-static struct PyModuleDef _structmodule;
+namespace {
+extern struct PyModuleDef _structmodule;
+}
 
 #define get_struct_state_structinst(self) \
     (get_struct_state(_PyType_GetModuleByDef(Py_TYPE(self), &_structmodule)))
@@ -77,7 +79,7 @@ typedef struct { char c; float x; } st_float;
 typedef struct { char c; double x; } st_double;
 typedef struct { char c; void *x; } st_void_p;
 typedef struct { char c; size_t x; } st_size_t;
-typedef struct { char c; _Bool x; } st_bool;
+typedef struct { char c; bool x; } st_bool;
 
 #define SHORT_ALIGN (sizeof(st_short) - sizeof(short))
 #define INT_ALIGN (sizeof(st_int) - sizeof(int))
@@ -86,7 +88,7 @@ typedef struct { char c; _Bool x; } st_bool;
 #define DOUBLE_ALIGN (sizeof(st_double) - sizeof(double))
 #define VOID_P_ALIGN (sizeof(st_void_p) - sizeof(void *))
 #define SIZE_T_ALIGN (sizeof(st_size_t) - sizeof(size_t))
-#define BOOL_ALIGN (sizeof(st_bool) - sizeof(_Bool))
+#define BOOL_ALIGN (sizeof(st_bool) - sizeof(bool))
 
 /* We can't support q and Q in native mode unless the compiler does;
    in std mode, they're 8 bytes on all platforms. */
@@ -498,7 +500,7 @@ nu_ulonglong(_structmodulestate *state, const char *p, const formatdef *f)
 static PyObject *
 nu_bool(_structmodulestate *state, const char *p, const formatdef *f)
 {
-    _Bool x;
+    bool x;
     memcpy((char *)&x, p, sizeof x);
     return PyBool_FromLong(x != 0);
 }
@@ -713,7 +715,7 @@ static int
 np_bool(_structmodulestate *state, char *p, PyObject *v, const formatdef *f)
 {
     int y;
-    _Bool x;
+    bool x;
     y = PyObject_IsTrue(v);
     if (y < 0)
         return -1;
@@ -792,7 +794,7 @@ static const formatdef native_table[] = {
     {'N',       sizeof(size_t), SIZE_T_ALIGN,   nu_size_t,      np_size_t},
     {'q',       sizeof(long long), LONG_LONG_ALIGN, nu_longlong, np_longlong},
     {'Q',       sizeof(long long), LONG_LONG_ALIGN, nu_ulonglong,np_ulonglong},
-    {'?',       sizeof(_Bool),      BOOL_ALIGN,     nu_bool,        np_bool},
+    {'?',       sizeof(bool),      BOOL_ALIGN,     nu_bool,        np_bool},
     {'e',       sizeof(short),  SHORT_ALIGN,    nu_halffloat,   np_halffloat},
     {'f',       sizeof(float),  FLOAT_ALIGN,    nu_float,       np_float},
     {'d',       sizeof(double), DOUBLE_ALIGN,   nu_double,      np_double},
@@ -1373,7 +1375,7 @@ prepare_s(PyStructObject *self)
 
     self->s_size = size;
     self->s_len = len;
-    codes = PyMem_Malloc((ncodes + 1) * sizeof(formatcode));
+    codes = (formatcode*)PyMem_Malloc((ncodes + 1) * sizeof(formatcode));
     if (codes == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1436,7 +1438,7 @@ s_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     PyObject *self;
 
     assert(type != NULL);
-    allocfunc alloc_func = PyType_GetSlot(type, Py_tp_alloc);
+    allocfunc alloc_func = (allocfunc)PyType_GetSlot(type, Py_tp_alloc);
     assert(alloc_func != NULL);
 
     self = alloc_func(type, 0);
@@ -1504,7 +1506,7 @@ s_dealloc(PyStructObject *s)
         PyMem_Free(s->s_codes);
     }
     Py_XDECREF(s->s_format);
-    freefunc free_func = PyType_GetSlot(Py_TYPE(s), Py_tp_free);
+    freefunc free_func = (freefunc)PyType_GetSlot(Py_TYPE(s), Py_tp_free);
     free_func(s);
     Py_DECREF(tp);
 }
@@ -1574,7 +1576,7 @@ Struct_unpack_impl(PyStructObject *self, Py_buffer *buffer)
                      self->s_size);
         return NULL;
     }
-    return s_unpack_internal(self, buffer->buf, state);
+    return s_unpack_internal(self, (const char*)buffer->buf, state);
 }
 
 /*[clinic input]
@@ -1709,13 +1711,13 @@ PyObject *unpackiter_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static PyType_Slot unpackiter_type_slots[] = {
-    {Py_tp_dealloc, unpackiter_dealloc},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_traverse, unpackiter_traverse},
-    {Py_tp_iter, PyObject_SelfIter},
-    {Py_tp_iternext, unpackiter_iternext},
+    {Py_tp_dealloc, (void*)unpackiter_dealloc},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
+    {Py_tp_traverse, (void*)unpackiter_traverse},
+    {Py_tp_iter, (void*)PyObject_SelfIter},
+    {Py_tp_iternext, (void*)unpackiter_iternext},
     {Py_tp_methods, unpackiter_methods},
-    {Py_tp_new, unpackiter_new},
+    {Py_tp_new, (void*)unpackiter_new},
     {0, 0},
 };
 
@@ -1898,7 +1900,7 @@ s_pack(PyObject *self, PyObject *const *args, Py_ssize_t nargs)
     /* Allocate a new string */
     _PyBytesWriter writer;
     _PyBytesWriter_Init(&writer);
-    buf = _PyBytesWriter_Alloc(&writer, soself->s_size);
+    buf = (char*)_PyBytesWriter_Alloc(&writer, soself->s_size);
     if (buf == NULL) {
         _PyBytesWriter_Dealloc(&writer);
         return NULL;
@@ -2074,17 +2076,17 @@ PyDoc_STRVAR(s__doc__,
 );
 
 static PyType_Slot PyStructType_slots[] = {
-    {Py_tp_dealloc, s_dealloc},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_setattro, PyObject_GenericSetAttr},
+    {Py_tp_dealloc, (void*)s_dealloc},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
+    {Py_tp_setattro, (void*)PyObject_GenericSetAttr},
     {Py_tp_doc, (void*)s__doc__},
     {Py_tp_methods, s_methods},
     {Py_tp_members, s_members},
     {Py_tp_getset, s_getsetlist},
-    {Py_tp_init, Struct___init__},
-    {Py_tp_alloc, PyType_GenericAlloc},
-    {Py_tp_new, s_new},
-    {Py_tp_free, PyObject_Del},
+    {Py_tp_init, (void*)Struct___init__},
+    {Py_tp_alloc, (void*)PyType_GenericAlloc},
+    {Py_tp_new, (void*)s_new},
+    {Py_tp_free, (void*)PyObject_Del},
     {0, 0},
 };
 
@@ -2446,11 +2448,12 @@ _structmodule_exec(PyObject *m)
 }
 
 static PyModuleDef_Slot _structmodule_slots[] = {
-    {Py_mod_exec, _structmodule_exec},
+    {Py_mod_exec, (void*)_structmodule_exec},
     {0, NULL}
 };
 
-static struct PyModuleDef _structmodule = {
+namespace {
+struct PyModuleDef _structmodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "_struct",
     .m_doc = module_doc,
@@ -2461,6 +2464,7 @@ static struct PyModuleDef _structmodule = {
     .m_clear = _structmodule_clear,
     .m_free = _structmodule_free,
 };
+}
 
 PyMODINIT_FUNC
 PyInit__struct(void)

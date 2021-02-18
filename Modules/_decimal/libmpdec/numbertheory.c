@@ -90,7 +90,7 @@ _mpd_init_fnt_params(mpd_size_t n, int sign, int modnum)
     assert(P1 <= modnum && modnum <= P3);
 
     nhalf = n/2;
-    tparams = mpd_sh_alloc(sizeof *tparams, nhalf, sizeof (mpd_uint_t));
+    tparams = (fnt_params*)mpd_sh_alloc(sizeof *tparams, nhalf, sizeof (mpd_uint_t));
     if (tparams == NULL) {
         return NULL;
     }

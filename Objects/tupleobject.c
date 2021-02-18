@@ -14,7 +14,6 @@ class tuple "PyTupleObject *" "&PyTuple_Type"
 
 #include "clinic/tupleobject.c.h"
 
-
 #if PyTuple_MAXSAVESIZE > 0
 static struct _Py_tuple_state *
 get_tuple_state(void)
@@ -456,6 +455,10 @@ tupleitem(PyTupleObject *a, Py_ssize_t i)
     return a->ob_item[i];
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyObject *
 _PyTuple_FromArray(PyObject *const *src, Py_ssize_t n)
 {
@@ -476,6 +479,10 @@ _PyTuple_FromArray(PyObject *const *src, Py_ssize_t n)
     tuple_gc_track(tuple);
     return (PyObject *)tuple;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 static PyObject *
 tupleslice(PyTupleObject *a, Py_ssize_t ilow,
@@ -1026,6 +1033,10 @@ _PyTuple_ClearFreeList(PyThreadState *tstate)
 }
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyStatus
 _PyTuple_Init(PyThreadState *tstate)
 {
@@ -1036,6 +1047,13 @@ _PyTuple_Init(PyThreadState *tstate)
     return _PyStatus_OK();
 }
 
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 _PyTuple_Fini(PyThreadState *tstate)
@@ -1051,6 +1069,10 @@ _PyTuple_Fini(PyThreadState *tstate)
 #endif
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /*********************** Tuple Iterator **************************/
 

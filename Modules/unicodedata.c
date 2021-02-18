@@ -539,7 +539,7 @@ nfd_nfkd(PyObject *self, PyObject *input, int k)
                 Py_UCS4 *new_output;
                 osize += 10;
                 space += 10;
-                new_output = PyMem_Realloc(output, osize*sizeof(Py_UCS4));
+                new_output = (Py_UCS4*)PyMem_Realloc(output, osize*sizeof(Py_UCS4));
                 if (new_output == NULL) {
                     PyMem_Free(output);
                     PyErr_NoMemory();
@@ -1318,7 +1318,7 @@ unicodedata_destroy_capi(PyObject *capsule)
 static PyObject *
 unicodedata_create_capi(void)
 {
-    _PyUnicode_Name_CAPI *capi = PyMem_Malloc(sizeof(_PyUnicode_Name_CAPI));
+    _PyUnicode_Name_CAPI *capi = (_PyUnicode_Name_CAPI*)PyMem_Malloc(sizeof(_PyUnicode_Name_CAPI));
     if (capi == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -1444,8 +1444,8 @@ ucd_dealloc(PreviousDBVersion *self)
 }
 
 static PyType_Slot ucd_type_slots[] = {
-    {Py_tp_dealloc, ucd_dealloc},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
+    {Py_tp_dealloc, (void*)ucd_dealloc},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
     {Py_tp_methods, unicodedata_functions},
     {Py_tp_members, DB_members},
     {0, 0}
@@ -1511,7 +1511,7 @@ unicodedata_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot unicodedata_slots[] = {
-    {Py_mod_exec, unicodedata_exec},
+    {Py_mod_exec, (void*)unicodedata_exec},
     {0, NULL}
 };
 

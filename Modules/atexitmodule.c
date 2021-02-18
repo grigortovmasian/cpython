@@ -50,6 +50,9 @@ atexit_cleanup(struct atexit_state *state)
     state->ncallbacks = 0;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyStatus
 _PyAtExit_Init(PyThreadState *tstate)
@@ -66,7 +69,6 @@ _PyAtExit_Init(PyThreadState *tstate)
     }
     return _PyStatus_OK();
 }
-
 
 void
 _PyAtExit_Fini(PyInterpreterState *interp)
@@ -114,6 +116,10 @@ _PyAtExit_Call(PyThreadState *tstate)
     struct atexit_state *state = &tstate->interp->atexit;
     atexit_callfuncs(state);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 
 /* ===================================================================== */

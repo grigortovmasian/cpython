@@ -78,7 +78,9 @@ HMAC_CTX_get_md(const HMAC_CTX *ctx)
 #define PY_OPENSSL_HAS_BLAKE2 1
 #endif
 
-static PyModuleDef _hashlibmodule;
+namespace {
+extern PyModuleDef _hashlibmodule;
+}
 
 typedef struct {
     PyTypeObject *EVPtype;
@@ -531,7 +533,7 @@ static PyGetSetDef EVP_getseters[] = {
     {"name",
      (getter)EVP_get_name, NULL,
      NULL,
-     PyDoc_STR("algorithm name.")},
+     PyDoc_STR((void*)"algorithm name.")},
     {NULL}  /* Sentinel */
 };
 
@@ -569,12 +571,12 @@ PyDoc_STRVAR(hashtype_doc,
 "digest_size -- number of bytes in this hashes output");
 
 static PyType_Slot EVPtype_slots[] = {
-    {Py_tp_dealloc, EVP_dealloc},
-    {Py_tp_repr, EVP_repr},
+    {Py_tp_dealloc, (void*)EVP_dealloc},
+    {Py_tp_repr, (void*)EVP_repr},
     {Py_tp_doc, (char *)hashtype_doc},
     {Py_tp_methods, EVP_methods},
     {Py_tp_getset, EVP_getseters},
-    {Py_tp_new, _disabled_new},
+    {Py_tp_new, (void*)_disabled_new},
     {0, 0},
 };
 
@@ -724,7 +726,7 @@ static PyType_Slot EVPXOFtype_slots[] = {
     {Py_tp_doc, (char *)hashxoftype_doc},
     {Py_tp_methods, EVPXOF_methods},
     {Py_tp_getset, EVPXOF_getseters},
-    {Py_tp_new, _disabled_new},
+    {Py_tp_new, (void*)_disabled_new},
     {0, 0},
 };
 
@@ -1713,11 +1715,11 @@ digest_size -- number of bytes in digest() output\n");
 
 static PyType_Slot HMACtype_slots[] = {
     {Py_tp_doc, (char *)hmactype_doc},
-    {Py_tp_repr, (reprfunc)_hmac_repr},
-    {Py_tp_dealloc,(destructor)_hmac_dealloc},
+    {Py_tp_repr, (void*)_hmac_repr},
+    {Py_tp_dealloc,(void*)_hmac_dealloc},
     {Py_tp_methods, HMAC_methods},
     {Py_tp_getset, HMAC_getset},
-    {Py_tp_new, _disabled_new},
+    {Py_tp_new, (void*)_disabled_new},
     {0, NULL}
 };
 
@@ -1896,8 +1898,8 @@ _hashlib_compare_digest_impl(PyObject *module, PyObject *a, PyObject *b)
             return NULL;
         }
 
-        rc = _tscmp(PyUnicode_DATA(a),
-                    PyUnicode_DATA(b),
+        rc = _tscmp((const unsigned char*)PyUnicode_DATA(a),
+                    (const unsigned char*)PyUnicode_DATA(b),
                     PyUnicode_GET_LENGTH(a),
                     PyUnicode_GET_LENGTH(b));
     }
@@ -2073,15 +2075,16 @@ hashlib_init_hmactype(PyObject *module)
 
 static PyModuleDef_Slot hashlib_slots[] = {
     /* OpenSSL 1.0.2 and LibreSSL */
-    {Py_mod_exec, hashlib_openssl_legacy_init},
-    {Py_mod_exec, hashlib_init_evptype},
-    {Py_mod_exec, hashlib_init_evpxoftype},
-    {Py_mod_exec, hashlib_init_hmactype},
-    {Py_mod_exec, hashlib_md_meth_names},
+    {Py_mod_exec, (void*)hashlib_openssl_legacy_init},
+    {Py_mod_exec, (void*)hashlib_init_evptype},
+    {Py_mod_exec, (void*)hashlib_init_evpxoftype},
+    {Py_mod_exec, (void*)hashlib_init_hmactype},
+    {Py_mod_exec, (void*)hashlib_md_meth_names},
     {0, NULL}
 };
 
-static struct PyModuleDef _hashlibmodule = {
+namespace {
+struct PyModuleDef _hashlibmodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "_hashlib",
     .m_doc = "OpenSSL interface for hashlib module",
@@ -2092,6 +2095,7 @@ static struct PyModuleDef _hashlibmodule = {
     .m_clear = hashlib_clear,
     .m_free = hashlib_free
 };
+}
 
 PyMODINIT_FUNC
 PyInit__hashlib(void)

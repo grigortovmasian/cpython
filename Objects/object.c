@@ -13,12 +13,13 @@
 #include "frameobject.h"
 #include "interpreteridobject.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* Defined in tracemalloc.c */
 extern void _PyMem_DumpTraceback(int fd, const void *ptr);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 _Py_IDENTIFIER(Py_Repr);
 _Py_IDENTIFIER(__bytes__);

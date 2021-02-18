@@ -287,8 +287,8 @@ static struct PyModuleDef _bisectmodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "_bisect",
     .m_doc = module_doc,
-    .m_methods = bisect_methods,
-    .m_size = 0
+    .m_size = 0,
+    .m_methods = bisect_methods
 };
 
 PyMODINIT_FUNC

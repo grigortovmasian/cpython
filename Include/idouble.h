@@ -1,5 +1,9 @@
 #ifndef IDOUBLE_H
 #define IDOUBLE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 struct idouble {
     double* val;
@@ -15,5 +19,11 @@ void  DELETE_IDOUBLE(struct idouble* l);
 void CAAD_iVarAdd(double* l, double* r, double* res);
 
 struct idouble ADD_OP(const struct idouble* l, const struct idouble* r);
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif //IDOUBLE_H

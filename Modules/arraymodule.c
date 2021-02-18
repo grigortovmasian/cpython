@@ -22,7 +22,9 @@ module array
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=7d1b8d7f5958fd83]*/
 
 struct arrayobject; /* Forward */
-static struct PyModuleDef arraymodule;
+namespace {
+extern struct PyModuleDef arraymodule;
+}
 
 /* All possible arraydescr values are defined in the vector "descriptors"
  * below.  That's defined later because the appropriate get and set
@@ -528,7 +530,7 @@ d_setitem(arrayobject *ap, Py_ssize_t i, PyObject *v)
     static int \
     code##_compareitems(const void *lhs, const void *rhs, Py_ssize_t length) \
     { \
-        const type *a = lhs, *b = rhs; \
+        const type *a = (const type *)lhs, *b = (const type *)rhs; \
         for (Py_ssize_t i = 0; i < length; ++i) \
             if (a[i] != b[i]) \
                 return a[i] < b[i] ? -1 : 1; \
@@ -1815,10 +1817,10 @@ typecode_to_mformat_code(char typecode)
 
     case 'u':
         if (sizeof(Py_UNICODE) == 2) {
-            return UTF16_LE + is_big_endian;
+            return (machine_format_code)(UTF16_LE + is_big_endian);
         }
         if (sizeof(Py_UNICODE) == 4) {
-            return UTF32_LE + is_big_endian;
+            return (machine_format_code)(UTF32_LE + is_big_endian);
         }
         return UNKNOWN_FORMAT;
 
@@ -1880,11 +1882,11 @@ typecode_to_mformat_code(char typecode)
     }
     switch (intsize) {
     case 2:
-        return UNSIGNED_INT16_LE + is_big_endian + (2 * is_signed);
+        return (machine_format_code)(UNSIGNED_INT16_LE + is_big_endian + (2 * is_signed));
     case 4:
-        return UNSIGNED_INT32_LE + is_big_endian + (2 * is_signed);
+        return (machine_format_code)(UNSIGNED_INT32_LE + is_big_endian + (2 * is_signed));
     case 8:
-        return UNSIGNED_INT64_LE + is_big_endian + (2 * is_signed);
+        return (machine_format_code)(UNSIGNED_INT64_LE + is_big_endian + (2 * is_signed));
     default:
         return UNKNOWN_FORMAT;
     }
@@ -2794,37 +2796,37 @@ static struct PyMemberDef array_members[] = {
 };
 
 static PyType_Slot array_slots[] = {
-    {Py_tp_dealloc, array_dealloc},
-    {Py_tp_repr, array_repr},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
+    {Py_tp_dealloc, (void*)array_dealloc},
+    {Py_tp_repr, (void*)array_repr},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
     {Py_tp_doc, (void *)arraytype_doc},
-    {Py_tp_richcompare, array_richcompare},
-    {Py_tp_iter, array_iter},
+    {Py_tp_richcompare, (void*)array_richcompare},
+    {Py_tp_iter, (void*)array_iter},
     {Py_tp_methods, array_methods},
     {Py_tp_members, array_members},
     {Py_tp_getset, array_getsets},
-    {Py_tp_alloc, PyType_GenericAlloc},
-    {Py_tp_new, array_new},
-    {Py_tp_free, PyObject_Del},
+    {Py_tp_alloc, (void*)PyType_GenericAlloc},
+    {Py_tp_new, (void*)array_new},
+    {Py_tp_free, (void*)PyObject_Del},
 
     /* as sequence */
-    {Py_sq_length, array_length},
-    {Py_sq_concat, array_concat},
-    {Py_sq_repeat, array_repeat},
-    {Py_sq_item, array_item},
-    {Py_sq_ass_item, array_ass_item},
-    {Py_sq_contains, array_contains},
-    {Py_sq_inplace_concat, array_inplace_concat},
-    {Py_sq_inplace_repeat, array_inplace_repeat},
+    {Py_sq_length, (void*)array_length},
+    {Py_sq_concat, (void*)array_concat},
+    {Py_sq_repeat, (void*)array_repeat},
+    {Py_sq_item, (void*)array_item},
+    {Py_sq_ass_item, (void*)array_ass_item},
+    {Py_sq_contains, (void*)array_contains},
+    {Py_sq_inplace_concat, (void*)array_inplace_concat},
+    {Py_sq_inplace_repeat, (void*)array_inplace_repeat},
 
     /* as mapping */
-    {Py_mp_length, array_length},
-    {Py_mp_subscript, array_subscr},
-    {Py_mp_ass_subscript, array_ass_subscr},
+    {Py_mp_length, (void*)array_length},
+    {Py_mp_subscript, (void*)array_subscr},
+    {Py_mp_ass_subscript, (void*)array_ass_subscr},
 
     /* as buffer */
-    {Py_bf_getbuffer, array_buffer_getbuf},
-    {Py_bf_releasebuffer, array_buffer_relbuf},
+    {Py_bf_getbuffer, (void*)array_buffer_getbuf},
+    {Py_bf_releasebuffer, (void*)array_buffer_relbuf},
 
     {0, NULL},
 };
@@ -2958,11 +2960,11 @@ static PyMethodDef arrayiter_methods[] = {
 };
 
 static PyType_Slot arrayiter_slots[] = {
-    {Py_tp_dealloc, arrayiter_dealloc},
-    {Py_tp_getattro, PyObject_GenericGetAttr},
-    {Py_tp_traverse, arrayiter_traverse},
-    {Py_tp_iter, PyObject_SelfIter},
-    {Py_tp_iternext, arrayiter_next},
+    {Py_tp_dealloc, (void*)arrayiter_dealloc},
+    {Py_tp_getattro, (void*)PyObject_GenericGetAttr},
+    {Py_tp_traverse, (void*)arrayiter_traverse},
+    {Py_tp_iter,(void*) PyObject_SelfIter},
+    {Py_tp_iternext, (void*)arrayiter_next},
     {Py_tp_methods, arrayiter_methods},
     {0, NULL},
 };
@@ -3071,16 +3073,16 @@ array_modexec(PyObject *m)
 }
 
 static PyModuleDef_Slot arrayslots[] = {
-    {Py_mod_exec, array_modexec},
+    {Py_mod_exec, (void*)array_modexec},
     {0, NULL}
 };
 
-
-static struct PyModuleDef arraymodule = {
+namespace {
+struct PyModuleDef arraymodule = {
     .m_base = PyModuleDef_HEAD_INIT,
     .m_name = "array",
-    .m_size = sizeof(array_state),
     .m_doc = module_doc,
+    .m_size = sizeof(array_state),
     .m_methods = a_methods,
     .m_slots = arrayslots,
     .m_traverse = array_traverse,
@@ -3088,6 +3090,7 @@ static struct PyModuleDef arraymodule = {
     .m_free = array_free,
 };
 
+}
 
 PyMODINIT_FUNC
 PyInit_array(void)

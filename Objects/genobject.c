@@ -1508,6 +1508,10 @@ _PyAsyncGen_ClearFreeLists(PyThreadState *tstate)
     }
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 _PyAsyncGen_Fini(PyThreadState *tstate)
 {
@@ -1519,6 +1523,9 @@ _PyAsyncGen_Fini(PyThreadState *tstate)
 #endif
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 static PyObject *
 async_gen_unwrap_value(PyAsyncGenObject *gen, PyObject *result)

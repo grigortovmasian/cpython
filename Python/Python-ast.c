@@ -261,6 +261,10 @@ get_ast_state(void)
 #include "Python-ast.h"
 #include "structmember.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void _PyAST_Fini(PyInterpreterState *interp)
 {
 #ifdef Py_BUILD_CORE
@@ -489,6 +493,10 @@ void _PyAST_Fini(PyInterpreterState *interp)
     state->initialized = 0;
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 static int init_identifiers(struct ast_state *state)
 {

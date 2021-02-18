@@ -36,11 +36,17 @@ typedef struct {
     int typed_elements[1];
 } asdl_int_seq;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 asdl_generic_seq *_Py_asdl_generic_seq_new(Py_ssize_t size, PyArena *arena);
 asdl_identifier_seq *_Py_asdl_identifier_seq_new(Py_ssize_t size, PyArena *arena);
 asdl_int_seq *_Py_asdl_int_seq_new(Py_ssize_t size, PyArena *arena);
 
-
+#ifdef __cplusplus
+}
+#endif
 #define GENERATE_ASDL_SEQ_CONSTRUCTOR(NAME, TYPE) \
 asdl_ ## NAME ## _seq *_Py_asdl_ ## NAME ## _seq_new(Py_ssize_t size, PyArena *arena) \
 { \

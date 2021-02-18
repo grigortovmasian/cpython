@@ -230,7 +230,7 @@ _multiprocessing_SemLock__rebuild(PyTypeObject *type, PyObject *const *args, Py_
     int maxvalue;
     const char *name;
 
-    if (!_PyArg_ParseStack(args, nargs, ""F_SEM_HANDLE"iiz:_rebuild",
+    if (!_PyArg_ParseStack(args, nargs, "\"F_SEM_HANDLE\"iiz:_rebuild",
         &handle, &kind, &maxvalue, &name)) {
         goto exit;
     }

@@ -965,8 +965,18 @@ expr_as_unicode(expr_ty e, int level)
     return _PyUnicodeWriter_Finish(&writer);
 }
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyObject *
 _PyAST_ExprAsUnicode(expr_ty e)
 {
     return expr_as_unicode(e, PR_TEST);
 }
+
+#ifdef __cplusplus
+}
+#endif
+

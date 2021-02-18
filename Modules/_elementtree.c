@@ -81,10 +81,12 @@ static void _clear_joined_ptr(PyObject **p)
 }
 
 /* Types defined by this extension */
-static PyTypeObject Element_Type;
-static PyTypeObject ElementIter_Type;
-static PyTypeObject TreeBuilder_Type;
-static PyTypeObject XMLParser_Type;
+namespace {
+extern PyTypeObject Element_Type;
+extern PyTypeObject ElementIter_Type;
+extern PyTypeObject TreeBuilder_Type;
+extern PyTypeObject XMLParser_Type;
+}
 
 
 /* Per-module state; PEP 3121 */
@@ -96,7 +98,9 @@ typedef struct {
     PyObject *pi_factory;
 } elementtreestate;
 
-static struct PyModuleDef elementtreemodule;
+namespace {
+extern struct PyModuleDef elementtreemodule;
+}
 
 /* Given a module object (assumed to be _elementtree), get its per-module
  * state.
@@ -225,7 +229,7 @@ typedef struct {
 LOCAL(int)
 create_extra(ElementObject* self, PyObject* attrib)
 {
-    self->extra = PyObject_Malloc(sizeof(ElementObjectExtra));
+    self->extra = (ElementObjectExtra*)PyObject_Malloc(sizeof(ElementObjectExtra));
     if (!self->extra) {
         PyErr_NoMemory();
         return -1;
@@ -473,12 +477,12 @@ element_resize(ElementObject* self, Py_ssize_t extra)
              * "children", which needs at least 4 bytes. Although it's a
              * false alarm always assume at least one child to be safe.
              */
-            children = PyObject_Realloc(self->extra->children,
+            children = (PyObject**)PyObject_Realloc(self->extra->children,
                                         size * sizeof(PyObject*));
             if (!children)
                 goto nomemory;
         } else {
-            children = PyObject_Malloc(size * sizeof(PyObject*));
+            children = (PyObject**)PyObject_Malloc(size * sizeof(PyObject*));
             if (!children)
                 goto nomemory;
             /* copy existing children from static area to malloc buffer */
@@ -810,12 +814,12 @@ _elementtree_Element___deepcopy___impl(ElementObject *self, PyObject *memo)
     text = deepcopy(JOIN_OBJ(self->text), memo);
     if (!text)
         goto error;
-    _set_joined_ptr(&element->text, JOIN_SET(text, JOIN_GET(self->text)));
+    _set_joined_ptr(&element->text, (PyObject*)JOIN_SET(text, JOIN_GET(self->text)));
 
     tail = deepcopy(JOIN_OBJ(self->tail), memo);
     if (!tail)
         goto error;
-    _set_joined_ptr(&element->tail, JOIN_SET(tail, JOIN_GET(self->tail)));
+    _set_joined_ptr(&element->tail, (PyObject*)JOIN_SET(tail, JOIN_GET(self->tail)));
 
     assert(!element->extra || !element->extra->length);
     if (self->extra) {
@@ -998,11 +1002,11 @@ element_setstate_from_attributes(ElementObject *self,
     Py_INCREF(tag);
     Py_XSETREF(self->tag, tag);
 
-    text = text ? JOIN_SET(text, PyList_CheckExact(text)) : Py_None;
+    text = text ? (PyObject*)JOIN_SET(text, PyList_CheckExact(text)) : Py_None;
     Py_INCREF(JOIN_OBJ(text));
     _set_joined_ptr(&self->text, text);
 
-    tail = tail ? JOIN_SET(tail, PyList_CheckExact(tail)) : Py_None;
+    tail = tail ? (PyObject*)JOIN_SET(tail, PyList_CheckExact(tail)) : Py_None;
     Py_INCREF(JOIN_OBJ(tail));
     _set_joined_ptr(&self->tail, tail);
 
@@ -2246,8 +2250,8 @@ gettext:
     return NULL;
 }
 
-
-static PyTypeObject ElementIter_Type = {
+namespace{
+PyTypeObject ElementIter_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     /* Using the module's name since the pure-Python implementation does not
        have such a type. */
@@ -2290,6 +2294,7 @@ static PyTypeObject ElementIter_Type = {
     0,                                          /* tp_alloc */
     0,                                          /* tp_new */
 };
+}
 
 #define INIT_PARENT_STACK_SIZE 8
 
@@ -2331,7 +2336,7 @@ typedef struct {
 
     PyObject *root; /* root node (first created node) */
 
-    PyObject *this; /* current node */
+    PyObject *ths; /* current node */
     PyObject *last; /* most recently created node */
     PyObject *last_for_tail; /* most recently created node that takes a tail */
 
@@ -2370,7 +2375,7 @@ treebuilder_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         t->root = NULL;
 
         Py_INCREF(Py_None);
-        t->this = Py_None;
+        t->ths = Py_None;
         Py_INCREF(Py_None);
         t->last = Py_None;
 
@@ -2380,7 +2385,7 @@ treebuilder_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         t->pi_factory = NULL;
         t->stack = PyList_New(20);
         if (!t->stack) {
-            Py_DECREF(t->this);
+            Py_DECREF(t->ths);
             Py_DECREF(t->last);
             Py_DECREF((PyObject *) t);
             return NULL;
@@ -2463,7 +2468,7 @@ treebuilder_gc_traverse(TreeBuilderObject *self, visitproc visit, void *arg)
     Py_VISIT(self->start_event_obj);
     Py_VISIT(self->events_append);
     Py_VISIT(self->root);
-    Py_VISIT(self->this);
+    Py_VISIT(self->ths);
     Py_VISIT(self->last);
     Py_VISIT(self->last_for_tail);
     Py_VISIT(self->data);
@@ -2488,7 +2493,7 @@ treebuilder_gc_clear(TreeBuilderObject *self)
     Py_CLEAR(self->data);
     Py_CLEAR(self->last);
     Py_CLEAR(self->last_for_tail);
-    Py_CLEAR(self->this);
+    Py_CLEAR(self->ths);
     Py_CLEAR(self->pi_factory);
     Py_CLEAR(self->comment_factory);
     Py_CLEAR(self->element_factory);
@@ -2566,7 +2571,7 @@ treebuilder_extend_element_text_or_tail(PyObject *element, PyObject **data,
     if (Element_CheckExact(element)) {
         PyObject *dest_obj = JOIN_OBJ(*dest);
         if (dest_obj == Py_None) {
-            *dest = JOIN_SET(*data, PyList_CheckExact(*data));
+            *dest = (PyObject*)JOIN_SET(*data, PyList_CheckExact(*data));
             *data = NULL;
             Py_DECREF(dest_obj);
             return 0;
@@ -2679,7 +2684,7 @@ treebuilder_handle_start(TreeBuilderObject* self, PyObject* tag,
                          PyObject* attrib)
 {
     PyObject* node;
-    PyObject* this;
+    PyObject* ths;
     elementtreestate *st = ET_STATE_GLOBAL;
 
     if (treebuilder_flush_data(self) < 0) {
@@ -2704,11 +2709,11 @@ treebuilder_handle_start(TreeBuilderObject* self, PyObject* tag,
         return NULL;
     }
 
-    this = self->this;
+    ths = self->ths;
     Py_CLEAR(self->last_for_tail);
 
-    if (this != Py_None) {
-        if (treebuilder_add_subelement(this, node) < 0)
+    if (ths != Py_None) {
+        if (treebuilder_add_subelement(ths, node) < 0)
             goto error;
     } else {
         if (self->root) {
@@ -2723,17 +2728,17 @@ treebuilder_handle_start(TreeBuilderObject* self, PyObject* tag,
     }
 
     if (self->index < PyList_GET_SIZE(self->stack)) {
-        if (PyList_SetItem(self->stack, self->index, this) < 0)
+        if (PyList_SetItem(self->stack, self->index, ths) < 0)
             goto error;
-        Py_INCREF(this);
+        Py_INCREF(ths);
     } else {
-        if (PyList_Append(self->stack, this) < 0)
+        if (PyList_Append(self->stack, ths) < 0)
             goto error;
     }
     self->index++;
 
     Py_INCREF(node);
-    Py_SETREF(self->this, node);
+    Py_SETREF(self->ths, node);
     Py_INCREF(node);
     Py_SETREF(self->last, node);
 
@@ -2802,12 +2807,12 @@ treebuilder_handle_end(TreeBuilderObject* self, PyObject* tag)
     }
 
     item = self->last;
-    self->last = self->this;
+    self->last = self->ths;
     Py_INCREF(self->last);
     Py_XSETREF(self->last_for_tail, self->last);
     self->index--;
-    self->this = PyList_GET_ITEM(self->stack, self->index);
-    Py_INCREF(self->this);
+    self->ths = PyList_GET_ITEM(self->stack, self->index);
+    Py_INCREF(self->ths);
     Py_DECREF(item);
 
     if (treebuilder_append_event(self, self->end_event_obj, self->last) < 0)
@@ -2821,7 +2826,7 @@ LOCAL(PyObject*)
 treebuilder_handle_comment(TreeBuilderObject* self, PyObject* text)
 {
     PyObject* comment;
-    PyObject* this;
+    PyObject* ths;
 
     if (treebuilder_flush_data(self) < 0) {
         return NULL;
@@ -2832,9 +2837,9 @@ treebuilder_handle_comment(TreeBuilderObject* self, PyObject* text)
         if (!comment)
             return NULL;
 
-        this = self->this;
-        if (self->insert_comments && this != Py_None) {
-            if (treebuilder_add_subelement(this, comment) < 0)
+        ths = self->ths;
+        if (self->insert_comments && ths != Py_None) {
+            if (treebuilder_add_subelement(ths, comment) < 0)
                 goto error;
             Py_INCREF(comment);
             Py_XSETREF(self->last_for_tail, comment);
@@ -2860,7 +2865,7 @@ LOCAL(PyObject*)
 treebuilder_handle_pi(TreeBuilderObject* self, PyObject* target, PyObject* text)
 {
     PyObject* pi;
-    PyObject* this;
+    PyObject* ths;
     PyObject* stack[2] = {target, text};
 
     if (treebuilder_flush_data(self) < 0) {
@@ -2873,9 +2878,9 @@ treebuilder_handle_pi(TreeBuilderObject* self, PyObject* target, PyObject* text)
             return NULL;
         }
 
-        this = self->this;
-        if (self->insert_pis && this != Py_None) {
-            if (treebuilder_add_subelement(this, pi) < 0)
+        ths = self->ths;
+        if (self->insert_pis && ths != Py_None) {
+            if (treebuilder_add_subelement(ths, pi) < 0)
                 goto error;
             Py_INCREF(pi);
             Py_XSETREF(self->last_for_tail, pi);
@@ -3926,7 +3931,7 @@ _elementtree_XMLParser_feed(XMLParserObject *self, PyObject *data)
             PyErr_SetString(PyExc_OverflowError, "size does not fit in an int");
             return NULL;
         }
-        res = expat_parse(self, view.buf, (int)view.len, 0);
+        res = expat_parse(self, (const char*)view.buf, (int)view.len, 0);
         PyBuffer_Release(&view);
         return res;
     }
@@ -4216,7 +4221,8 @@ static PyGetSetDef element_getsetlist[] = {
     {NULL},
 };
 
-static PyTypeObject Element_Type = {
+namespace {
+PyTypeObject Element_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "xml.etree.ElementTree.Element", sizeof(ElementObject), 0,
     /* methods */
@@ -4257,6 +4263,7 @@ static PyTypeObject Element_Type = {
     element_new,                                    /* tp_new */
     0,                                              /* tp_free */
 };
+}
 
 static PyMethodDef treebuilder_methods[] = {
     _ELEMENTTREE_TREEBUILDER_DATA_METHODDEF
@@ -4268,7 +4275,8 @@ static PyMethodDef treebuilder_methods[] = {
     {NULL, NULL}
 };
 
-static PyTypeObject TreeBuilder_Type = {
+namespace {
+PyTypeObject TreeBuilder_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "xml.etree.ElementTree.TreeBuilder", sizeof(TreeBuilderObject), 0,
     /* methods */
@@ -4309,6 +4317,7 @@ static PyTypeObject TreeBuilder_Type = {
     treebuilder_new,                                /* tp_new */
     0,                                              /* tp_free */
 };
+}
 
 static PyMethodDef xmlparser_methods[] = {
     _ELEMENTTREE_XMLPARSER_FEED_METHODDEF
@@ -4318,7 +4327,8 @@ static PyMethodDef xmlparser_methods[] = {
     {NULL, NULL}
 };
 
-static PyTypeObject XMLParser_Type = {
+namespace {
+PyTypeObject XMLParser_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "xml.etree.ElementTree.XMLParser", sizeof(XMLParserObject), 0,
     /* methods */
@@ -4359,6 +4369,7 @@ static PyTypeObject XMLParser_Type = {
     xmlparser_new,                                  /* tp_new */
     0,                                              /* tp_free */
 };
+}
 
 /* ==================================================================== */
 /* python module interface */
@@ -4369,8 +4380,8 @@ static PyMethodDef _functions[] = {
     {NULL, NULL}
 };
 
-
-static struct PyModuleDef elementtreemodule = {
+namespace {
+struct PyModuleDef elementtreemodule = {
     PyModuleDef_HEAD_INIT,
     "_elementtree",
     NULL,
@@ -4381,6 +4392,7 @@ static struct PyModuleDef elementtreemodule = {
     elementtree_clear,
     elementtree_free
 };
+}
 
 PyMODINIT_FUNC
 PyInit__elementtree(void)
@@ -4423,7 +4435,7 @@ PyInit__elementtree(void)
         return NULL;
 
     /* link against pyexpat */
-    expat_capi = PyCapsule_Import(PyExpat_CAPSULE_NAME, 0);
+    expat_capi = (PyExpat_CAPI*)PyCapsule_Import(PyExpat_CAPSULE_NAME, 0);
     if (expat_capi) {
         /* check that it's usable */
         if (strcmp(expat_capi->magic, PyExpat_CAPI_MAGIC) != 0 ||

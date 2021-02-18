@@ -489,15 +489,15 @@ static PyStructSequence_Field profiler_subentry_fields[] = {
 
 static PyStructSequence_Desc profiler_entry_desc = {
     .name = "_lsprof.profiler_entry",
-    .fields = profiler_entry_fields,
     .doc = NULL,
+    .fields = profiler_entry_fields,
     .n_in_sequence = 6
 };
 
 static PyStructSequence_Desc profiler_subentry_desc = {
     .name = "_lsprof.profiler_subentry",
-    .fields = profiler_subentry_fields,
     .doc = NULL,
+    .fields = profiler_subentry_fields,
     .n_in_sequence = 5
 };
 
@@ -604,7 +604,7 @@ _lsprof_Profiler_getstats_impl(ProfilerObject *self, PyTypeObject *cls)
 /*[clinic end generated code: output=1806ef720019ee03 input=445e193ef4522902]*/
 {
     statscollector_t collect;
-    collect.state = PyType_GetModuleState(cls);
+    collect.state = (_lsprof_state*)PyType_GetModuleState(cls);
     if (pending_exception(self)) {
         return NULL;
     }
@@ -796,11 +796,11 @@ Profiler(timer=None, timeunit=None, subcalls=True, builtins=True)\n\
 static PyType_Slot _lsprof_profiler_type_spec_slots[] = {
     {Py_tp_doc, (void *)profiler_doc},
     {Py_tp_methods, profiler_methods},
-    {Py_tp_dealloc, profiler_dealloc},
-    {Py_tp_init, profiler_init},
-    {Py_tp_alloc, PyType_GenericAlloc},
-    {Py_tp_new, PyType_GenericNew},
-    {Py_tp_free, PyObject_Del},
+    {Py_tp_dealloc, (void *)profiler_dealloc},
+    {Py_tp_init, (void *)profiler_init},
+    {Py_tp_alloc, (void *)PyType_GenericAlloc},
+    {Py_tp_new, (void *)PyType_GenericNew},
+    {Py_tp_free, (void *)PyObject_Del},
     {0, 0}
 };
 
@@ -844,7 +844,7 @@ _lsprof_free(void *module)
 static int
 _lsprof_exec(PyObject *module)
 {
-    _lsprof_state *state = PyModule_GetState(module);
+    _lsprof_state *state = (_lsprof_state*)PyModule_GetState(module);
 
     state->profiler_type = (PyTypeObject *)PyType_FromModuleAndSpec(
         module, &_lsprof_profiler_type_spec, NULL);
@@ -876,7 +876,7 @@ _lsprof_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot _lsprofslots[] = {
-    {Py_mod_exec, _lsprof_exec},
+    {Py_mod_exec, (void*)_lsprof_exec},
     {0, NULL}
 };
 

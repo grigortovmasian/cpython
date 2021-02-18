@@ -1212,12 +1212,12 @@ PyDoc_STRVAR(scanner_doc, "JSON scanner object");
 
 static PyType_Slot PyScannerType_slots[] = {
     {Py_tp_doc, (void *)scanner_doc},
-    {Py_tp_dealloc, scanner_dealloc},
-    {Py_tp_call, scanner_call},
-    {Py_tp_traverse, scanner_traverse},
-    {Py_tp_clear, scanner_clear},
+    {Py_tp_dealloc, (void *)scanner_dealloc},
+    {Py_tp_call, (void *)scanner_call},
+    {Py_tp_traverse, (void *)scanner_traverse},
+    {Py_tp_clear, (void *)scanner_clear},
     {Py_tp_members, scanner_members},
-    {Py_tp_new, scanner_new},
+    {Py_tp_new, (void *)scanner_new},
     {0, 0}
 };
 
@@ -1773,12 +1773,12 @@ PyDoc_STRVAR(encoder_doc, "_iterencode(obj, _current_indent_level) -> iterable")
 
 static PyType_Slot PyEncoderType_slots[] = {
     {Py_tp_doc, (void *)encoder_doc},
-    {Py_tp_dealloc, encoder_dealloc},
-    {Py_tp_call, encoder_call},
-    {Py_tp_traverse, encoder_traverse},
-    {Py_tp_clear, encoder_clear},
+    {Py_tp_dealloc, (void *)encoder_dealloc},
+    {Py_tp_call, (void *)encoder_call},
+    {Py_tp_traverse, (void *)encoder_traverse},
+    {Py_tp_clear, (void *)encoder_clear},
     {Py_tp_members, encoder_members},
-    {Py_tp_new, encoder_new},
+    {Py_tp_new, (void *)encoder_new},
     {0, 0}
 };
 
@@ -1862,7 +1862,7 @@ _jsonmodule_free(void *module)
 }
 
 static PyModuleDef_Slot _json_slots[] = {
-    {Py_mod_exec, _json_exec},
+    {Py_mod_exec, (void *)_json_exec},
     {0, NULL}
 };
 

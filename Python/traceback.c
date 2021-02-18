@@ -226,6 +226,9 @@ PyTypeObject PyTraceBack_Type = {
     tb_new,                                     /* tp_new */
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyObject*
 _PyTraceBack_FromFrame(PyObject *tb_next, PyFrameObject *frame)
@@ -236,6 +239,10 @@ _PyTraceBack_FromFrame(PyObject *tb_next, PyFrameObject *frame)
     return tb_create_raw((PyTracebackObject *)tb_next, frame, frame->f_lasti,
                          PyFrame_GetLineNumber(frame));
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 
 int
@@ -622,6 +629,11 @@ PyTraceBack_Print(PyObject *v, PyObject *f)
     return err;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* Format an integer in range [0; 0xffffffff] to decimal and write it
    into the file fd.
 
@@ -825,6 +837,7 @@ dump_traceback(int fd, PyThreadState *tstate, int write_header)
     }
 }
 
+
 /* Dump the traceback of a Python thread into fd. Use write() to write the
    traceback and retry if write() is interrupted by a signal (failed with
    EINTR), but don't call the Python signal handler.
@@ -923,4 +936,8 @@ _Py_DumpTracebackThreads(int fd, PyInterpreterState *interp,
 
     return NULL;
 }
+
+#ifdef __cplusplus
+}
+#endif
 

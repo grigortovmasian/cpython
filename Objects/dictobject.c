@@ -273,6 +273,9 @@ _PyDict_ClearFreeList(PyThreadState *tstate)
     }
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 _PyDict_Fini(PyThreadState *tstate)
@@ -285,6 +288,9 @@ _PyDict_Fini(PyThreadState *tstate)
 #endif
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void

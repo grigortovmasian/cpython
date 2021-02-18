@@ -96,6 +96,9 @@ PyObject _Py_EllipsisObject = {
 
 /* Slice object implementation */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void _PySlice_Fini(PyThreadState *tstate)
 {
@@ -106,6 +109,10 @@ void _PySlice_Fini(PyThreadState *tstate)
         PyObject_GC_Del(obj);
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /* start, stop, and step are python objects with None indicating no
    index is present.

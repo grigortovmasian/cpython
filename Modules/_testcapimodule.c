@@ -37,7 +37,9 @@
 #  error "_testcapi must test the public Python C API, not CPython internal C API"
 #endif
 
-static struct PyModuleDef _testcapimodule;
+namespace {
+extern struct PyModuleDef _testcapimodule;
+}
 
 static PyObject *TestError;     /* set to exception object in init */
 
@@ -1021,31 +1023,31 @@ test_buildvalue_N(PyObject *self, PyObject *Py_UNUSED(ignored))
 static PyObject *
 test_get_statictype_slots(PyObject *self, PyObject *Py_UNUSED(ignored))
 {
-    newfunc tp_new = PyType_GetSlot(&PyLong_Type, Py_tp_new);
+    newfunc tp_new = (newfunc)PyType_GetSlot(&PyLong_Type, Py_tp_new);
     if (PyLong_Type.tp_new != tp_new) {
         PyErr_SetString(PyExc_AssertionError, "mismatch: tp_new of long");
         return NULL;
     }
 
-    reprfunc tp_repr = PyType_GetSlot(&PyLong_Type, Py_tp_repr);
+    reprfunc tp_repr = (reprfunc)PyType_GetSlot(&PyLong_Type, Py_tp_repr);
     if (PyLong_Type.tp_repr != tp_repr) {
         PyErr_SetString(PyExc_AssertionError, "mismatch: tp_repr of long");
         return NULL;
     }
 
-    ternaryfunc tp_call = PyType_GetSlot(&PyLong_Type, Py_tp_call);
+    ternaryfunc tp_call = (ternaryfunc)PyType_GetSlot(&PyLong_Type, Py_tp_call);
     if (tp_call != NULL) {
         PyErr_SetString(PyExc_AssertionError, "mismatch: tp_call of long");
         return NULL;
     }
 
-    binaryfunc nb_add = PyType_GetSlot(&PyLong_Type, Py_nb_add);
+    binaryfunc nb_add = (binaryfunc)PyType_GetSlot(&PyLong_Type, Py_nb_add);
     if (PyLong_Type.tp_as_number->nb_add != nb_add) {
         PyErr_SetString(PyExc_AssertionError, "mismatch: nb_add of long");
         return NULL;
     }
 
-    lenfunc mp_length = PyType_GetSlot(&PyLong_Type, Py_mp_length);
+    lenfunc mp_length = (lenfunc)PyType_GetSlot(&PyLong_Type, Py_mp_length);
     if (mp_length != NULL) {
         PyErr_SetString(PyExc_AssertionError, "mismatch: mp_length of long");
         return NULL;
@@ -1057,7 +1059,7 @@ test_get_statictype_slots(PyObject *self, PyObject *Py_UNUSED(ignored))
         return NULL;
     }
 
-    tp_new = PyType_GetSlot(&PyLong_Type, 0);
+    tp_new = (newfunc)PyType_GetSlot(&PyLong_Type, 0);
     if (tp_new != NULL) {
         PyErr_SetString(PyExc_AssertionError, "mismatch: slot 0 of long");
         return NULL;
@@ -1410,7 +1412,7 @@ getargs_s_star(PyObject *self, PyObject *args)
     PyObject *bytes;
     if (!PyArg_ParseTuple(args, "s*", &buffer))
         return NULL;
-    bytes = PyBytes_FromStringAndSize(buffer.buf, buffer.len);
+    bytes = PyBytes_FromStringAndSize((const char*)buffer.buf, buffer.len);
     PyBuffer_Release(&buffer);
     return bytes;
 }
@@ -1445,7 +1447,7 @@ getargs_z_star(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "z*", &buffer))
         return NULL;
     if (buffer.buf != NULL)
-        bytes = PyBytes_FromStringAndSize(buffer.buf, buffer.len);
+        bytes = PyBytes_FromStringAndSize((const char*)buffer.buf, buffer.len);
     else {
         Py_INCREF(Py_None);
         bytes = Py_None;
@@ -1483,7 +1485,7 @@ getargs_y_star(PyObject *self, PyObject *args)
     PyObject *bytes;
     if (!PyArg_ParseTuple(args, "y*", &buffer))
         return NULL;
-    bytes = PyBytes_FromStringAndSize(buffer.buf, buffer.len);
+    bytes = PyBytes_FromStringAndSize((const char*)buffer.buf, buffer.len);
     PyBuffer_Release(&buffer);
     return bytes;
 }
@@ -2175,12 +2177,12 @@ getargs_w_star(PyObject *self, PyObject *args)
         return NULL;
 
     if (2 <= buffer.len) {
-        str = buffer.buf;
+        str = (char*)buffer.buf;
         str[0] = '[';
         str[buffer.len-1] = ']';
     }
 
-    result = PyBytes_FromStringAndSize(buffer.buf, buffer.len);
+    result = PyBytes_FromStringAndSize((const char*)buffer.buf, buffer.len);
     PyBuffer_Release(&buffer);
     return result;
 }
@@ -3664,7 +3666,7 @@ test_from_contiguous(PyObject* self, PyObject *Py_UNUSED(ignored))
     int i;
 
     PyBuffer_FromContiguous(&view, init, view.len, 'C');
-    ptr = view.buf;
+    ptr = (int*)view.buf;
     for (i = 0; i < 5; i++) {
         if (ptr[2*i] != i) {
             PyErr_SetString(TestError,
@@ -3677,7 +3679,7 @@ test_from_contiguous(PyObject* self, PyObject *Py_UNUSED(ignored))
     view.strides[0] = -2 * itemsize;
 
     PyBuffer_FromContiguous(&view, init, view.len, 'C');
-    ptr = view.buf;
+    ptr = (int*)view.buf;
     for (i = 0; i < 5; i++) {
         if (*(ptr-2*i) != i) {
             PyErr_SetString(TestError,
@@ -3834,7 +3836,7 @@ test_pytime_object_to_time_t(PyObject *self, PyObject *args)
         return NULL;
     if (check_time_rounding(round) < 0)
         return NULL;
-    if (_PyTime_ObjectToTime_t(obj, &sec, round) == -1)
+    if (_PyTime_ObjectToTime_t(obj, &sec, (_PyTime_round_t)round) == -1)
         return NULL;
     return _PyLong_FromTime_t(sec);
 }
@@ -3850,7 +3852,7 @@ test_pytime_object_to_timeval(PyObject *self, PyObject *args)
         return NULL;
     if (check_time_rounding(round) < 0)
         return NULL;
-    if (_PyTime_ObjectToTimeval(obj, &sec, &usec, round) == -1)
+    if (_PyTime_ObjectToTimeval(obj, &sec, &usec, (_PyTime_round_t)round) == -1)
         return NULL;
     return Py_BuildValue("Nl", _PyLong_FromTime_t(sec), usec);
 }
@@ -3866,7 +3868,7 @@ test_pytime_object_to_timespec(PyObject *self, PyObject *args)
         return NULL;
     if (check_time_rounding(round) < 0)
         return NULL;
-    if (_PyTime_ObjectToTimespec(obj, &sec, &nsec, round) == -1)
+    if (_PyTime_ObjectToTimespec(obj, &sec, &nsec, (_PyTime_round_t)round) == -1)
         return NULL;
     return Py_BuildValue("Nl", _PyLong_FromTime_t(sec), nsec);
 }
@@ -3963,7 +3965,9 @@ without_gc(PyObject *Py_UNUSED(self), PyObject *obj)
     return obj;
 }
 
-static PyMethodDef ml;
+namespace {
+extern  PyMethodDef ml;
+}
 
 static PyObject *
 create_cfunction(PyObject *self, PyObject *args)
@@ -3971,12 +3975,14 @@ create_cfunction(PyObject *self, PyObject *args)
     return PyCFunction_NewEx(&ml, self, NULL);
 }
 
-static PyMethodDef ml = {
+namespace {
+PyMethodDef ml = {
     "create_cfunction",
     create_cfunction,
     METH_NOARGS,
     NULL
 };
+}
 
 static PyObject *
 _test_incref(PyObject *ob)
@@ -4489,7 +4495,7 @@ typedef struct {
 static void
 temporary_c_thread(void *data)
 {
-    test_c_thread_t *test_c_thread = data;
+    test_c_thread_t *test_c_thread = (test_c_thread_t*)data;
     PyGILState_STATE state;
     PyObject *res;
 
@@ -4759,7 +4765,7 @@ test_pytime_fromsecondsobject(PyObject *self, PyObject *args)
         return NULL;
     if (check_time_rounding(round) < 0)
         return NULL;
-    if (_PyTime_FromSecondsObject(&ts, obj, round) == -1)
+    if (_PyTime_FromSecondsObject(&ts, obj, (_PyTime_round_t)round) == -1)
         return NULL;
     return _PyTime_AsNanosecondsObject(ts);
 }
@@ -4798,7 +4804,7 @@ test_PyTime_AsTimeval(PyObject *self, PyObject *args)
     if (_PyTime_FromNanosecondsObject(&t, obj) < 0) {
         return NULL;
     }
-    if (_PyTime_AsTimeval(t, &tv, round) < 0) {
+    if (_PyTime_AsTimeval(t, &tv, (_PyTime_round_t)round) < 0) {
         return NULL;
     }
 
@@ -4846,7 +4852,7 @@ test_PyTime_AsMilliseconds(PyObject *self, PyObject *args)
     if (check_time_rounding(round) < 0) {
         return NULL;
     }
-    ms = _PyTime_AsMilliseconds(t, round);
+    ms = _PyTime_AsMilliseconds(t, (_PyTime_round_t)round);
     /* This conversion rely on the fact that _PyTime_t is a number of
        nanoseconds */
     return _PyTime_AsNanosecondsObject(ms);
@@ -4867,7 +4873,7 @@ test_PyTime_AsMicroseconds(PyObject *self, PyObject *args)
     if (check_time_rounding(round) < 0) {
         return NULL;
     }
-    ms = _PyTime_AsMicroseconds(t, round);
+    ms = _PyTime_AsMicroseconds(t, (_PyTime_round_t)round);
     /* This conversion rely on the fact that _PyTime_t is a number of
        nanoseconds */
     return _PyTime_AsNanosecondsObject(ms);
@@ -4880,7 +4886,7 @@ pymem_buffer_overflow(PyObject *self, PyObject *args)
 
     /* Deliberate buffer overflow to check that PyMem_Free() detects
        the overflow when debug hooks are installed. */
-    buffer = PyMem_Malloc(16);
+    buffer = (char*)PyMem_Malloc(16);
     if (buffer == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -4898,7 +4904,7 @@ pymem_api_misuse(PyObject *self, PyObject *args)
 
     /* Deliberate misusage of Python allocators:
        allococate with PyMem but release with PyMem_Raw. */
-    buffer = PyMem_Malloc(16);
+    buffer = (char*)PyMem_Malloc(16);
     PyMem_RawFree(buffer);
 
     Py_RETURN_NONE;
@@ -4912,7 +4918,7 @@ pymem_malloc_without_gil(PyObject *self, PyObject *args)
     /* Deliberate bug to test debug hooks on Python memory allocators:
        call PyMem_Malloc() without holding the GIL */
     Py_BEGIN_ALLOW_THREADS
-    buffer = PyMem_Malloc(10);
+    buffer = (char*)PyMem_Malloc(10);
     Py_END_ALLOW_THREADS
 
     PyMem_Free(buffer);
@@ -5004,7 +5010,7 @@ pyobject_malloc_without_gil(PyObject *self, PyObject *args)
     /* Deliberate bug to test debug hooks on Python memory allocators:
        call PyObject_Malloc() without holding the GIL */
     Py_BEGIN_ALLOW_THREADS
-    buffer = PyObject_Malloc(10);
+    buffer = (char*)PyObject_Malloc(10);
     Py_END_ALLOW_THREADS
 
     PyObject_Free(buffer);
@@ -6576,12 +6582,12 @@ static PyTypeObject MethodDescriptorBase_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "MethodDescriptorBase",
     sizeof(MethodDescriptorObject),
-    .tp_new = MethodDescriptor_new,
-    .tp_call = PyVectorcall_Call,
     .tp_vectorcall_offset = offsetof(MethodDescriptorObject, vectorcall),
+    .tp_call = PyVectorcall_Call,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
                 Py_TPFLAGS_METHOD_DESCRIPTOR | Py_TPFLAGS_HAVE_VECTORCALL,
     .tp_descr_get = func_descr_get,
+    .tp_new = MethodDescriptor_new,
 };
 
 static PyTypeObject MethodDescriptorDerived_Type = {
@@ -6593,8 +6599,8 @@ static PyTypeObject MethodDescriptorDerived_Type = {
 static PyTypeObject MethodDescriptorNopGet_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "MethodDescriptorNopGet",
-    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .tp_call = call_return_args,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .tp_descr_get = nop_descr_get,
 };
 
@@ -6616,10 +6622,10 @@ static PyTypeObject MethodDescriptor2_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "MethodDescriptor2",
     sizeof(MethodDescriptor2Object),
-    .tp_new = MethodDescriptor2_new,
-    .tp_call = PyVectorcall_Call,
     .tp_vectorcall_offset = offsetof(MethodDescriptor2Object, vectorcall),
+    .tp_call = PyVectorcall_Call,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_VECTORCALL,
+    .tp_new = MethodDescriptor2_new,
 };
 
 PyDoc_STRVAR(heapdocctype__doc__,
@@ -6694,9 +6700,9 @@ heapgcctype_dealloc(HeapCTypeObject *self)
 }
 
 static PyType_Slot HeapGcCType_slots[] = {
-    {Py_tp_init, heapctype_init},
+    {Py_tp_init, (void*)heapctype_init},
     {Py_tp_members, heapctype_members},
-    {Py_tp_dealloc, heapgcctype_dealloc},
+    {Py_tp_dealloc, (void*)heapgcctype_dealloc},
     {Py_tp_doc, (char*)heapgctype__doc__},
     {0, 0},
 };
@@ -6722,9 +6728,9 @@ heapctype_dealloc(HeapCTypeObject *self)
 }
 
 static PyType_Slot HeapCType_slots[] = {
-    {Py_tp_init, heapctype_init},
+    {Py_tp_init, (void*)heapctype_init},
     {Py_tp_members, heapctype_members},
-    {Py_tp_dealloc, heapctype_dealloc},
+    {Py_tp_dealloc, (void*)heapctype_dealloc},
     {Py_tp_doc, (char*)heapctype__doc__},
     {0, 0},
 };
@@ -6764,7 +6770,7 @@ static struct PyMemberDef heapctypesubclass_members[] = {
 };
 
 static PyType_Slot HeapCTypeSubclass_slots[] = {
-    {Py_tp_init, heapctypesubclass_init},
+    {Py_tp_init, (void*)heapctypesubclass_init},
     {Py_tp_members, heapctypesubclass_members},
     {Py_tp_doc, (char*)heapctypesubclass__doc__},
     {0, 0},
@@ -6805,8 +6811,8 @@ heapctypewithbuffer_releasebuffer(HeapCTypeWithBufferObject *self, Py_buffer *vi
 }
 
 static PyType_Slot HeapCTypeWithBuffer_slots[] = {
-    {Py_bf_getbuffer, heapctypewithbuffer_getbuffer},
-    {Py_bf_releasebuffer, heapctypewithbuffer_releasebuffer},
+    {Py_bf_getbuffer, (void*)heapctypewithbuffer_getbuffer},
+    {Py_bf_releasebuffer, (void*)heapctypewithbuffer_releasebuffer},
     {Py_tp_doc, (char*)heapctypewithbuffer__doc__},
     {0, 0},
 };
@@ -6828,7 +6834,7 @@ static int
 heapctypesubclasswithfinalizer_init(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     PyTypeObject *base = (PyTypeObject *)PyType_GetSlot(Py_TYPE(self), Py_tp_base);
-    initproc base_init = PyType_GetSlot(base, Py_tp_init);
+    initproc base_init = (initproc)PyType_GetSlot(base, Py_tp_init);
     base_init(self, args, kwargs);
     return 0;
 }
@@ -6881,9 +6887,9 @@ cleanup_finalize:
 }
 
 static PyType_Slot HeapCTypeSubclassWithFinalizer_slots[] = {
-    {Py_tp_init, heapctypesubclasswithfinalizer_init},
+    {Py_tp_init, (void*)heapctypesubclasswithfinalizer_init},
     {Py_tp_members, heapctypesubclass_members},
-    {Py_tp_finalize, heapctypesubclasswithfinalizer_finalize},
+    {Py_tp_finalize, (void*)heapctypesubclasswithfinalizer_finalize},
     {Py_tp_doc, (char*)heapctypesubclasswithfinalizer__doc__},
     {0, 0},
 };
@@ -6925,7 +6931,7 @@ static struct PyMemberDef heapctypewithdict_members[] = {
 static PyType_Slot HeapCTypeWithDict_slots[] = {
     {Py_tp_members, heapctypewithdict_members},
     {Py_tp_getset, heapctypewithdict_getsetlist},
-    {Py_tp_dealloc, heapctypewithdict_dealloc},
+    {Py_tp_dealloc, (void*)heapctypewithdict_dealloc},
     {0, 0},
 };
 
@@ -6946,7 +6952,7 @@ static struct PyMemberDef heapctypewithnegativedict_members[] = {
 static PyType_Slot HeapCTypeWithNegativeDict_slots[] = {
     {Py_tp_members, heapctypewithnegativedict_members},
     {Py_tp_getset, heapctypewithdict_getsetlist},
-    {Py_tp_dealloc, heapctypewithdict_dealloc},
+    {Py_tp_dealloc, (void*)heapctypewithdict_dealloc},
     {0, 0},
 };
 
@@ -6984,7 +6990,7 @@ heapctypewithweakref_dealloc(HeapCTypeWithWeakrefObject* self)
 
 static PyType_Slot HeapCTypeWithWeakref_slots[] = {
     {Py_tp_members, heapctypewithweakref_members},
-    {Py_tp_dealloc, heapctypewithweakref_dealloc},
+    {Py_tp_dealloc, (void*)heapctypewithweakref_dealloc},
     {0, 0},
 };
 
@@ -7054,10 +7060,10 @@ heapctypesetattr_setattro(HeapCTypeSetattrObject *self, PyObject *attr, PyObject
 }
 
 static PyType_Slot HeapCTypeSetattr_slots[] = {
-    {Py_tp_init, heapctypesetattr_init},
+    {Py_tp_init, (void*)heapctypesetattr_init},
     {Py_tp_members, heapctypesetattr_members},
-    {Py_tp_setattro, heapctypesetattr_setattro},
-    {Py_tp_dealloc, heapctypesetattr_dealloc},
+    {Py_tp_setattro, (void*)heapctypesetattr_setattro},
+    {Py_tp_dealloc, (void*)heapctypesetattr_dealloc},
     {Py_tp_doc, (char*)heapctypesetattr__doc__},
     {0, 0},
 };
@@ -7085,11 +7091,11 @@ static PyTypeObject MethInstance_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "MethInstance",
     sizeof(PyObject),
-    .tp_new = PyType_GenericNew,
     .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_methods = meth_instance_methods,
     .tp_doc = (char*)PyDoc_STR(
         "Class with normal (instance) methods to test calling conventions"),
+    .tp_methods = meth_instance_methods,
+    .tp_new = PyType_GenericNew,
 };
 
 static PyMethodDef meth_class_methods[] = {
@@ -7107,11 +7113,12 @@ static PyTypeObject MethClass_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "MethClass",
     sizeof(PyObject),
-    .tp_new = PyType_GenericNew,
     .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_methods = meth_class_methods,
     .tp_doc = PyDoc_STR(
         "Class with class methods to test calling conventions"),
+    .tp_methods = meth_class_methods,
+    .tp_new = PyType_GenericNew,
+
 };
 
 static PyMethodDef meth_static_methods[] = {
@@ -7129,11 +7136,11 @@ static PyTypeObject MethStatic_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "MethStatic",
     sizeof(PyObject),
-    .tp_new = PyType_GenericNew,
     .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_methods = meth_static_methods,
     .tp_doc = PyDoc_STR(
         "Class with static methods to test calling conventions"),
+    .tp_methods = meth_static_methods,
+    .tp_new = PyType_GenericNew,
 };
 
 /* ContainerNoGC -- a simple container without GC methods */
@@ -7183,8 +7190,8 @@ static PyTypeObject ContainerNoGC_type = {
     .tp_new = ContainerNoGC_new,
 };
 
-
-static struct PyModuleDef _testcapimodule = {
+namespace {
+struct PyModuleDef _testcapimodule = {
     PyModuleDef_HEAD_INIT,
     "_testcapi",
     NULL,
@@ -7195,7 +7202,7 @@ static struct PyModuleDef _testcapimodule = {
     NULL,
     NULL
 };
-
+}
 /* Per PEP 489, this module will not be converted to multi-phase initialization
  */
 

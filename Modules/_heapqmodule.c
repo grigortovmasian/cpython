@@ -682,7 +682,7 @@ heapq_exec(PyObject *m)
 }
 
 static struct PyModuleDef_Slot heapq_slots[] = {
-    {Py_mod_exec, heapq_exec},
+    {Py_mod_exec, (void*)heapq_exec},
     {0, NULL}
 };
 

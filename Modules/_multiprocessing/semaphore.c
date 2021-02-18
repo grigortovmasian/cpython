@@ -493,7 +493,7 @@ _multiprocessing_SemLock_impl(PyTypeObject *type, int kind, int value,
     }
 
     if (!unlink) {
-        name_copy = PyMem_Malloc(strlen(name) + 1);
+        name_copy = (char*)PyMem_Malloc(strlen(name) + 1);
         if (name_copy == NULL) {
             return PyErr_NoMemory();
         }
@@ -546,7 +546,7 @@ _multiprocessing_SemLock__rebuild_impl(PyTypeObject *type, SEM_HANDLE handle,
     char *name_copy = NULL;
 
     if (name != NULL) {
-        name_copy = PyMem_Malloc(strlen(name) + 1);
+        name_copy = (char*)PyMem_Malloc(strlen(name) + 1);
         if (name_copy == NULL)
             return PyErr_NoMemory();
         strcpy(name_copy, name);

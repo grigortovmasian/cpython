@@ -46,7 +46,9 @@ get_grp_state(PyObject *module)
     return (grpmodulestate *)state;
 }
 
-static struct PyModuleDef grpmodule;
+namespace{
+extern struct PyModuleDef grpmodule;
+}
 
 #define DEFAULT_BUFFER_SIZE 1024
 
@@ -132,7 +134,7 @@ grp_getgrgid_impl(PyObject *module, PyObject *id)
     }
 
     while (1) {
-        buf2 = PyMem_RawRealloc(buf, bufsize);
+        buf2 = (char*)PyMem_RawRealloc(buf, bufsize);
         if (buf2 == NULL) {
             p = NULL;
             nomem = 1;
@@ -213,7 +215,7 @@ grp_getgrnam_impl(PyObject *module, PyObject *name)
     }
 
     while(1) {
-        buf2 = PyMem_RawRealloc(buf, bufsize);
+        buf2 = (char*)PyMem_RawRealloc(buf, bufsize);
         if (buf2 == NULL) {
             p = NULL;
             nomem = 1;
@@ -326,7 +328,7 @@ grpmodule_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot grpmodule_slots[] = {
-    {Py_mod_exec, grpmodule_exec},
+    {Py_mod_exec, (void*)grpmodule_exec},
     {0, NULL}
 };
 
@@ -343,8 +345,8 @@ static int grpmodule_clear(PyObject *m) {
 static void grpmodule_free(void *m) {
     grpmodule_clear((PyObject *)m);
 }
-
-static struct PyModuleDef grpmodule = {
+namespace {
+struct PyModuleDef grpmodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "grp",
     .m_doc = grp__doc__,
@@ -355,6 +357,7 @@ static struct PyModuleDef grpmodule = {
     .m_clear = grpmodule_clear,
     .m_free = grpmodule_free,
 };
+}
 
 PyMODINIT_FUNC
 PyInit_grp(void)

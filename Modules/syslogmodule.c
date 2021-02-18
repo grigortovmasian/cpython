@@ -337,7 +337,7 @@ syslog_exec(PyObject *module)
 }
 
 static PyModuleDef_Slot syslog_slots[] = {
-    {Py_mod_exec, syslog_exec},
+    {Py_mod_exec, (void*)syslog_exec},
     {0, NULL}
 };
 

@@ -76,7 +76,9 @@ get_resource_state(PyObject *module)
     return (resourcemodulestate *)state;
 }
 
-static struct PyModuleDef resourcemodule;
+namespace {
+extern struct PyModuleDef resourcemodule;
+}
 
 /*[clinic input]
 resource.getrusage
@@ -296,10 +298,10 @@ resource_prlimit_impl(PyObject *module, pid_t pid, int resource,
         if (py2rlimit(limits, &new_limit) < 0) {
             return NULL;
         }
-        retval = prlimit(pid, resource, &new_limit, &old_limit);
+        retval = prlimit(pid, (__rlimit_resource)resource, &new_limit, &old_limit);
     }
     else {
-        retval = prlimit(pid, resource, NULL, &old_limit);
+        retval = prlimit(pid, (__rlimit_resource)resource, NULL, &old_limit);
     }
 
     if (retval == -1) {
@@ -501,7 +503,7 @@ resource_exec(PyObject *module)
 }
 
 static struct PyModuleDef_Slot resource_slots[] = {
-    {Py_mod_exec, resource_exec},
+    {Py_mod_exec, (void*)resource_exec},
     {0, NULL}
 };
 
@@ -522,7 +524,8 @@ resourcemodule_free(void *m) {
     resourcemodule_clear((PyObject *)m);
 }
 
-static struct PyModuleDef resourcemodule = {
+namespace {
+struct PyModuleDef resourcemodule = {
     PyModuleDef_HEAD_INIT,
     .m_name = "resource",
     .m_size = sizeof(resourcemodulestate),
@@ -532,6 +535,7 @@ static struct PyModuleDef resourcemodule = {
     .m_clear = resourcemodule_clear,
     .m_free = resourcemodule_free,
 };
+}
 
 PyMODINIT_FUNC
 PyInit_resource(void)

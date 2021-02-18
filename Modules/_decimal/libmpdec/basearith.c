@@ -321,12 +321,12 @@ _mpd_basedivmod(mpd_uint_t *q, mpd_uint_t *r,
     d = MPD_RADIX / (vconst[n-1] + 1);
 
     if (nplusm >= MPD_MINALLOC_MAX) {
-        if ((u = mpd_alloc(nplusm+1, sizeof *u)) == NULL) {
+        if ((u = (mpd_uint_t*)mpd_alloc(nplusm+1, sizeof *u)) == NULL) {
             return -1;
         }
     }
     if (n >= MPD_MINALLOC_MAX) {
-        if ((v = mpd_alloc(n+1, sizeof *v)) == NULL) {
+        if ((v = (mpd_uint_t*)mpd_alloc(n+1, sizeof *v)) == NULL) {
             mpd_free(u);
             return -1;
         }

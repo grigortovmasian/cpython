@@ -3061,6 +3061,9 @@ error:
     return -1;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyStatus
 _PyBytes_Init(PyThreadState *tstate)
@@ -3082,6 +3085,11 @@ _PyBytes_Fini(PyThreadState *tstate)
     }
     Py_CLEAR(state->empty_string);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 
 /*********************** Bytes Iterator ****************************/
 
