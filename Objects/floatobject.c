@@ -132,17 +132,15 @@ PyFloat_FromDouble(double fval)
 #endif
         state->free_list = (PyFloatObject *) Py_TYPE(op);
         state->numfree--;
-        *(op->ob_fval.val) = fval;
     }
     else {
         op = (PyFloatObject*)PyObject_Malloc(sizeof(PyFloatObject));
         if (!op) {
             return PyErr_NoMemory();
-        }    
-        op->ob_fval =  CREATE_NEW_IDOUBLE(fval);
+        }
     }
     _PyObject_Init((PyObject*)op, &PyFloat_Type);
-
+    op->ob_fval = fval;
     return (PyObject *) op;
 }
 
@@ -229,7 +227,6 @@ PyFloat_FromString(PyObject *v)
     return result;
 }
 
-int asasassxaxsax;
 static void
 float_dealloc(PyFloatObject *op)
 {
@@ -239,8 +236,7 @@ float_dealloc(PyFloatObject *op)
         // float_dealloc() must not be called after _PyFloat_Fini()
         assert(state->numfree != -1);
 #endif
-        if (state->numfree >= PyFloat_MAXFREELIST)  {       
-            DELETE_IDOUBLE (&(op->ob_fval));
+        if (state->numfree >= PyFloat_MAXFREELIST)  {
             PyObject_Free(op);
             return;
         }
@@ -249,7 +245,6 @@ float_dealloc(PyFloatObject *op)
         state->free_list = op;
     }
     else {
-        DELETE_IDOUBLE (&(op->ob_fval));
         Py_TYPE(op)->tp_free((PyObject *)op);
     }
 }
@@ -561,7 +556,7 @@ float_richcompare(PyObject *v, PyObject *w, int op)
 static Py_hash_t
 float_hash(PyFloatObject *v)
 {
-    return _Py_HashDouble(*(v->ob_fval.val));
+    return _Py_HashDouble(v->ob_fval);
 }
 
 static PyObject *
@@ -834,19 +829,19 @@ float_pow(PyObject *v, PyObject *w, PyObject *z)
 static PyObject *
 float_neg(PyFloatObject *v)
 {
-    return PyFloat_FromDouble(-(*(v->ob_fval.val)));
+    return PyFloat_FromDouble(-v->ob_fval);
 }
 
 static PyObject *
 float_abs(PyFloatObject *v)
 {
-    return PyFloat_FromDouble(fabs(*(v->ob_fval.val)));
+    return PyFloat_FromDouble(fabs(v->ob_fval));
 }
 
 static int
 float_bool(PyFloatObject *v)
 {
-    return *(v->ob_fval.val) != 0.0;
+    return v->ob_fval != 0.0;
 }
 
 /*[clinic input]
@@ -1096,7 +1091,7 @@ float_float(PyObject *v)
     if (PyFloat_CheckExact(v))
         Py_INCREF(v);
     else
-        v = PyFloat_FromDouble(*(((PyFloatObject *)v)->ob_fval.val));
+        v = PyFloat_FromDouble(((PyFloatObject *)v)->ob_fval);
     return v;
 }
 
