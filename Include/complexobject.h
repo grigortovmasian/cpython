@@ -72,3 +72,7 @@ PyAPI_FUNC(int) _PyComplex_FormatAdvancedWriter(
 }
 #endif
 #endif /* !Py_COMPLEXOBJECT_H */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

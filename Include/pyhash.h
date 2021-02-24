@@ -1,6 +1,12 @@
 #ifndef Py_HASH_H
 
 #define Py_HASH_H
+
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -143,5 +149,10 @@ PyAPI_FUNC(PyHash_FuncDef*) PyHash_GetFuncDef(void);
 #ifdef __cplusplus
 }
 #endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 
 #endif /* !Py_HASH_H */

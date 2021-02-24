@@ -112,7 +112,6 @@ raised for division by zero and mod by zero.
 #define double idouble
 #endif
 
-
 /*[clinic input]
 module math
 [clinic start generated code]*/

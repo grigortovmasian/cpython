@@ -6269,3 +6269,7 @@ int _PyUnicode_IsLinebreak(const Py_UCS4 ch)
     return 0;
 }
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

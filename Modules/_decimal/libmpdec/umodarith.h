@@ -675,3 +675,7 @@ ppro_powmod(mpd_uint_t base, mpd_uint_t exp, double *dmod, uint32_t *dinvmod)
 
 
 #endif /* LIBMPDEC_UMODARITH_H_ */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

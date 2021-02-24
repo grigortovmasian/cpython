@@ -120,3 +120,7 @@ PyAPI_FUNC(int) _PyFloat_FormatAdvancedWriter(
 }
 #endif
 #endif /* !Py_FLOATOBJECT_H */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

@@ -1315,3 +1315,7 @@ exit:
     return return_value;
 }
 /*[clinic end generated code: output=840f8c315ebd4946 input=a9049054013a1b77]*/
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

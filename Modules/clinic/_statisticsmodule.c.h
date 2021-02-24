@@ -71,3 +71,7 @@ exit:
     return return_value;
 }
 /*[clinic end generated code: output=c5826928a238326c input=a9049054013a1b77]*/
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

@@ -1,3 +1,8 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#define double idouble
+#endif
+
 #ifndef Py_CPYTHON_UNICODEOBJECT_H
 #  error "this header file must not be included directly"
 #endif
@@ -1157,3 +1162,8 @@ PyAPI_FUNC(int) _PyUnicode_WideCharString_Converter(PyObject *, void *);
 PyAPI_FUNC(int) _PyUnicode_WideCharString_Opt_Converter(PyObject *, void *);
 
 PyAPI_FUNC(Py_ssize_t) _PyUnicode_ScanIdentifier(PyObject *);
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

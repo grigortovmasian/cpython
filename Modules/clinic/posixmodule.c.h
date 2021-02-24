@@ -9169,3 +9169,7 @@ exit:
     #define OS_WAITSTATUS_TO_EXITCODE_METHODDEF
 #endif /* !defined(OS_WAITSTATUS_TO_EXITCODE_METHODDEF) */
 /*[clinic end generated code: output=f3ec08afcd6cd8f8 input=a9049054013a1b77]*/
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

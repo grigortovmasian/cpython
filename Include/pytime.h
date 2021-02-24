@@ -269,3 +269,7 @@ PyAPI_FUNC(int) _PyTime_GetPerfCounterWithInfo(
 
 #endif /* Py_PYTIME_H */
 #endif /* Py_LIMITED_API */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

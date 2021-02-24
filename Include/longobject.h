@@ -223,3 +223,7 @@ PyAPI_FUNC(PyObject *) _PyLong_Lshift(PyObject *, size_t);
 }
 #endif
 #endif /* !Py_LONGOBJECT_H */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

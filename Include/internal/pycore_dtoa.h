@@ -26,3 +26,7 @@ PyAPI_FUNC(double) _Py_dg_infinity(int sign);
 }
 #endif
 #endif   /* !PY_NO_SHORT_FLOAT_REPR */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

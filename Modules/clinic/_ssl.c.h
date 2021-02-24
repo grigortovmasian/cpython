@@ -1453,3 +1453,7 @@ exit:
     #define _SSL_ENUM_CRLS_METHODDEF
 #endif /* !defined(_SSL_ENUM_CRLS_METHODDEF) */
 /*[clinic end generated code: output=2bb53a80040c9b35 input=a9049054013a1b77]*/
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

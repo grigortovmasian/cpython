@@ -957,3 +957,7 @@ MPD_PRAGMA(MPD_HIDE_SYMBOLS_END) /* restore previous scope rules */
 
 
 #endif /* LIBMPDEC_MPDECIMAL_H_ */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

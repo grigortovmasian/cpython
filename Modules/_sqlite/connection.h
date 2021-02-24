@@ -170,3 +170,7 @@ int pysqlite_check_connection(pysqlite_Connection* con);
 int pysqlite_connection_setup_types(PyObject *module);
 
 #endif
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

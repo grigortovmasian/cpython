@@ -44,3 +44,7 @@ double _Py_log1p(double x);
 /* Use the substitute from _math.c on all platforms:
    it includes workarounds for buggy handling of zeros. */
 #define m_log1p _Py_log1p
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+

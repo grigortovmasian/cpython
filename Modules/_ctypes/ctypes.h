@@ -1,7 +1,9 @@
+/*
 #ifdef USE_IDOUBLE
 #include "idouble.h"
 #define double idouble
 #endif
+*/
 
 #if defined (__SVR4) && defined (__sun)
 #   include <alloca.h>
@@ -380,3 +382,7 @@ void *Py_ffi_closure_alloc(size_t size, void** codeloc);
  compile-command: "python setup.py -q build install --home ~"
  End:
 */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
