@@ -2021,6 +2021,29 @@ static PyNumberMethods float_as_number = {
     0,                  /* nb_inplace_true_divide */
 };
 
+PyObject * getattrofuncFloat(PyObject *self, PyObject * attr) {
+        char* my_result=0; 
+      	if (PyUnicode_Check(attr)) {
+    		PyObject * temp_bytes = PyUnicode_AsEncodedString(attr, "UTF-8", "strict"); // Owned reference
+    		if (temp_bytes != NULL) {
+        		my_result = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+        		my_result = strdup(my_result);
+                        printf("%s",my_result);
+        		Py_DECREF(temp_bytes);
+			if(strcmp(my_result, "markAsInput") == 0){
+					std::cout<<"get attr calling mark as input";
+        	        		return PyObject_GenericGetAttr(self,attr);
+			} 
+    		}
+	}
+
+        return PyObject_GenericGetAttr(self,attr);
+}
+int setattrofuncFloat(PyObject *self, PyObject *attr, PyObject *value) {
+	
+	return 0;
+}
+
 PyTypeObject PyFloat_Type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "float",
@@ -2038,8 +2061,8 @@ PyTypeObject PyFloat_Type = {
     (hashfunc)float_hash,                       /* tp_hash */
     0,                                          /* tp_call */
     0,                                          /* tp_str */
-    PyObject_GenericGetAttr,                    /* tp_getattro */
-    0,                                          /* tp_setattro */
+    getattrofuncFloat,                    /* tp_getattro */
+    setattrofuncFloat,                          /* tp_setattro */
     0,                                          /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
     float_new__doc__,                           /* tp_doc */
