@@ -274,17 +274,17 @@ EXPORT(void)testfunc_array(int values[4])
            values[3]);
 }
 
-EXPORT(long double)testfunc_Ddd(double a, double b)
+EXPORT(/*long*/	 double)testfunc_Ddd(double a, double b)
 {
-    long double result = (long double)(a * b);
+    /*long*/ double result = (/*long*/ double)(a * b);
     printf("testfunc_Ddd(%p, %p)\n", (void *)&a, (void *)&b);
     printf("testfunc_Ddd(%g, %g)\n", a, b);
     return result;
 }
 
-EXPORT(long double)testfunc_DDD(long double a, long double b)
+EXPORT(/*long*/ double)testfunc_DDD(/*long*/ double a, /*long*/ double b)
 {
-    long double result = a * b;
+    /*long*/ double result = a * b;
     printf("testfunc_DDD(%p, %p)\n", (void *)&a, (void *)&b);
     printf("testfunc_DDD(%Lg, %Lg)\n", a, b);
     return result;
@@ -362,12 +362,12 @@ EXPORT(double) _testfunc_d_bhilfd(signed char b, short h, int i, long l, float f
     return (double)(b + h + i + l + f + d);
 }
 
-EXPORT(long double) _testfunc_D_bhilfD(signed char b, short h, int i, long l, float f, long double d)
+EXPORT(/*long*/ double) _testfunc_D_bhilfD(signed char b, short h, int i, long l, float f, /*long*/ double d)
 {
 /*      printf("_testfunc_d_bhilfd got %d %d %d %ld %f %f\n",
                b, h, i, l, f, d);
 */
-    return (long double)(b + h + i + l + f + d);
+    return (/*long*/ double)(b + h + i + l + f + d);
 }
 
 EXPORT(char *) _testfunc_p_p(void *s)
@@ -667,7 +667,7 @@ EXPORT(long long) tf_q(long long c) { S; return c/3; }
 EXPORT(unsigned long long) tf_Q(unsigned long long c) { U; return c/3; }
 EXPORT(float) tf_f(float c) { S; return c/3; }
 EXPORT(double) tf_d(double c) { S; return c/3; }
-EXPORT(long double) tf_D(long double c) { S; return c/3; }
+EXPORT(/*long*/ double) tf_D(/*long*/	 double c) { S; return c/3; }
 
 #ifdef MS_WIN32
 EXPORT(signed char) __stdcall s_tf_b(signed char c) { S; return c/3; }
@@ -698,7 +698,7 @@ EXPORT(long long) tf_bq(signed char x, long long c) { S; return c/3; }
 EXPORT(unsigned long long) tf_bQ(signed char x, unsigned long long c) { U; return c/3; }
 EXPORT(float) tf_bf(signed char x, float c) { S; return c/3; }
 EXPORT(double) tf_bd(signed char x, double c) { S; return c/3; }
-EXPORT(long double) tf_bD(signed char x, long double c) { S; return c/3; }
+EXPORT(/*long*/ double) tf_bD(signed char x, /*long*/ double c) { S; return c/3; }
 EXPORT(void) tv_i(int c) { S; return; }
 
 #ifdef MS_WIN32

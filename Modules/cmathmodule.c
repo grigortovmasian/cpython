@@ -269,7 +269,7 @@ cmath_acos_impl(PyObject *module, Py_complex z)
 
     if (fabs(z.real) > CM_LARGE_DOUBLE || fabs(z.imag) > CM_LARGE_DOUBLE) {
         /* avoid unnecessary overflow for large arguments */
-        r.real = atan2(fabs(z.imag), z.real);
+        r.real = atan2((double)fabs(z.imag), z.real);
         /* split into cases to make sure that the branch cut has the
            correct continuity on systems with unsigned zeros */
         if (z.real < 0.) {
@@ -373,7 +373,7 @@ cmath_asinh_impl(PyObject *module, Py_complex z)
             r.real = -copysign(log(hypot(z.real/2., z.imag/2.)) +
                                M_LN2*2., -z.real);
         }
-        r.imag = atan2(z.imag, fabs(z.real));
+        r.imag = atan2(z.imag, (double)fabs(z.real));
     } else {
         s1.real = 1.+z.imag;
         s1.imag = -z.real;
@@ -485,7 +485,7 @@ cmath_atanh_impl(PyObject *module, Py_complex z)
             errno = EDOM;
         } else {
             r.real = -log(sqrt(ay)/sqrt(hypot(ay, 2.)));
-            r.imag = copysign(atan2(2., -ay)/2, z.imag);
+            r.imag = copysign(atan2((double)2., -ay)/2, z.imag);
             errno = 0;
         }
     } else {

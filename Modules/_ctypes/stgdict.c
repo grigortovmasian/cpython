@@ -90,7 +90,7 @@ PyCStgDict_clone(StgDictObject *dst, StgDictObject *src)
     Py_XINCREF(dst->checker);
 
     if (src->format) {
-        dst->format = PyMem_Malloc(strlen(src->format) + 1);
+        dst->format = (char*)PyMem_Malloc(strlen(src->format) + 1);
         if (dst->format == NULL) {
             PyErr_NoMemory();
             return -1;
@@ -98,7 +98,7 @@ PyCStgDict_clone(StgDictObject *dst, StgDictObject *src)
         strcpy(dst->format, src->format);
     }
     if (src->shape) {
-        dst->shape = PyMem_Malloc(sizeof(Py_ssize_t) * src->ndim);
+        dst->shape = (Py_ssize_t*)PyMem_Malloc(sizeof(Py_ssize_t) * src->ndim);
         if (dst->shape == NULL) {
             PyErr_NoMemory();
             return -1;
@@ -110,7 +110,7 @@ PyCStgDict_clone(StgDictObject *dst, StgDictObject *src)
     if (src->ffi_type_pointer.elements == NULL)
         return 0;
     size = sizeof(ffi_type *) * (src->length + 1);
-    dst->ffi_type_pointer.elements = PyMem_Malloc(size);
+    dst->ffi_type_pointer.elements = (_ffi_type**)PyMem_Malloc(size);
     if (dst->ffi_type_pointer.elements == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -573,7 +573,7 @@ PyCStructUnionType_update_stgdict(PyObject *type, PyObject *fields, int isStruct
 
             len = strlen(fieldname) + strlen(fieldfmt);
 
-            buf = PyMem_Malloc(len + 2 + 1);
+            buf = (char*)PyMem_Malloc(len + 2 + 1);
             if (buf == NULL) {
                 Py_DECREF(pair);
                 PyErr_NoMemory();

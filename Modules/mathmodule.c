@@ -1185,13 +1185,15 @@ math_2(PyObject *const *args, Py_ssize_t nargs,
         return NULL;
     else
         return PyFloat_FromDouble(r);
-}
+}	
+
 
 #define FUNC1(funcname, func, can_overflow, docstring)                  \
     static PyObject * math_##funcname(PyObject *self, PyObject *args) { \
         return math_1(args, func, can_overflow);                            \
     }\
     PyDoc_STRVAR(math_##funcname##_doc, docstring);
+
 
 #define FUNC1A(funcname, func, docstring)                               \
     static PyObject * math_##funcname(PyObject *self, PyObject *args) { \
@@ -1205,6 +1207,7 @@ math_2(PyObject *const *args, Py_ssize_t nargs,
     }\
     PyDoc_STRVAR(math_##funcname##_doc, docstring);
 
+/*
 FUNC1(acos, acos, 0,
       "acos($module, x, /)\n--\n\n"
       "Return the arc cosine (measured in radians) of x.\n\n"
@@ -1230,6 +1233,7 @@ FUNC2(atan2, m_atan2,
 FUNC1(atanh, m_atanh, 0,
       "atanh($module, x, /)\n--\n\n"
       "Return the inverse hyperbolic tangent of x.")
+*/
 
 /*[clinic input]
 math.ceil
@@ -1265,6 +1269,7 @@ math_ceil(PyObject *module, PyObject *number)
     return PyLong_FromDouble(ceil(x));
 }
 
+/*
 FUNC2(copysign, copysign,
       "copysign($module, x, y, /)\n--\n\n"
        "Return a float with the magnitude (absolute value) of x but the sign of y.\n\n"
@@ -1293,6 +1298,7 @@ FUNC1(expm1, m_expm1, 1,
 FUNC1(fabs, fabs, 0,
       "fabs($module, x, /)\n--\n\n"
       "Return the absolute value of the float x.")
+*/
 
 /*[clinic input]
 math.floor
@@ -1349,6 +1355,7 @@ FUNC2(remainder, m_remainder,
       "Return x - n*y where n*y is the closest integer multiple of y.\n"
       "In the case where x is exactly halfway between two multiples of\n"
       "y, the nearest even value of n is used. The result is always exact.")
+/*
 FUNC1(sin, sin, 0,
       "sin($module, x, /)\n--\n\n"
       "Return the sine of x (measured in radians).")
@@ -1364,6 +1371,7 @@ FUNC1(tan, tan, 0,
 FUNC1(tanh, tanh, 0,
       "tanh($module, x, /)\n--\n\n"
       "Return the hyperbolic tangent of x.")
+*/
 
 /* Precision summation function as msum() by Raymond Hettinger in
    <http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/393090>,
@@ -1480,7 +1488,7 @@ math_fsum(PyObject *module, PyObject *seq)
     Py_ssize_t i, j, n = 0, m = NUM_PARTIALS;
     double x, y, t, ps[NUM_PARTIALS], *p = ps;
     double xsave, special_sum = 0.0, inf_sum = 0.0;
-    volatile double hi, yr, lo;
+    /*volatile*/ double hi, yr, lo;
 
     iter = PyObject_GetIter(seq);
     if (iter == NULL)
@@ -2296,7 +2304,13 @@ math_modf_impl(PyObject *module, double x)
     }
 
     errno = 0;
-    x = modf(x, &y);
+#ifdef USE_IDOUBLE
+            y = (int)((double)x);
+            x = x - y;
+#else
+             x = modf(x, &y);
+#endif
+
     return Py_BuildValue("(dd)", x, y);
 }
 
@@ -2836,14 +2850,14 @@ math_pow_impl(PyObject *module, double x, double y)
     if (!Py_IS_FINITE(x) || !Py_IS_FINITE(y)) {
         errno = 0;
         if (Py_IS_NAN(x))
-            r = y == 0. ? 1. : x; /* NaN**0 = 1 */
+            r = y == (double)0. ? (double)1. : x; /* NaN**0 = 1 */
         else if (Py_IS_NAN(y))
-            r = x == 1. ? 1. : y; /* 1**NaN = 1 */
+            r = x == (double)1. ? (double)1. : y; /* 1**NaN = 1 */
         else if (Py_IS_INFINITY(x)) {
             odd_y = Py_IS_FINITE(y) && fmod(fabs(y), 2.0) == 1.0;
             if (y > 0.)
-                r = odd_y ? x : fabs(x);
-            else if (y == 0.)
+                r = odd_y ? x : (double)fabs(x);
+            else if (y == (double)0.)
                 r = 1.;
             else /* y < 0. */
                 r = odd_y ? copysign(0., x) : 0.;
@@ -2851,11 +2865,11 @@ math_pow_impl(PyObject *module, double x, double y)
         else if (Py_IS_INFINITY(y)) {
             if (fabs(x) == 1.0)
                 r = 1.;
-            else if (y > 0. && fabs(x) > 1.0)
+            else if (y > (double)0. && fabs(x) > 1.0)
                 r = y;
             else if (y < 0. && fabs(x) < 1.0) {
                 r = -y; /* result is +inf */
-                if (x == 0.) /* 0**-inf: divide-by-zero */
+                if (x == (double)0.) /* 0**-inf: divide-by-zero */
                     errno = EDOM;
             }
             else
@@ -3591,6 +3605,7 @@ math_exec(PyObject *module)
 }
 
 static PyMethodDef math_methods[] = {
+/*
     {"acos",            math_acos,      METH_O,         math_acos_doc},
     {"acosh",           math_acosh,     METH_O,         math_acosh_doc},
     {"asin",            math_asin,      METH_O,         math_asin_doc},
@@ -3598,17 +3613,22 @@ static PyMethodDef math_methods[] = {
     {"atan",            math_atan,      METH_O,         math_atan_doc},
     {"atan2",           (PyCFunction)(void(*)(void))math_atan2,     METH_FASTCALL,  math_atan2_doc},
     {"atanh",           math_atanh,     METH_O,         math_atanh_doc},
+*/
     MATH_CEIL_METHODDEF
+/*
     {"copysign",        (PyCFunction)(void(*)(void))math_copysign,  METH_FASTCALL,  math_copysign_doc},
     {"cos",             math_cos,       METH_O,         math_cos_doc},
     {"cosh",            math_cosh,      METH_O,         math_cosh_doc},
+*/
     MATH_DEGREES_METHODDEF
     MATH_DIST_METHODDEF
+/*
     {"erf",             math_erf,       METH_O,         math_erf_doc},
     {"erfc",            math_erfc,      METH_O,         math_erfc_doc},
     {"exp",             math_exp,       METH_O,         math_exp_doc},
     {"expm1",           math_expm1,     METH_O,         math_expm1_doc},
     {"fabs",            math_fabs,      METH_O,         math_fabs_doc},
+*/
     MATH_FACTORIAL_METHODDEF
     MATH_FLOOR_METHODDEF
     MATH_FMOD_METHODDEF
@@ -3633,11 +3653,13 @@ static PyMethodDef math_methods[] = {
     MATH_POW_METHODDEF
     MATH_RADIANS_METHODDEF
     {"remainder",       (PyCFunction)(void(*)(void))math_remainder, METH_FASTCALL,  math_remainder_doc},
+/*
     {"sin",             math_sin,       METH_O,         math_sin_doc},
     {"sinh",            math_sinh,      METH_O,         math_sinh_doc},
     {"sqrt",            math_sqrt,      METH_O,         math_sqrt_doc},
     {"tan",             math_tan,       METH_O,         math_tan_doc},
     {"tanh",            math_tanh,      METH_O,         math_tanh_doc},
+*/
     MATH_TRUNC_METHODDEF
     MATH_PROD_METHODDEF
     MATH_PERM_METHODDEF

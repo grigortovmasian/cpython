@@ -238,7 +238,7 @@ static int64_t DebugOpCounterStart;
 static int64_t DebugOpCounterEnd;
 public:
     idouble(const double& c) : val(c) {
-    	std::cout<<"new double\n";
+ //   	std::cout<<"new double\n";
 //        if(AADC_UNLIKELY(recording)) CAAD_iVarConstructorConstant(&val, &c);
     }
 
@@ -437,8 +437,6 @@ inline bool operator<=(const double& lhs, const idouble& rhs){ return lhs <= rhs
 inline bool operator>=(const double& lhs, const idouble& rhs){ return lhs >= rhs.val; }
 inline bool operator==(const double& lhs, const idouble& rhs){ return lhs == rhs.val; }
 inline bool operator!=(const double& lhs, const idouble& rhs){ return !(lhs == rhs); }
-
-
 
 inline idouble operator + (const idouble& a, const idouble& b) {
     idouble c;

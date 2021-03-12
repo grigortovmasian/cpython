@@ -1,8 +1,3 @@
-#ifdef USE_IDOUBLE
-#include "idouble.h"
-#define double idouble
-#endif
-
 /*
  * Copyright (c) 2008-2020 Stefan Krah. All rights reserved.
  *
@@ -36,110 +31,22 @@
 
 
 #ifndef _MSC_VER
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include "pyconfig.h"
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
 #endif
 
 #ifdef __cplusplus
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <cinttypes>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <climits>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <cstdint>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <cstdio>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <cstdlib>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
 extern "C" {
 #else
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <inttypes.h>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <limits.h>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <stdint.h>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <stdio.h>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include <stdlib.h>
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
 #endif
 
 
@@ -155,15 +62,7 @@ extern "C" {
 #endif
 
 #if defined(_MSC_VER)
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
   #include "vccompat.h"
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
   #define EXTINLINE extern inline
 #else
   #define EXTINLINE
@@ -957,7 +856,3 @@ MPD_PRAGMA(MPD_HIDE_SYMBOLS_END) /* restore previous scope rules */
 
 
 #endif /* LIBMPDEC_MPDECIMAL_H_ */
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-

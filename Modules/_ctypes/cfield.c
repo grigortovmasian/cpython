@@ -735,10 +735,10 @@ bool_set(void *ptr, PyObject *value, Py_ssize_t size)
     case -1:
         return NULL;
     case 0:
-        *(_Bool *)ptr = 0;
+        *(bool *)ptr = 0;
         _RET(value);
     default:
-        *(_Bool *)ptr = 1;
+        *(bool *)ptr = 1;
         _RET(value);
     }
 }
@@ -746,7 +746,7 @@ bool_set(void *ptr, PyObject *value, Py_ssize_t size)
 static PyObject *
 bool_get(void *ptr, Py_ssize_t size)
 {
-    return PyBool_FromLong((long)*(_Bool *)ptr);
+    return PyBool_FromLong((long)*(bool *)ptr);
 }
 
 static PyObject *
@@ -1000,20 +1000,20 @@ Q_get_sw(void *ptr, Py_ssize_t size)
 static PyObject *
 g_set(void *ptr, PyObject *value, Py_ssize_t size)
 {
-    long double x;
+    /*long*/ double x;
 
     x = PyFloat_AsDouble(value);
     if (x == -1 && PyErr_Occurred())
         return NULL;
-    memcpy(ptr, &x, sizeof(long double));
+    memcpy(ptr, &x, sizeof(/*long*/ double));
     _RET(value);
 }
 
 static PyObject *
 g_get(void *ptr, Py_ssize_t size)
 {
-    long double val;
-    memcpy(&val, ptr, sizeof(long double));
+    /*long*/ double val;
+    memcpy(&val, ptr, sizeof(/*long*/ double));
     return PyFloat_FromDouble(val);
 }
 
@@ -1059,9 +1059,9 @@ static PyObject *
 d_get_sw(void *ptr, Py_ssize_t size)
 {
 #ifdef WORDS_BIGENDIAN
-    return PyFloat_FromDouble(_PyFloat_Unpack8(ptr, 1));
+    return PyFloat_FromDouble(_PyFloat_Unpack8((const unsigned char*)ptr, 1));
 #else
-    return PyFloat_FromDouble(_PyFloat_Unpack8(ptr, 0));
+    return PyFloat_FromDouble(_PyFloat_Unpack8((const unsigned char*)ptr, 0));
 #endif
 }
 
@@ -1107,9 +1107,9 @@ static PyObject *
 f_get_sw(void *ptr, Py_ssize_t size)
 {
 #ifdef WORDS_BIGENDIAN
-    return PyFloat_FromDouble(_PyFloat_Unpack4(ptr, 1));
+    return PyFloat_FromDouble(_PyFloat_Unpack4((const unsigned char*)ptr, 1));
 #else
-    return PyFloat_FromDouble(_PyFloat_Unpack4(ptr, 0));
+    return PyFloat_FromDouble(_PyFloat_Unpack4((const unsigned char*)ptr, 0));
 #endif
 }
 
@@ -1603,7 +1603,7 @@ typedef struct { char c; int x; } s_int;
 typedef struct { char c; long x; } s_long;
 typedef struct { char c; float x; } s_float;
 typedef struct { char c; double x; } s_double;
-typedef struct { char c; long double x; } s_long_double;
+typedef struct { char c; /*long*/ double x; } s_long_double;
 typedef struct { char c; char *x; } s_char_p;
 typedef struct { char c; void *x; } s_void_p;
 
@@ -1615,7 +1615,7 @@ typedef struct { char c; void *x; } s_void_p;
 #define INT_ALIGN (sizeof(s_int) - sizeof(int))
 #define FLOAT_ALIGN (sizeof(s_float) - sizeof(float))
 #define DOUBLE_ALIGN (sizeof(s_double) - sizeof(double))
-#define LONGDOUBLE_ALIGN (sizeof(s_long_double) - sizeof(long double))
+#define LONGDOUBLE_ALIGN (sizeof(s_long_double) - sizeof(/*long*/ double))
 
 /* #define CHAR_P_ALIGN (sizeof(s_char_p) - sizeof(char*)) */
 #define VOID_P_ALIGN (sizeof(s_void_p) - sizeof(void*))
@@ -1665,7 +1665,7 @@ ffi_type ffi_type_double = { sizeof(double), DOUBLE_ALIGN, FFI_TYPE_DOUBLE };
 #undef ffi_type_longdouble
 #endif
   /* This is already defined on OSX */
-ffi_type ffi_type_longdouble = { sizeof(long double), LONGDOUBLE_ALIGN,
+ffi_type ffi_type_longdouble = { sizeof(/*long*/ double), LONGDOUBLE_ALIGN,
                                  FFI_TYPE_LONGDOUBLE };
 
 ffi_type ffi_type_pointer = { sizeof(void *), VOID_P_ALIGN, FFI_TYPE_POINTER };

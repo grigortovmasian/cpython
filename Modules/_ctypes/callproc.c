@@ -728,7 +728,7 @@ union result {
     int i;
     long l;
     long long q;
-    long double D;
+    /*long*/ double D;
     double d;
     float f;
     void *p;
@@ -1014,7 +1014,7 @@ static int _call_function_pointer(int flags,
     __try {
 #endif
 #endif
-                ffi_call(&cif, pProc, resmem, avalues);
+                ffi_call(&cif, (void (*)())pProc, resmem, avalues);
 #ifdef MS_WIN32
 #ifndef DONT_USE_SEH
     }
@@ -1337,7 +1337,7 @@ PyObject *_ctypes_callproc(PPROC pProc,
         goto cleanup;
     }
     for (i = 0; i < argcount; ++i) {
-        atypes[i] = args[i].ffi_type;
+        atypes[i] = args[i].ffi_typ;
 #ifdef CTYPES_PASS_BY_REF_HACK
         size_t size = atypes[i]->size;
         if (IS_PASS_BY_REF(size)) {

@@ -1,8 +1,3 @@
-#ifdef USE_IDOUBLE
-#include "idouble.h"
-#define double idouble
-#endif
-
 /*
  * Copyright (c) 2008-2020 Stefan Krah. All rights reserved.
  *
@@ -35,24 +30,8 @@
 #define LIBMPDEC_NUMBERTHEORY_H_
 
 
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
 #include "mpdecimal.h"
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-
 #include "constants.h"
-#ifdef USE_IDOUBLE
-#define double idouble
-#endif
-
 
 
 /* Internal header file: all symbols have local scope in the DSO */
@@ -95,7 +74,3 @@ MPD_PRAGMA(MPD_HIDE_SYMBOLS_END) /* restore previous scope rules */
 
 
 #endif /* LIBMPDEC_NUMBERTHEORY_H_ */
-#ifdef USE_IDOUBLE
-#undef double
-#endif
-

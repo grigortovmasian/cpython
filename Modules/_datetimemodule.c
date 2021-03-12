@@ -2428,7 +2428,14 @@ accum(const char* tag, PyObject *sofar, PyObject *num, PyObject *factor,
         dnum = PyFloat_AsDouble(num);
         if (dnum == -1.0 && PyErr_Occurred())
             return NULL;
-        fracpart = modf(dnum, &intpart);
+
+#ifdef USE_IDOUBLE
+            intpart = (int)((double)dnum);
+            fracpart  = dnum - intpart;
+#else
+           fracpart = modf(dnum, &intpart);
+#endif
+
         x = PyLong_FromDouble(intpart);
         if (x == NULL)
             return NULL;
@@ -2453,7 +2460,12 @@ accum(const char* tag, PyObject *sofar, PyObject *num, PyObject *factor,
         dnum = PyLong_AsDouble(factor);
 
         dnum *= fracpart;
-        fracpart = modf(dnum, &intpart);
+#ifdef USE_IDOUBLE
+            intpart = (int)((double)dnum);
+            fracpart  = dnum - intpart;
+#else
+           fracpart = modf(dnum, &intpart);
+#endif
         x = PyLong_FromDouble(intpart);
         if (x == NULL) {
             Py_DECREF(sum);
