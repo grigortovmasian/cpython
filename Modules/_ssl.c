@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -5383,7 +5385,11 @@ _ssl_RAND_add_impl(PyObject *module, Py_buffer *view, double entropy)
     len = view->len;
     do {
         written = Py_MIN(len, INT_MAX);
+#ifdef USE_IDOUBLE
+        RAND_add(buf, (int)written, idoubleTofloat(entropy));
+#else
         RAND_add(buf, (int)written, entropy);
+#endif
         buf += written;
         len -= written;
     } while (len);

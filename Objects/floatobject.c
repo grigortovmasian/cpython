@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -558,13 +560,8 @@ float_richcompare(PyObject *v, PyObject *w, int op)
             }
             else
                 Py_INCREF(ww);
-#ifdef USE_IDOUBLE
-            intpart = (int)((double)i);
-            fracpart = i - intpart;
-#else
-            fracpart = modf(i, &intpart);
-#endif
 
+            fracpart = modf(i, &intpart);
 
             vv = PyLong_FromDouble(intpart);
             if (vv == NULL)
@@ -700,7 +697,11 @@ float_rem(PyObject *v, PyObject *w)
         return NULL;
     }
     mod = fmod(vx, wx);
+#ifdef USE_IDOUBLE
+    if (idoubleToBool(mod)) {
+#else
     if (mod) {
+#endif
         /* ensure the remainder has the same sign as the denominator */
         if ((wx < 0) != (mod < 0)) {
             mod += wx;
@@ -727,7 +728,11 @@ _float_div_mod(double vx, double wx, double *floordiv, double *mod)
        it will always be very close to one.
     */
     div = (vx - *mod) / wx;
+#ifdef USE_IDOUBLE
+    if (idoubleToBool(*mod)) {
+#else
     if (*mod) {
+#endif
         /* ensure the remainder has the same sign as the denominator */
         if ((wx < 0) != (*mod < 0)) {
             *mod += wx;
@@ -740,8 +745,13 @@ _float_div_mod(double vx, double wx, double *floordiv, double *mod)
            it has the same sign as the denominator. */
         *mod = copysign(0.0, wx);
     }
+    
     /* snap quotient to nearest integral value */
+#ifdef USE_IDOUBLE
+    if (idoubleToBool(div)) {
+#else
     if (div) {
+#endif
         *floordiv = floor(div);
         if (div - *floordiv > 0.5) {
             *floordiv += 1.0;
@@ -1147,9 +1157,11 @@ float___round___impl(PyObject *self, PyObject *o_ndigits)
         /* single-argument round or with None ndigits:
          * round to nearest integer */
         rounded = round(x);
-        if (fabs(x-rounded) == 0.5)
+        if (fabs(x-rounded) == 0.5) {
             /* halfway case: round to even */
-            rounded = 2.0*round(x/2.0);
+            double ttt = x/2.0;
+            rounded = 2.0*round(ttt);
+        }   
         return PyLong_FromDouble(rounded);
     }
 
@@ -1315,23 +1327,39 @@ float_hex_impl(PyObject *self)
         else
             return PyUnicode_FromString("0x0.0p+0");
     }
-
-    m = frexp(fabs(x), &e);
+    double ttttt = fabs(x); 
+    m = frexp(ttttt , &e);
     shift = 1 - Py_MAX(DBL_MIN_EXP - e, 0);
     m = ldexp(m, shift);
     e -= shift;
 
     si = 0;
+#ifdef USE_IDOUBLE
+    s[si] = char_from_hex(idoubleToInt(m));
+#else
     s[si] = char_from_hex((int)m);
+#endif
     si++;
+#ifdef USE_IDOUBLE
+    m -= idoubleToInt(m);
+#else
     m -= (int)m;
+#endif
     s[si] = '.';
     si++;
     for (i=0; i < (TOHEX_NBITS-1)/4; i++) {
         m *= 16.0;
+#ifdef USE_IDOUBLE
+        s[si] = char_from_hex(idoubleToInt(m));
+#else
         s[si] = char_from_hex((int)m);
+#endif
         si++;
-        m -= (int)m;
+#ifdef USE_IDOUBLE
+        m -= idoubleToInt(m);
+#else
+   	m -= (int)m;
+#endif
     }
     s[si] = '\0';
 
@@ -1569,8 +1597,9 @@ float_fromhex(PyTypeObject *type, PyObject *string)
                 }
         if (round_up) {
             x += 2*half_eps;
+	    double ttt =(2*half_eps);
             if (top_exp == DBL_MAX_EXP &&
-                x == ldexp((double)(2*half_eps), DBL_MANT_DIG))
+                x == ldexp(ttt, DBL_MANT_DIG))
                 /* overflow corner case: pre-rounded value <
                    2**DBL_MAX_EXP; rounded=2**DBL_MAX_EXP. */
                 goto overflow_error;
@@ -2266,7 +2295,11 @@ _PyFloat_Pack2(double x, unsigned char *p, int le)
 
         f *= 1024.0; /* 2**10 */
         /* Round to even */
+#ifdef USE_IDOUBLE
+        bits = (unsigned short)idoubleToInt(f); /* Note the truncation */
+#else
         bits = (unsigned short)f; /* Note the truncation */
+#endif
         assert(bits < 1024);
         assert(e < 31);
         if ((f - bits > 0.5) || ((f - bits == 0.5) && (bits % 2 == 1))) {
@@ -2354,7 +2387,12 @@ _PyFloat_Pack4(double x, unsigned char *p, int le)
         }
 
         f *= 8388608.0; /* 2**23 */
+#ifdef USE_IDOUBLE
+        double tttttt = f + 0.5;
+        fbits = (unsigned int)idoubleToInt(tttttt ); /* Round */
+#else
         fbits = (unsigned int)(f + 0.5); /* Round */
+#endif
         assert(fbits <= 8388608);
         if (fbits >> 23) {
             /* The carry propagated out of a string of 23 1 bits. */
@@ -2384,7 +2422,11 @@ _PyFloat_Pack4(double x, unsigned char *p, int le)
 
     }
     else {
+#ifdef USE_IDOUBLE
+        float y = (float)idoubleTofloat(x);
+#else
         float y = (float)x;
+#endif
         int i, incr = 1;
 
         if (Py_IS_INFINITY(y) && !Py_IS_INFINITY(x))
@@ -2462,12 +2504,23 @@ _PyFloat_Pack8(double x, unsigned char *p, int le)
 
         /* fhi receives the high 28 bits; flo the low 24 bits (== 52 bits) */
         f *= 268435456.0; /* 2**28 */
+#ifdef USE_IDOUBLE
+        fhi = (unsigned int)idoubleToInt(f); /* Truncate */
+#else
         fhi = (unsigned int)f; /* Truncate */
+#endif
         assert(fhi < 268435456);
 
         f -= (double)fhi;
         f *= 16777216.0; /* 2**24 */
+#ifdef USE_IDOUBLE
+        {
+        double ttttttttttt = f + 0.5;
+        flo = (unsigned int)idoubleToInt(ttttttttttt); /* Round */
+        }
+#else
         flo = (unsigned int)(f + 0.5); /* Round */
+#endif
         assert(flo <= 16777216);
         if (flo >> 24) {
             /* The carry propagated out of a string of 24 1 bits. */

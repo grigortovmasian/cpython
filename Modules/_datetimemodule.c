@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -2429,12 +2431,7 @@ accum(const char* tag, PyObject *sofar, PyObject *num, PyObject *factor,
         if (dnum == -1.0 && PyErr_Occurred())
             return NULL;
 
-#ifdef USE_IDOUBLE
-            intpart = (int)((double)dnum);
-            fracpart  = dnum - intpart;
-#else
-           fracpart = modf(dnum, &intpart);
-#endif
+        fracpart = modf(dnum, &intpart);
 
         x = PyLong_FromDouble(intpart);
         if (x == NULL)
@@ -2460,12 +2457,7 @@ accum(const char* tag, PyObject *sofar, PyObject *num, PyObject *factor,
         dnum = PyLong_AsDouble(factor);
 
         dnum *= fracpart;
-#ifdef USE_IDOUBLE
-            intpart = (int)((double)dnum);
-            fracpart  = dnum - intpart;
-#else
-           fracpart = modf(dnum, &intpart);
-#endif
+        fracpart = modf(dnum, &intpart);
         x = PyLong_FromDouble(intpart);
         if (x == NULL) {
             Py_DECREF(sum);
@@ -2552,7 +2544,11 @@ delta_new(PyTypeObject *type, PyObject *args, PyObject *kw)
         y = accum("weeks", x, week, us_per_week, &leftover_us);
         CLEANUP;
     }
+#ifdef USE_IDOUBLE
+    if (idoubleToBool(leftover_us)) {
+#else
     if (leftover_us) {
+#endif
         /* Round to nearest whole # of us, and add into x. */
         double whole_us = round(leftover_us);
         int x_is_odd;
@@ -2578,7 +2574,11 @@ delta_new(PyTypeObject *type, PyObject *args, PyObject *kw)
             whole_us = 2.0 * round((leftover_us + x_is_odd) * 0.5) - x_is_odd;
         }
 
+#ifdef USE_IDOUBLE
+        temp = PyLong_FromLong((long)idoubleToInt(whole_us));
+#else
         temp = PyLong_FromLong((long)whole_us);
+#endif
 
         if (temp == NULL) {
             Py_DECREF(x);

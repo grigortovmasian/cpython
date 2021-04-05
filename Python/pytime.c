@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -187,13 +189,7 @@ _PyTime_DoubleToDenominator(double d, time_t *sec, long *numerator,
 #else
     volatile double floatpart;
 #endif
-
-#ifdef USE_IDOUBLE
-            intpart = (int)((double)d);
-            floatpart= d - intpart;
-#else
-            floatpart= modf(i, &intpart);
-#endif
+    floatpart= modf(d, &intpart);
 
     floatpart *= denominator;
     floatpart = _PyTime_Round(floatpart, round);
@@ -211,8 +207,13 @@ _PyTime_DoubleToDenominator(double d, time_t *sec, long *numerator,
         error_time_t_overflow();
         return -1;
     }
+#ifdef USE_IDOUBLE
+    *sec = (time_t)idoubleToInt(intpart);
+    *numerator = (long)idoubleToInt(floatpart);
+#else
     *sec = (time_t)intpart;
     *numerator = (long)floatpart;
+#endif
     assert(0 <= *numerator && *numerator < idenominator);
     return 0;
 }
@@ -261,18 +262,18 @@ _PyTime_ObjectToTime_t(PyObject *obj, time_t *sec, _PyTime_round_t round)
         }
 
         d = _PyTime_Round(d, round);
-
-#ifdef USE_IDOUBLE
-            intpart = (int)((double)d);
-#else
-           (void)modf(d, &intpart);
-#endif
+	modf(d, &intpart);
 
         if (!_Py_InIntegralTypeRange(time_t, intpart)) {
             error_time_t_overflow();
             return -1;
         }
+#ifdef USE_IDOUBLE
+        *sec = (time_t)idoubleToInt(intpart);
+
+#else
         *sec = (time_t)intpart;
+#endif
         return 0;
     }
     else {
@@ -461,7 +462,11 @@ _PyTime_FromDouble(_PyTime_t *t, double value, _PyTime_round_t round,
         _PyTime_overflow();
         return -1;
     }
+#ifdef USE_IDOUBLE
+    *t = (_PyTime_t)idoubleToInt(d);
+#else
     *t = (_PyTime_t)d;
+#endif
     return 0;
 }
 

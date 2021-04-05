@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -1297,7 +1299,12 @@ sys_setswitchinterval_impl(PyObject *module, double interval)
                          "switch interval must be strictly positive");
         return NULL;
     }
+#ifdef USE_IDOUBLE
+     unsigned long ttt = idoubleToInt(1e6 * interval);
+    _PyEval_SetSwitchInterval(ttt);
+#else
     _PyEval_SetSwitchInterval((unsigned long) (1e6 * interval));
+#endif	
     Py_RETURN_NONE;
 }
 

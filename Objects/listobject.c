@@ -1,4 +1,10 @@
 /* List object implementation */
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
 
 #include "Python.h"
 #include "pycore_abstract.h"      // _PyIndex_Check()

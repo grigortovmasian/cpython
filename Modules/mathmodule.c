@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -162,7 +164,11 @@ m_sinpi(double x)
     /* this function should only ever be called for finite arguments */
     assert(Py_IS_FINITE(x));
     y = fmod(fabs(x), 2.0);
+#ifdef USE_IDOUBLE
+    n = (int)idoubleToInt(round(2.0*y));
+#else
     n = (int)round(2.0*y);
+#endif
     assert(0 <= n && n <= 4);
     switch (n) {
     case 0:
@@ -366,7 +372,11 @@ m_tgamma(double x)
             return Py_NAN; /* negative integers n */
         }
         if (x <= NGAMMA_INTEGRAL)
+#ifdef USE_IDOUBLE
+            return gamma_integral[(int)idoubleToInt(x) - 1];
+#else
             return gamma_integral[(int)x - 1];
+#endif
     }
     absx = fabs(x);
 
@@ -2208,7 +2218,11 @@ math_frexp_impl(PyObject *module, double x)
     int i;
     /* deal with special cases directly, to sidestep platform
        differences */
+#ifdef USE_IDOUBLE
+    if (Py_IS_NAN(x) || Py_IS_INFINITY(x) || !idoubleToBool(x)) {
+#else
     if (Py_IS_NAN(x) || Py_IS_INFINITY(x) || !x) {
+#endif
         i = 0;
     }
     else {
@@ -2304,12 +2318,8 @@ math_modf_impl(PyObject *module, double x)
     }
 
     errno = 0;
-#ifdef USE_IDOUBLE
-            y = (int)((double)x);
-            x = x - y;
-#else
-             x = modf(x, &y);
-#endif
+   
+    x = modf(x, &y);
 
     return Py_BuildValue("(dd)", x, y);
 }

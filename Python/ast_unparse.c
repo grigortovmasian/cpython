@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 #include <float.h>   /* DBL_MAX_10_EXP */
 #include <stdbool.h>
 #include "Python.h"

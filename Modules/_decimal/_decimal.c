@@ -37,6 +37,13 @@
 #include "pydecimal.h"
 #include "docstrings.h"
 
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+using namespace std;
+#define double idouble
+#endif
 
 #if !defined(MPD_VERSION_HEX) || MPD_VERSION_HEX < 0x02050000
   #error "libmpdec version >= 2.5.0 required"
@@ -66,7 +73,7 @@
 
 /* _Py_DEC_MINALLOC >= MPD_MINALLOC */
 #define _Py_DEC_MINALLOC 4
-
+	
 typedef struct {
     PyObject_HEAD
     Py_hash_t hash;
@@ -2267,6 +2274,7 @@ PyDecType_FromFloatExact(PyTypeObject *type, PyObject *v,
     if (x == -1.0 && PyErr_Occurred()) {
         return NULL;
     }
+
     sign = (copysign(1.0, x) == 1.0) ? 0 : 1;
 
     if (Py_IS_NAN(x) || Py_IS_INFINITY(x)) {

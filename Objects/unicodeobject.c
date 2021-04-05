@@ -1,5 +1,6 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
 #define double idouble
 #endif
 

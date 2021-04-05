@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -863,7 +865,11 @@ convertsimple(PyObject *arg, const char **p_format, va_list *p_va, int flags,
         if (dval == -1.0 && PyErr_Occurred())
             RETURN_ERR_OCCURRED;
         else
+#ifdef USE_IDOUBLE
+            *p = (float) idoubleTofloat(dval);
+#else
             *p = (float) dval;
+#endif
         break;
     }
 

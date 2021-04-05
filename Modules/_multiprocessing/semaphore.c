@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -348,8 +350,14 @@ _multiprocessing_SemLock_acquire_impl(SemLockObject *self, int blocking,
             PyErr_SetFromErrno(PyExc_OSError);
             return NULL;
         }
+#ifdef USE_IDOUBLE
+        long sec = (long)idoubleToInt(timeout);
+        long nsec = (long)idoubleToInt(1e9 * (timeout - sec) + 0.5);
+
+#else
         long sec = (long) timeout;
         long nsec = (long) (1e9 * (timeout - sec) + 0.5);
+#endif
         deadline.tv_sec = now.tv_sec + sec;
         deadline.tv_nsec = now.tv_usec * 1000 + nsec;
         deadline.tv_sec += (deadline.tv_nsec / 1000000000);

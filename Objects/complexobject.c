@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -571,7 +573,11 @@ complex_pow(PyObject *v, PyObject *w, PyObject *z)
     }
     errno = 0;
     exponent = b;
+#ifdef USE_IDOUBLE
+       int_exponent = idoubleToInt(exponent.real);
+#else
     int_exponent = (long)exponent.real;
+#endif
     if (exponent.imag == 0. && exponent.real == int_exponent)
         p = c_powi(a, int_exponent);
     else

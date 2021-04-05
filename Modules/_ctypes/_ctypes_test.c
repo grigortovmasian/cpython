@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -343,7 +345,11 @@ EXPORT(int) _testfunc_i_bhilfd(signed char b, short h, int i, long l, float f, d
 /*      printf("_testfunc_i_bhilfd got %d %d %d %ld %f %f\n",
                b, h, i, l, f, d);
 */
+#ifdef USE_IDOUBLE
+    return (int)idoubleToInt(b + h + i + l + f + d);
+#else
     return (int)(b + h + i + l + f + d);
+#endif
 }
 
 EXPORT(float) _testfunc_f_bhilfd(signed char b, short h, int i, long l, float f, double d)
@@ -351,7 +357,11 @@ EXPORT(float) _testfunc_f_bhilfd(signed char b, short h, int i, long l, float f,
 /*      printf("_testfunc_f_bhilfd got %d %d %d %ld %f %f\n",
                b, h, i, l, f, d);
 */
+#ifdef USE_IDOUBLE
+    return (float)idoubleTofloat(b + h + i + l + f + d);
+#else
     return (float)(b + h + i + l + f + d);
+#endif
 }
 
 EXPORT(double) _testfunc_d_bhilfd(signed char b, short h, int i, long l, float f, double d)
@@ -459,12 +469,20 @@ EXPORT(int) _testfunc_callback_with_pointer(int (*func)(int *))
 EXPORT(long long) _testfunc_q_bhilfdq(signed char b, short h, int i, long l, float f,
                                       double d, long long q)
 {
+#ifdef USE_IDOUBLE
+    return (long long)idoubleToInt(b + h + i + l + f + d + q);
+#else
     return (long long)(b + h + i + l + f + d + q);
+#endif
 }
 
 EXPORT(long long) _testfunc_q_bhilfd(signed char b, short h, int i, long l, float f, double d)
 {
+#ifdef USE_IDOUBLE
+    return (long long)idoubleToInt(b + h + i + l + f + d);
+#else
     return (long long)(b + h + i + l + f + d);
+#endif
 }
 
 EXPORT(int) _testfunc_callback_i_if(int value, int (*func)(int))
@@ -652,8 +670,13 @@ static PyMethodDef module_methods[] = {
     { NULL, NULL, 0, NULL},
 };
 
+#ifdef USE_IDOUBLE
+#define S last_tf_arg_s = (long long)idoubleToInt(c)
+#define U last_tf_arg_u = (unsigned long long)idoubleToInt(c)
+#else
 #define S last_tf_arg_s = (long long)c
 #define U last_tf_arg_u = (unsigned long long)c
+#endif
 
 EXPORT(signed char) tf_b(signed char c) { S; return c/3; }
 EXPORT(unsigned char) tf_B(unsigned char c) { U; return c/3; }

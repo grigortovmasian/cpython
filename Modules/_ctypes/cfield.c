@@ -1,5 +1,7 @@
 #ifdef USE_IDOUBLE
 #include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
 #define double idouble
 #endif
 
@@ -1069,8 +1071,11 @@ static PyObject *
 f_set(void *ptr, PyObject *value, Py_ssize_t size)
 {
     float x;
-
+#ifdef USE_IDOUBLE
+    x = (float)idoubleTofloat(PyFloat_AsDouble(value));
+#else
     x = (float)PyFloat_AsDouble(value);
+#endif
     if (x == -1 && PyErr_Occurred())
         return NULL;
     memcpy(ptr, &x, sizeof(x));
@@ -1089,8 +1094,11 @@ static PyObject *
 f_set_sw(void *ptr, PyObject *value, Py_ssize_t size)
 {
     float x;
-
+#ifdef USE_IDOUBLE
+    x = (float)idoubleTofloat(PyFloat_AsDouble(value));
+#else
     x = (float)PyFloat_AsDouble(value);
+#endif
     if (x == -1 && PyErr_Occurred())
         return NULL;
 #ifdef WORDS_BIGENDIAN
