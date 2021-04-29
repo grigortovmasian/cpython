@@ -675,11 +675,13 @@ float_div(PyObject *v, PyObject *w)
     double a,b;
     CONVERT_TO_DOUBLE(v, a);
     CONVERT_TO_DOUBLE(w, b);
+#ifndef USE_IDOUBLE
     if (b == 0.0) {
         PyErr_SetString(PyExc_ZeroDivisionError,
                         "float division by zero");
         return NULL;
     }
+#endif
     a = a / b;
     return PyFloat_FromDouble(a);
 }
@@ -691,11 +693,13 @@ float_rem(PyObject *v, PyObject *w)
     double mod;
     CONVERT_TO_DOUBLE(v, vx);
     CONVERT_TO_DOUBLE(w, wx);
+#ifndef USE_IDOUBLE
     if (wx == 0.0) {
         PyErr_SetString(PyExc_ZeroDivisionError,
                         "float modulo");
         return NULL;
     }
+#endif
     mod = fmod(vx, wx);
 #ifdef USE_IDOUBLE
     if (idoubleToBool(mod)) {
@@ -770,10 +774,12 @@ float_divmod(PyObject *v, PyObject *w)
     double mod, floordiv;
     CONVERT_TO_DOUBLE(v, vx);
     CONVERT_TO_DOUBLE(w, wx);
+#ifndef USE_IDOUBLE
     if (wx == 0.0) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float divmod()");
         return NULL;
     }
+#endif
     _float_div_mod(vx, wx, &floordiv, &mod);
     return Py_BuildValue("(dd)", floordiv, mod);
 }
@@ -785,10 +791,12 @@ float_floor_div(PyObject *v, PyObject *w)
     double mod, floordiv;
     CONVERT_TO_DOUBLE(v, vx);
     CONVERT_TO_DOUBLE(w, wx);
+#ifndef USE_IDOUBLE
     if (wx == 0.0) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float floor division by zero");
         return NULL;
     }
+#endif
     _float_div_mod(vx, wx, &floordiv, &mod);
     return PyFloat_FromDouble(floordiv);
 }
@@ -812,6 +820,23 @@ float_pow(PyObject *v, PyObject *w, PyObject *z)
     CONVERT_TO_DOUBLE(v, iv);
     CONVERT_TO_DOUBLE(w, iw);
 
+#ifdef USE_IDOUBLE
+    errno = 0;
+    ix = pow(iv, iw);
+    Py_ADJUST_ERANGE1(ix);
+    if (negate_result)
+        ix = -ix;
+
+    if (errno != 0) {
+        /* We don't expect any errno value other than ERANGE, but
+         * the range of libm bugs appears unbounded.
+         */
+        PyErr_SetFromErrno(errno == ERANGE ? PyExc_OverflowError :
+                             PyExc_ValueError);
+        return NULL;
+    }
+    return PyFloat_FromDouble(ix);
+#endif
     /* Sort out special cases here instead of relying on pow() */
     if (iw == 0) {              /* v**0 is 1, even 0**0 */
         return PyFloat_FromDouble(1.0);
