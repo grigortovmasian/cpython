@@ -24,8 +24,9 @@ typedef struct {
     int use_fastcall;
 } partialobject;
 
-static PyTypeObject partial_type;
-
+namespace {
+extern PyTypeObject partial_type;
+}
 static PyObject *
 partial_new(PyTypeObject *type, PyObject *args, PyObject *kw)
 {
@@ -150,7 +151,7 @@ partial_fastcall(partialobject *pto, PyObject **args, Py_ssize_t nargs,
             stack = small_stack;
         }
         else {
-            stack_buf = PyMem_Malloc(nargs2 * sizeof(PyObject *));
+            stack_buf = (PyObject**)PyMem_Malloc(nargs2 * sizeof(PyObject *));
             if (stack_buf == NULL) {
                 PyErr_NoMemory();
                 return NULL;
@@ -380,7 +381,8 @@ static PyMethodDef partial_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
-static PyTypeObject partial_type = {
+namespace {
+PyTypeObject partial_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "functools.partial",                /* tp_name */
     sizeof(partialobject),              /* tp_basicsize */
@@ -423,7 +425,7 @@ static PyTypeObject partial_type = {
     partial_new,                        /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* cmp_to_key ***************************************************************/
 
@@ -751,7 +753,9 @@ typedef struct lru_cache_object {
     PyObject *dict;
 } lru_cache_object;
 
-static PyTypeObject lru_cache_type;
+namespace {
+extern PyTypeObject lru_cache_type;
+}
 
 static PyObject *
 lru_cache_make_key(PyObject *args, PyObject *kwds, int typed)
@@ -1321,7 +1325,8 @@ static PyGetSetDef lru_cache_getsetlist[] = {
     {NULL}
 };
 
-static PyTypeObject lru_cache_type = {
+namespace {
+PyTypeObject lru_cache_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "functools._lru_cache_wrapper",     /* tp_name */
     sizeof(lru_cache_object),           /* tp_basicsize */
@@ -1364,7 +1369,7 @@ static PyTypeObject lru_cache_type = {
     0,                                  /* tp_alloc */
     lru_cache_new,                      /* tp_new */
 };
-
+}
 /* module level code ********************************************************/
 
 PyDoc_STRVAR(module_doc,

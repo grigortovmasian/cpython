@@ -183,7 +183,7 @@ fcntl_ioctl_impl(PyObject *module, int fd, unsigned int code,
     if (ob_arg != NULL) {
         if (PyArg_Parse(ob_arg, "w*:ioctl", &pstr)) {
             char *arg;
-            str = pstr.buf;
+            str = (char *)pstr.buf;
             len = pstr.len;
 
             if (mutate_arg) {
@@ -235,7 +235,7 @@ fcntl_ioctl_impl(PyObject *module, int fd, unsigned int code,
 
         PyErr_Clear();
         if (PyArg_Parse(ob_arg, "s*:ioctl", &pstr)) {
-            str = pstr.buf;
+            str = (char*)pstr.buf;
             len = pstr.len;
             if (len > IOCTL_BUFSZ) {
                 PyBuffer_Release(&pstr);

@@ -37,7 +37,9 @@
 #include "structmember.h"
 
 /* Object used as dummy key to fill deleted entries */
-static PyObject _dummy_struct;
+namespace {
+extern PyObject _dummy_struct;
+}
 
 #define dummy (&_dummy_struct)
 
@@ -2318,11 +2320,18 @@ PySet_ClearFreeList(void)
     return 0;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 PySet_Fini(void)
 {
     Py_CLEAR(emptyfrozenset);
 }
+#ifdef __cplusplus
+}
+#endif
 
 int
 _PySet_NextEntry(PyObject *set, Py_ssize_t *pos, PyObject **key, Py_hash_t *hash)
@@ -2542,8 +2551,10 @@ static PyTypeObject _PySetDummy_Type = {
     Py_TPFLAGS_DEFAULT, /*tp_flags */
 };
 
-static PyObject _dummy_struct = {
+namespace {
+PyObject _dummy_struct = {
   _PyObject_EXTRA_INIT
   2, &_PySetDummy_Type
 };
+}
 

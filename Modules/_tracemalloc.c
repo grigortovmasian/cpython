@@ -472,7 +472,7 @@ traceback_new(void)
 
         traceback_size = TRACEBACK_SIZE(traceback->nframe);
 
-        copy = raw_malloc(traceback_size);
+        copy = (traceback_t*)raw_malloc(traceback_size);
         if (copy == NULL) {
 #ifdef TRACE_DEBUG
             tracemalloc_error("failed to intern the traceback: malloc failed");
@@ -936,13 +936,13 @@ tracemalloc_clear_traces(void)
 static int
 tracemalloc_init(void)
 {
-    if (_Py_tracemalloc_config.initialized == TRACEMALLOC_FINALIZED) {
+    if (_Py_tracemalloc_config.initialized == _PyTraceMalloc_Config::TRACEMALLOC_FINALIZED) {
         PyErr_SetString(PyExc_RuntimeError,
                         "the tracemalloc module has been unloaded");
         return -1;
     }
 
-    if (_Py_tracemalloc_config.initialized == TRACEMALLOC_INITIALIZED)
+    if (_Py_tracemalloc_config.initialized == _PyTraceMalloc_Config::TRACEMALLOC_INITIALIZED)
         return 0;
 
     PyMem_GetAllocator(PYMEM_DOMAIN_RAW, &allocators.raw);
@@ -1006,7 +1006,7 @@ tracemalloc_init(void)
     tracemalloc_empty_traceback.frames[0].lineno = 0;
     tracemalloc_empty_traceback.hash = traceback_hash(&tracemalloc_empty_traceback);
 
-    _Py_tracemalloc_config.initialized = TRACEMALLOC_INITIALIZED;
+    _Py_tracemalloc_config.initialized = _PyTraceMalloc_Config::TRACEMALLOC_INITIALIZED;
     return 0;
 }
 
@@ -1014,9 +1014,9 @@ tracemalloc_init(void)
 static void
 tracemalloc_deinit(void)
 {
-    if (_Py_tracemalloc_config.initialized != TRACEMALLOC_INITIALIZED)
+    if (_Py_tracemalloc_config.initialized != _PyTraceMalloc_Config::TRACEMALLOC_INITIALIZED)
         return;
-    _Py_tracemalloc_config.initialized = TRACEMALLOC_FINALIZED;
+    _Py_tracemalloc_config.initialized = _PyTraceMalloc_Config::TRACEMALLOC_FINALIZED;
 
     tracemalloc_stop();
 
@@ -1068,7 +1068,7 @@ tracemalloc_start(int max_nframe)
     /* allocate a buffer to store a new traceback */
     size = TRACEBACK_SIZE(max_nframe);
     assert(tracemalloc_traceback == NULL);
-    tracemalloc_traceback = raw_malloc(size);
+    tracemalloc_traceback = (traceback_t*)raw_malloc(size);
     if (tracemalloc_traceback == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1273,7 +1273,7 @@ static int
 tracemalloc_get_traces_fill(_Py_hashtable_t *traces, _Py_hashtable_entry_t *entry,
                             void *user_data)
 {
-    get_traces_t *get_traces = user_data;
+    get_traces_t *get_traces = (get_traces_t*)user_data;
     unsigned int domain;
     trace_t trace;
     PyObject *tracemalloc_obj;
@@ -1464,6 +1464,10 @@ _PyMem_DumpFrame(int fd, frame_t * frame)
     PUTS(fd, "\n");
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Dump the traceback where a memory block was allocated into file descriptor
    fd. The function may block on TABLES_LOCK() but it is unlikely. */
 void
@@ -1488,6 +1492,9 @@ _PyMem_DumpTraceback(int fd, const void *ptr)
     }
     PUTS(fd, "\n");
 }
+#ifdef __cplusplus
+}
+#endif
 
 #undef PUTS
 
@@ -1646,6 +1653,9 @@ PyInit__tracemalloc(void)
 }
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 _PyTraceMalloc_Init(int nframe)
 {
@@ -1664,6 +1674,9 @@ _PyTraceMalloc_Fini(void)
     tracemalloc_deinit();
 }
 
+#ifdef __cplusplus
+}
+#endif
 int
 PyTraceMalloc_Track(unsigned int domain, uintptr_t ptr,
                     size_t size)

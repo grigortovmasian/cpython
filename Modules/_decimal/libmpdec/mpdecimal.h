@@ -708,11 +708,14 @@ void mpd_sset_u64(mpd_t *result, uint64_t a, mpd_context_t *ctx);
 /*                       Get attributes of a decimal                          */
 /******************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 EXTINLINE mpd_ssize_t mpd_adjexp(const mpd_t *dec);
 EXTINLINE mpd_ssize_t mpd_etiny(const mpd_context_t *ctx);
 EXTINLINE mpd_ssize_t mpd_etop(const mpd_context_t *ctx);
 EXTINLINE mpd_uint_t mpd_msword(const mpd_t *dec);
-EXTINLINE int mpd_word_digits(mpd_uint_t word);
+int mpd_word_digits(mpd_uint_t word);
 /* most significant digit of a word */
 EXTINLINE mpd_uint_t mpd_msd(mpd_uint_t word);
 /* least significant digit of a word */
@@ -726,17 +729,20 @@ EXTINLINE int mpd_isfinite(const mpd_t *dec);
 EXTINLINE int mpd_isinfinite(const mpd_t *dec);
 EXTINLINE int mpd_isinteger(const mpd_t *dec);
 EXTINLINE int mpd_isnan(const mpd_t *dec);
-EXTINLINE int mpd_isnegative(const mpd_t *dec);
+int mpd_isnegative(const mpd_t *dec);
 EXTINLINE int mpd_ispositive(const mpd_t *dec);
 EXTINLINE int mpd_isqnan(const mpd_t *dec);
 EXTINLINE int mpd_issigned(const mpd_t *dec);
 EXTINLINE int mpd_issnan(const mpd_t *dec);
-EXTINLINE int mpd_isspecial(const mpd_t *dec);
+int mpd_isspecial(const mpd_t *dec);
 EXTINLINE int mpd_iszero(const mpd_t *dec);
 /* undefined for special numbers */
 EXTINLINE int mpd_iszerocoeff(const mpd_t *dec);
-EXTINLINE int mpd_isnormal(const mpd_t *dec, const mpd_context_t *ctx);
-EXTINLINE int mpd_issubnormal(const mpd_t *dec, const mpd_context_t *ctx);
+int mpd_isnormal(const mpd_t *dec, const mpd_context_t *ctx);
+int mpd_issubnormal(const mpd_t *dec, const mpd_context_t *ctx);
+#ifdef __cplusplus
+}
+#endif
 /* odd word */
 EXTINLINE int mpd_isoddword(mpd_uint_t word);
 /* odd coefficient */

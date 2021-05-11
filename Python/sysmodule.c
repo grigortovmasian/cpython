@@ -256,6 +256,10 @@ exit:
     return res;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* We expose this function primarily for our own cleanup during
  * finalization. In general, it should not need to be called,
  * and as such it is not defined in any header files.
@@ -285,6 +289,9 @@ void _PySys_ClearAuditHooks(void) {
         e = n;
     }
 }
+#ifdef __cplusplus
+}
+#endif
 
 int
 PySys_AddAuditHook(Py_AuditHookFunction hook, void *userData)
@@ -437,7 +444,7 @@ sys_breakpointhook(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyOb
     const char *last_dot = strrchr(envar, '.');
     const char *attrname = NULL;
     PyObject *modulepath = NULL;
-
+    {
     if (last_dot == NULL) {
         /* The breakpoint is a built-in, e.g. PYTHONBREAKPOINT=int */
         modulepath = PyUnicode_FromString("builtins");
@@ -481,7 +488,7 @@ sys_breakpointhook(PyObject *self, PyObject *const *args, Py_ssize_t nargs, PyOb
     PyObject *retval = _PyObject_Vectorcall(hook, args, nargs, keywords);
     Py_DECREF(hook);
     return retval;
-
+    }
   warn:
     /* If any of the imports went wrong, then warn and ignore. */
     PyErr_Clear();
@@ -1858,9 +1865,6 @@ sys_callstats_impl(PyObject *module)
 }
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*[clinic input]
 sys._debugmallocstats
@@ -1870,6 +1874,7 @@ Print summary info to stderr about the state of pymalloc's structures.
 In Py_DEBUG mode, also perform some expensive internal consistency
 checks.
 [clinic start generated code]*/
+
 
 static PyObject *
 sys__debugmallocstats_impl(PyObject *module)
@@ -1884,6 +1889,10 @@ sys__debugmallocstats_impl(PyObject *module)
 
     Py_RETURN_NONE;
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef Py_TRACE_REFS
 /* Defined in objects.c because it uses static globals if that file */
@@ -2066,7 +2075,7 @@ _alloc_preinit_entry(const wchar_t *value)
     PyMemAllocatorEx old_alloc;
     _PyMem_SetDefaultAllocator(PYMEM_DOMAIN_RAW, &old_alloc);
 
-    _Py_PreInitEntry node = PyMem_RawCalloc(1, sizeof(*node));
+    _Py_PreInitEntry node = (_Py_PreInitEntry)PyMem_RawCalloc(1, sizeof(*node));
     if (node != NULL) {
         node->value = _PyMem_RawWcsdup(value);
         if (node->value == NULL) {
@@ -2276,7 +2285,7 @@ static int
 _PySys_AddXOptionWithError(const wchar_t *s)
 {
     PyObject *name = NULL, *value = NULL;
-
+    {
     PyObject *opts = get_xoptions();
     if (opts == NULL) {
         goto error;
@@ -2301,7 +2310,7 @@ _PySys_AddXOptionWithError(const wchar_t *s)
     Py_DECREF(name);
     Py_DECREF(value);
     return 0;
-
+    }
 error:
     Py_XDECREF(name);
     Py_XDECREF(value);
@@ -2906,7 +2915,7 @@ _PySys_InitMain(_PyRuntimeState *runtime, PyInterpreterState *interp)
     PyObject *sysdict = interp->sysdict;
     const PyConfig *config = &interp->config;
     int res;
-
+    {
 #define COPY_LIST(KEY, VALUE) \
     do { \
         PyObject *list = _PyWideStringList_AsList(&(VALUE)); \
@@ -2981,7 +2990,7 @@ _PySys_InitMain(_PyRuntimeState *runtime, PyInterpreterState *interp)
         return -1;
 
     return 0;
-
+    }
 err_occurred:
     return -1;
 }

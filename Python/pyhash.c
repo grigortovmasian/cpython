@@ -20,9 +20,13 @@ extern "C" {
 _Py_HashSecret_t _Py_HashSecret = {{0}};
 
 #if Py_HASH_ALGORITHM == Py_HASH_EXTERNAL
+namespace {
 extern PyHash_FuncDef PyHash_Func;
+}
 #else
-static PyHash_FuncDef PyHash_Func;
+namespace {
+extern PyHash_FuncDef PyHash_Func;
+}
 #endif
 
 /* Count _Py_HashBytes() calls */
@@ -278,9 +282,10 @@ fnv(const void *src, Py_ssize_t len)
     return x;
 }
 
-static PyHash_FuncDef PyHash_Func = {fnv, "fnv", 8 * SIZEOF_PY_HASH_T,
+namespace {
+PyHash_FuncDef PyHash_Func = {fnv, "fnv", 8 * SIZEOF_PY_HASH_T,
                                      16 * SIZEOF_PY_HASH_T};
-
+}
 #endif /* Py_HASH_ALGORITHM == Py_HASH_FNV */
 
 
@@ -412,6 +417,7 @@ siphash24(uint64_t k0, uint64_t k1, const void *src, Py_ssize_t src_sz) {
     return t;
 }
 
+
 uint64_t
 _Py_KeyedHash(uint64_t key, const void *src, Py_ssize_t src_sz)
 {
@@ -427,9 +433,12 @@ pysiphash(const void *src, Py_ssize_t src_sz) {
         src, src_sz);
 }
 
-static PyHash_FuncDef PyHash_Func = {pysiphash, "siphash24", 64, 128};
+namespace {
+PyHash_FuncDef PyHash_Func = {pysiphash, "siphash24", 64, 128};
+}
 #endif
 
 #ifdef __cplusplus
 }
 #endif
+

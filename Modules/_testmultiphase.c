@@ -85,11 +85,11 @@ Example_setattr(ExampleObject *self, const char *name, PyObject *v)
 }
 
 static PyType_Slot Example_Type_slots[] = {
-    {Py_tp_doc, "The Example type"},
-    {Py_tp_finalize, Example_finalize},
-    {Py_tp_traverse, Example_traverse},
-    {Py_tp_getattro, Example_getattro},
-    {Py_tp_setattr, Example_setattr},
+    {Py_tp_doc, (void*)"The Example type"},
+    {Py_tp_finalize, (void*)Example_finalize},
+    {Py_tp_traverse, (void*)Example_traverse},
+    {Py_tp_getattro, (void*)Example_getattro},
+    {Py_tp_setattr, (void*)Example_setattr},
     {Py_tp_methods, Example_methods},
     {0, 0},
 };
@@ -240,7 +240,7 @@ static int execfunc(PyObject *m)
 #define TEST_MODULE_DEF(name, slots, methods) TEST_MODULE_DEF_EX(name, slots, methods, 0, NULL)
 
 static PyModuleDef_Slot main_slots[] = {
-    {Py_mod_exec, execfunc},
+    {Py_mod_exec, (void*)execfunc},
     {0, NULL},
 };
 
@@ -255,8 +255,10 @@ PyInit__testmultiphase(PyObject *spec)
 
 /**** Importing a non-module object ****/
 
-static PyModuleDef def_nonmodule;
-static PyModuleDef def_nonmodule_with_methods;
+namespace {
+extern PyModuleDef def_nonmodule;
+extern PyModuleDef def_nonmodule_with_methods;
+}
 
 /* Create a SimpleNamespace(three=3) */
 static PyObject*
@@ -287,13 +289,15 @@ createfunc_nonmodule(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_nonmodule[] = {
-    {Py_mod_create, createfunc_nonmodule},
+    {Py_mod_create, (void*)createfunc_nonmodule},
     {0, NULL},
 };
 
-static PyModuleDef def_nonmodule = TEST_MODULE_DEF(
+namespace {
+PyModuleDef def_nonmodule = TEST_MODULE_DEF(
     "_testmultiphase_nonmodule", slots_create_nonmodule, NULL);
 
+}
 PyMODINIT_FUNC
 PyInit__testmultiphase_nonmodule(PyObject *spec)
 {
@@ -321,9 +325,11 @@ static PyMethodDef nonmodule_methods[] = {
     {NULL, NULL}           /* sentinel */
 };
 
-static PyModuleDef def_nonmodule_with_methods = TEST_MODULE_DEF(
+namespace {
+PyModuleDef def_nonmodule_with_methods = TEST_MODULE_DEF(
     "_testmultiphase_nonmodule_with_methods", slots_create_nonmodule, nonmodule_methods);
 
+}
 PyMODINIT_FUNC
 PyInit__testmultiphase_nonmodule_with_methods(PyObject *spec)
 {
@@ -490,7 +496,7 @@ createfunc_null(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_null[] = {
-    {Py_mod_create, createfunc_null},
+    {Py_mod_create, (void*)createfunc_null},
     {0, NULL},
 };
 
@@ -511,7 +517,7 @@ createfunc_raise(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_raise[] = {
-    {Py_mod_create, createfunc_raise},
+    {Py_mod_create, (void*)createfunc_raise},
     {0, NULL},
 };
 
@@ -532,7 +538,7 @@ createfunc_unreported_exception(PyObject *spec, PyModuleDef *def)
 }
 
 static PyModuleDef_Slot slots_create_unreported_exception[] = {
-    {Py_mod_create, createfunc_unreported_exception},
+    {Py_mod_create, (void*)createfunc_unreported_exception},
     {0, NULL},
 };
 
@@ -546,8 +552,8 @@ PyInit__testmultiphase_create_unreported_exception(PyObject *spec)
 }
 
 static PyModuleDef_Slot slots_nonmodule_with_exec_slots[] = {
-    {Py_mod_create, createfunc_nonmodule},
-    {Py_mod_exec, execfunc},
+    {Py_mod_create, (void*)createfunc_nonmodule},
+    {Py_mod_exec, (void*)execfunc},
     {0, NULL},
 };
 
@@ -567,7 +573,7 @@ execfunc_err(PyObject *mod)
 }
 
 static PyModuleDef_Slot slots_exec_err[] = {
-    {Py_mod_exec, execfunc_err},
+    {Py_mod_exec, (void*)execfunc_err},
     {0, NULL},
 };
 
@@ -588,7 +594,7 @@ execfunc_raise(PyObject *spec)
 }
 
 static PyModuleDef_Slot slots_exec_raise[] = {
-    {Py_mod_exec, execfunc_raise},
+    {Py_mod_exec, (void*)execfunc_raise},
     {0, NULL},
 };
 
@@ -609,7 +615,7 @@ execfunc_unreported_exception(PyObject *mod)
 }
 
 static PyModuleDef_Slot slots_exec_unreported_exception[] = {
-    {Py_mod_exec, execfunc_unreported_exception},
+    {Py_mod_exec, (void*)execfunc_unreported_exception},
     {0, NULL},
 };
 
@@ -626,7 +632,7 @@ static int
 bad_traverse(PyObject *self, visitproc visit, void *arg) {
     testmultiphase_state *m_state;
 
-    m_state = PyModule_GetState(self);
+    m_state = (testmultiphase_state*)PyModule_GetState(self);
 
     /* The following assertion mimics any traversal function that doesn't correctly handle
      * the case during module creation where the module state hasn't been created yet.
@@ -643,7 +649,7 @@ static int
 execfunc_with_bad_traverse(PyObject *mod) {
     testmultiphase_state *m_state;
 
-    m_state = PyModule_GetState(mod);
+    m_state = (testmultiphase_state*)PyModule_GetState(mod);
     if (m_state == NULL) {
         return -1;
     }
@@ -655,7 +661,7 @@ execfunc_with_bad_traverse(PyObject *mod) {
 }
 
 static PyModuleDef_Slot slots_with_bad_traverse[] = {
-    {Py_mod_exec, execfunc_with_bad_traverse},
+    {Py_mod_exec, (void*)execfunc_with_bad_traverse},
     {0, NULL}
 };
 

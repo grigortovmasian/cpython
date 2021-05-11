@@ -106,7 +106,7 @@ STRINGLIB(bytes_join)(PyObject *sep, PyObject *iterable)
         /* fast path */
         for (i = 0; i < nbufs; i++) {
             Py_ssize_t n = buffers[i].len;
-            char *q = buffers[i].buf;
+            char *q = (char *)buffers[i].buf;
             memcpy(p, q, n);
             p += n;
         }
@@ -120,7 +120,7 @@ STRINGLIB(bytes_join)(PyObject *sep, PyObject *iterable)
             p += seplen;
         }
         n = buffers[i].len;
-        q = buffers[i].buf;
+        q = (char *)buffers[i].buf;
         memcpy(p, q, n);
         p += n;
     }

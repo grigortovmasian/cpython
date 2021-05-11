@@ -1117,7 +1117,7 @@ calculate_module_search_path(PyCalculatePath *calculate,
     bufsz += wcslen(exec_prefix) + 1;
 
     /* Allocate the buffer */
-    wchar_t *buf = PyMem_RawMalloc(bufsz * sizeof(wchar_t));
+    wchar_t *buf = (wchar_t *)PyMem_RawMalloc(bufsz * sizeof(wchar_t));
     if (buf == NULL) {
         return _PyStatus_NO_MEMORY();
     }

@@ -260,10 +260,11 @@ class _sre.SRE_Scanner "ScannerObject *" "&Scanner_Type"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=b0230ec19a0deac8]*/
 
-static PyTypeObject Pattern_Type;
-static PyTypeObject Match_Type;
-static PyTypeObject Scanner_Type;
-
+namespace {
+extern PyTypeObject Pattern_Type;
+extern PyTypeObject Match_Type;
+extern PyTypeObject Scanner_Type;
+}
 /*[clinic input]
 _sre.getcodesize -> int
 [clinic start generated code]*/
@@ -1976,13 +1977,13 @@ Return the string obtained by doing backslash substitution on the string templat
 [clinic start generated code]*/
 
 static PyObject *
-_sre_SRE_Match_expand_impl(MatchObject *self, PyObject *template)
+_sre_SRE_Match_expand_impl(MatchObject *self, PyObject *templat)
 /*[clinic end generated code: output=931b58ccc323c3a1 input=4bfdb22c2f8b146a]*/
 {
     /* delegate to Python code */
     return call(
         SRE_PY_MODULE, "_expand",
-        PyTuple_Pack(3, self->pattern, self, template)
+        PyTuple_Pack(3, self->pattern, self, templat)
         );
 }
 
@@ -2589,7 +2590,8 @@ static PyMemberDef pattern_members[] = {
     {NULL}  /* Sentinel */
 };
 
-static PyTypeObject Pattern_Type = {
+namespace {
+PyTypeObject Pattern_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "re.Pattern",
     sizeof(PatternObject), sizeof(SRE_CODE),
@@ -2620,6 +2622,7 @@ static PyTypeObject Pattern_Type = {
     pattern_members,                    /* tp_members */
     pattern_getset,                     /* tp_getset */
 };
+}
 
 /* Match objects do not support length or assignment, but do support
    __getitem__. */
@@ -2666,8 +2669,8 @@ static PyMemberDef match_members[] = {
 
 /* FIXME: implement setattr("string", None) as a special case (to
    detach the associated string, if any */
-
-static PyTypeObject Match_Type = {
+namespace {
+PyTypeObject Match_Type = {
     PyVarObject_HEAD_INIT(NULL,0)
     "re.Match",
     sizeof(MatchObject), sizeof(Py_ssize_t),
@@ -2698,6 +2701,7 @@ static PyTypeObject Match_Type = {
     match_members,              /* tp_members */
     match_getset,               /* tp_getset */
 };
+}
 
 static PyMethodDef scanner_methods[] = {
     _SRE_SRE_SCANNER_MATCH_METHODDEF
@@ -2711,7 +2715,8 @@ static PyMemberDef scanner_members[] = {
     {NULL}  /* Sentinel */
 };
 
-static PyTypeObject Scanner_Type = {
+namespace {
+PyTypeObject Scanner_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_" SRE_MODULE ".SRE_Scanner",
     sizeof(ScannerObject), 0,
@@ -2742,6 +2747,7 @@ static PyTypeObject Scanner_Type = {
     scanner_members,            /* tp_members */
     0,                          /* tp_getset */
 };
+}
 
 static PyMethodDef _functions[] = {
     _SRE_COMPILE_METHODDEF

@@ -3480,7 +3480,7 @@ posix_getcwd(int use_bytes)
         char *newbuf;
         if (buflen <= PY_SSIZE_T_MAX - chunk) {
             buflen += chunk;
-            newbuf = PyMem_RawRealloc(buf, buflen);
+            newbuf = (char*)PyMem_RawRealloc(buf, buflen);
         }
         else {
             newbuf = NULL;
@@ -5041,7 +5041,7 @@ fsconvert_strdup(PyObject *o, EXECV_CHAR **out)
     if (!PyUnicode_FSConverter(o, &ub))
         return 0;
     size = PyBytes_GET_SIZE(ub);
-    *out = PyMem_Malloc(size + 1);
+    *out = (char *)PyMem_Malloc(size + 1);
     if (*out) {
         memcpy(*out, PyBytes_AS_STRING(ub), size + 1);
         result = 1;
@@ -6284,7 +6284,7 @@ os_sched_param_impl(PyTypeObject *type, PyObject *sched_priority)
 }
 
 
-PyDoc_VAR(os_sched_param__doc__);
+static const char os_sched_param__doc__tmp[]={};
 
 static PyStructSequence_Field sched_param_fields[] = {
     {"sched_priority", "the scheduling priority"},
@@ -6293,7 +6293,7 @@ static PyStructSequence_Field sched_param_fields[] = {
 
 static PyStructSequence_Desc sched_param_desc = {
     "sched_param", /* name */
-    os_sched_param__doc__, /* doc */
+    os_sched_param__doc__tmp, /* doc */
     sched_param_fields,
     1
 };
@@ -11065,7 +11065,7 @@ os_confstr_impl(PyObject *module, int name)
 
     if (len >= sizeof(buffer)) {
         size_t len2;
-        char *buf = PyMem_Malloc(len);
+        char *buf = (char *)PyMem_Malloc(len);
         if (buf == NULL)
             return PyErr_NoMemory();
         len2 = confstr(name, buf, len);
@@ -12146,7 +12146,7 @@ os_listxattr_impl(PyObject *module, path_t *path, int follow_symlinks)
             path_error(path);
             break;
         }
-        buffer = PyMem_MALLOC(buffer_size);
+        buffer = (char *)PyMem_MALLOC(buffer_size);
         if (!buffer) {
             PyErr_NoMemory();
             break;

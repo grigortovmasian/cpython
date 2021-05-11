@@ -280,7 +280,7 @@ _enter_buffered_busy(buffered *self)
     relax_locking = _Py_IsFinalizing();
     Py_BEGIN_ALLOW_THREADS
     if (!relax_locking)
-        st = PyThread_acquire_lock(self->lock, 1);
+        st = (PyLockStatus)PyThread_acquire_lock(self->lock, 1);
     else {
         /* When finalizing, we don't want a deadlock to happen with daemon
          * threads abruptly shut down while they owned the lock.
@@ -730,7 +730,7 @@ _buffered_init(buffered *self)
     }
     if (self->buffer)
         PyMem_Free(self->buffer);
-    self->buffer = PyMem_Malloc(self->buffer_size);
+    self->buffer = (char*)PyMem_Malloc(self->buffer_size);
     if (self->buffer == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1085,7 +1085,7 @@ _buffered_readline(buffered *self, Py_ssize_t limit)
     if (limit >= 0 && n > limit)
         n = limit;
     start = self->buffer + self->pos;
-    s = memchr(start, '\n', n);
+    s = (const char*)memchr(start, '\n', n);
     if (s != NULL) {
         res = PyBytes_FromStringAndSize(start, s - start + 1);
         if (res != NULL)

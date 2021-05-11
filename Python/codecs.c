@@ -65,7 +65,7 @@ PyObject *normalizestring(const char *string)
         return NULL;
     }
 
-    p = PyMem_Malloc(len + 1);
+    p = (char*)PyMem_Malloc(len + 1);
     if (p == NULL)
         return PyErr_NoMemory();
     for (i = 0; i < len; i++) {
@@ -101,7 +101,7 @@ PyObject *_PyCodec_Lookup(const char *encoding)
 {
     PyObject *result, *args = NULL, *v;
     Py_ssize_t i, len;
-
+    {
     if (encoding == NULL) {
         PyErr_BadArgument();
         goto onError;
@@ -184,7 +184,7 @@ PyObject *_PyCodec_Lookup(const char *encoding)
     }
     Py_DECREF(args);
     return result;
-
+    }
  onError:
     Py_XDECREF(args);
     return NULL;

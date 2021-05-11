@@ -297,7 +297,7 @@ EXPORT(char *)my_strtok(char *token, const char *delim)
 
 EXPORT(char *)my_strchr(const char *s, int c)
 {
-    return strchr(s, c);
+    return (char*)strchr(s, c);
 }
 
 
@@ -363,10 +363,12 @@ EXPORT(void *) _testfunc_c_p_p(int *argcp, char **argv)
     return argv[(*argcp)-1];
 }
 
+/*
 EXPORT(void *) get_strchr(void)
 {
     return (void *)strchr;
 }
+*/
 
 EXPORT(char *) my_strdup(char *src)
 {

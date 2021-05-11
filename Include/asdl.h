@@ -26,8 +26,16 @@ typedef struct {
     int elements[1];
 } asdl_int_seq;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 asdl_seq *_Py_asdl_seq_new(Py_ssize_t size, PyArena *arena);
 asdl_int_seq *_Py_asdl_int_seq_new(Py_ssize_t size, PyArena *arena);
+
+#ifdef __cplusplus
+}
+#endif
 
 #define asdl_seq_GET(S, I) (S)->elements[(I)]
 #define asdl_seq_LEN(S) ((S) == NULL ? 0 : (S)->size)

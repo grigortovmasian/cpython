@@ -95,7 +95,7 @@ _PyImportZip_Init(PyInterpreterState *interp)
 {
     PyObject *path_hooks, *zipimport;
     int err = 0;
-
+    {
     path_hooks = PySys_GetObject("path_hooks");
     if (path_hooks == NULL) {
         PyErr_SetString(PyExc_RuntimeError, "unable to get sys.path_hooks");
@@ -139,7 +139,7 @@ _PyImportZip_Init(PyInterpreterState *interp)
     }
 
     return _PyStatus_OK();
-
+    }
   error:
     PyErr_Print();
     return _PyStatus_ERR("initializing zipimport failed");
@@ -2277,7 +2277,7 @@ _imp_source_hash_impl(PyObject *module, long key, Py_buffer *source)
         uint64_t x;
         char data[sizeof(uint64_t)];
     } hash;
-    hash.x = _Py_KeyedHash((uint64_t)key, source->buf, source->len);
+    hash.x = _Py_KeyedHash((uint64_t)key, (const char*)source->buf, source->len);
 #if !PY_LITTLE_ENDIAN
     // Force to little-endian. There really ought to be a succinct standard way
     // to do this.
@@ -2330,7 +2330,7 @@ PyMODINIT_FUNC
 PyInit__imp(void)
 {
     PyObject *m, *d;
-
+    {
     m = PyModule_Create(&impmodule);
     if (m == NULL) {
         goto failure;
@@ -2352,6 +2352,7 @@ PyInit__imp(void)
     Py_DECREF(pyc_mode);
 
     return m;
+    }
   failure:
     Py_XDECREF(m);
     return NULL;
@@ -2389,7 +2390,7 @@ PyImport_ExtendInittab(struct _inittab *newtab)
     p = NULL;
     if (i + n <= SIZE_MAX / sizeof(struct _inittab) - 1) {
         size_t size = sizeof(struct _inittab) * (i + n + 1);
-        p = PyMem_RawRealloc(inittab_copy, size);
+        p = (_inittab*)PyMem_RawRealloc(inittab_copy, size);
     }
     if (p == NULL) {
         res = -1;

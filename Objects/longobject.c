@@ -272,7 +272,7 @@ _PyLong_New(Py_ssize_t size)
                         "too many digits in integer");
         return NULL;
     }
-    result = PyObject_MALLOC(offsetof(PyLongObject, ob_digit) +
+    result = (PyLongObject *)PyObject_MALLOC(offsetof(PyLongObject, ob_digit) +
                              size*sizeof(digit));
     if (!result) {
         PyErr_NoMemory();
@@ -1832,7 +1832,7 @@ long_to_decimal_string_internal(PyObject *aa,
         kind = writer->kind;
     }
     else if (bytes_writer) {
-        *bytes_str = _PyBytesWriter_Prepare(bytes_writer, *bytes_str, strlen);
+        *bytes_str = (char*)_PyBytesWriter_Prepare(bytes_writer, *bytes_str, strlen);
         if (*bytes_str == NULL) {
             Py_DECREF(scratch);
             return -1;
@@ -1844,7 +1844,7 @@ long_to_decimal_string_internal(PyObject *aa,
             Py_DECREF(scratch);
             return -1;
         }
-        kind = PyUnicode_KIND(str);
+        kind = (PyUnicode_Kind)PyUnicode_KIND(str);
     }
 
 #define WRITE_DIGITS(p)                                               \
@@ -2000,7 +2000,7 @@ long_format_binary(PyObject *aa, int base, int alternate,
         kind = writer->kind;
     }
     else if (bytes_writer) {
-        *bytes_str = _PyBytesWriter_Prepare(bytes_writer, *bytes_str, sz);
+        *bytes_str = (char *)_PyBytesWriter_Prepare(bytes_writer, *bytes_str, sz);
         if (*bytes_str == NULL)
             return -1;
     }
@@ -2008,7 +2008,7 @@ long_format_binary(PyObject *aa, int base, int alternate,
         v = PyUnicode_New(sz, 'x');
         if (v == NULL)
             return -1;
-        kind = PyUnicode_KIND(v);
+        kind = (PyUnicode_Kind)PyUnicode_KIND(v);
     }
 
 #define WRITE_DIGITS(p)                                                 \
@@ -5795,6 +5795,10 @@ PyLong_GetInfo(void)
     return int_info;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int
 _PyLong_Init(void)
 {
@@ -5861,3 +5865,6 @@ PyLong_Fini(void)
     }
 #endif
 }
+#ifdef __cplusplus
+}
+#endif

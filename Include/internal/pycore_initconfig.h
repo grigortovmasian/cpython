@@ -1,8 +1,5 @@
 #ifndef Py_INTERNAL_CORECONFIG_H
 #define Py_INTERNAL_CORECONFIG_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
@@ -10,7 +7,14 @@ extern "C" {
 
 #include "pycore_pystate.h"   /* _PyRuntimeState */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* --- PyStatus ----------------------------------------------- */
+
+#define _PyStatus_TYPE_OK 0,
+#define _PyStatus_TYPE_ERROR 1,
+#define _PyStatus_TYPE_EXIT 2
 
 /* Almost all errors causing Python initialization to fail */
 #ifdef _MSC_VER
@@ -20,28 +24,32 @@ extern "C" {
 #  define _PyStatus_GET_FUNC() __func__
 #endif
 
+//_PyStatus_TYPE_ERROR=1 _PyStatus_TYPE_OK=0 _PyStatus_TYPE_EXIT=2
 #define _PyStatus_OK() \
-    (PyStatus){._type = _PyStatus_TYPE_OK,}
+    (PyStatus){._type = (PyStatus::st)0,}
     /* other fields are set to 0 */
 #define _PyStatus_ERR(ERR_MSG) \
     (PyStatus){ \
-        ._type = _PyStatus_TYPE_ERROR, \
+        ._type = (PyStatus::st)1, \
         .func = _PyStatus_GET_FUNC(), \
         .err_msg = (ERR_MSG)}
         /* other fields are set to 0 */
 #define _PyStatus_NO_MEMORY() _PyStatus_ERR("memory allocation failed")
 #define _PyStatus_EXIT(EXITCODE) \
     (PyStatus){ \
-        ._type = _PyStatus_TYPE_EXIT, \
+        ._type = (PyStatus::st)0, \
         .exitcode = (EXITCODE)}
 #define _PyStatus_IS_ERROR(err) \
-    (err._type == _PyStatus_TYPE_ERROR)
+    (err._type == (PyStatus::st)1)
 #define _PyStatus_IS_EXIT(err) \
-    (err._type == _PyStatus_TYPE_EXIT)
+    (err._type == (PyStatus::st)2)
 #define _PyStatus_EXCEPTION(err) \
-    (err._type != _PyStatus_TYPE_OK)
+    (err._type != (PyStatus::st)0)
 #define _PyStatus_UPDATE_FUNC(err) \
     do { err.func = _PyStatus_GET_FUNC(); } while (0)
+
+PyObject* _PyErr_SetFromPyStatus(PyStatus status);
+
 
 /* --- PyWideStringList ------------------------------------------------ */
 
@@ -103,8 +111,8 @@ typedef struct {
 
 #define _PyPreCmdline_INIT \
     (_PyPreCmdline){ \
-        .use_environment = -1, \
         .isolated = -1, \
+        .use_environment = -1, \
         .dev_mode = -1}
 /* Note: _PyPreCmdline_INIT sets other fields to 0/NULL */
 

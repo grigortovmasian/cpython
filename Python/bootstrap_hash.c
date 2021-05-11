@@ -113,7 +113,7 @@ py_getrandom(void *buffer, Py_ssize_t size, int blocking, int raise)
     }
 
     flags = blocking ? 0 : GRND_NONBLOCK;
-    dest = buffer;
+    dest = (char *)buffer;
     while (0 < size) {
 #if defined(__sun) && defined(__SVR4)
         /* Issue #26735: On Solaris, getrandom() is limited to returning up
@@ -513,7 +513,7 @@ pyurandom(void *buffer, Py_ssize_t size, int blocking, int raise)
        ENOSYS or EPERM. Fall back on reading from /dev/urandom. */
 #endif
 
-    return dev_urandom(buffer, size, raise);
+    return dev_urandom((char *)buffer, size, raise);
 #endif
 }
 
@@ -546,6 +546,9 @@ _PyOS_URandomNonblock(void *buffer, Py_ssize_t size)
     return pyurandom(buffer, size, 0, 1);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyStatus
 _Py_HashRandomization_Init(const PyConfig *config)
@@ -565,7 +568,7 @@ _Py_HashRandomization_Init(const PyConfig *config)
         }
         else {
             /* use the specified hash seed */
-            lcg_urandom(config->hash_seed, secret, secret_size);
+            lcg_urandom(config->hash_seed, (unsigned char*)secret, secret_size);
         }
     }
     else {
@@ -599,3 +602,6 @@ _Py_HashRandomization_Fini(void)
     dev_urandom_close();
 #endif
 }
+#ifdef __cplusplus
+}
+#endif

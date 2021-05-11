@@ -1,8 +1,5 @@
 #ifndef Py_INTERNAL_PYSTATE_H
 #define Py_INTERNAL_PYSTATE_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
@@ -20,6 +17,9 @@ extern "C" {
 #include "pycore_warnings.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* ceval state */
 
 struct _pending_calls {
@@ -191,7 +191,10 @@ struct _gilstate_runtime_state {
 
 
 /* Full Python runtime state */
-
+struct _xidregistry {
+    PyThread_type_lock mutex;
+    struct _xidregitem *head;
+};
 typedef struct pyruntimestate {
     /* Is running Py_PreInitialize()? */
     int preinitializing;
@@ -224,10 +227,7 @@ typedef struct pyruntimestate {
         int64_t next_id;
     } interpreters;
     // XXX Remove this field once we have a tp_* slot.
-    struct _xidregistry {
-        PyThread_type_lock mutex;
-        struct _xidregitem *head;
-    } xidregistry;
+    struct _xidregistry xidregistry;
 
     unsigned long main_thread;
 

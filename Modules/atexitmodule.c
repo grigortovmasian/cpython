@@ -11,8 +11,9 @@
 /* Forward declaration (for atexit_cleanup) */
 static PyObject *atexit_clear(PyObject*, PyObject*);
 /* Forward declaration of module object */
-static struct PyModuleDef atexitmodule;
-
+namespace {
+extern struct PyModuleDef atexitmodule;
+}
 /* ===================================================================== */
 /* Callback machinery. */
 
@@ -155,7 +156,7 @@ atexit_register(PyObject *self, PyObject *args, PyObject *kwargs)
         return NULL;
     }
 
-    new_callback = PyMem_Malloc(sizeof(atexit_callback));
+    new_callback = (atexit_callback*)PyMem_Malloc(sizeof(atexit_callback));
     if (new_callback == NULL)
         return PyErr_NoMemory();
 
@@ -331,11 +332,12 @@ atexit_exec(PyObject *m) {
 }
 
 static PyModuleDef_Slot atexit_slots[] = {
-    {Py_mod_exec, atexit_exec},
+    {Py_mod_exec, (void *)atexit_exec},
     {0, NULL}
 };
 
-static struct PyModuleDef atexitmodule = {
+namespace {
+struct PyModuleDef atexitmodule = {
     PyModuleDef_HEAD_INIT,
     "atexit",
     atexit__doc__,
@@ -346,7 +348,7 @@ static struct PyModuleDef atexitmodule = {
     atexit_m_clear,
     (freefunc)atexit_free
 };
-
+}
 PyMODINIT_FUNC
 PyInit_atexit(void)
 {

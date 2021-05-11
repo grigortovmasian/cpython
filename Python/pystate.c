@@ -48,13 +48,13 @@ _PyRuntimeState_Init_impl(_PyRuntimeState *runtime)
     /* We preserve the hook across init, because there is
        currently no public API to set it between runtime
        initialization and interpreter initialization. */
-    void *open_code_hook = runtime->open_code_hook;
+    void *open_code_hook = (void*)runtime->open_code_hook;
     void *open_code_userdata = runtime->open_code_userdata;
     _Py_AuditHookEntry *audit_hook_head = runtime->audit_hook_head;
 
     memset(runtime, 0, sizeof(*runtime));
 
-    runtime->open_code_hook = open_code_hook;
+    runtime->open_code_hook = (Py_OpenCodeHookFunction)open_code_hook;
     runtime->open_code_userdata = open_code_userdata;
     runtime->audit_hook_head = audit_hook_head;
 
@@ -167,7 +167,7 @@ static void _PyGILState_NoteThreadState(
 PyStatus
 _PyInterpreterState_Enable(_PyRuntimeState *runtime)
 {
-    struct pyinterpreters *interpreters = &runtime->interpreters;
+    auto *interpreters = &runtime->interpreters;
     interpreters->next_id = 0;
 
     /* Py_Finalize() calls _PyRuntimeState_Fini() which clears the mutex.
@@ -197,7 +197,7 @@ PyInterpreterState_New(void)
         return NULL;
     }
 
-    PyInterpreterState *interp = PyMem_RawMalloc(sizeof(PyInterpreterState));
+    PyInterpreterState *interp = (PyInterpreterState *)PyMem_RawMalloc(sizeof(PyInterpreterState));
     if (interp == NULL) {
         return NULL;
     }
@@ -218,7 +218,7 @@ PyInterpreterState_New(void)
 #endif
 
     _PyRuntimeState *runtime = &_PyRuntime;
-    struct pyinterpreters *interpreters = &runtime->interpreters;
+    auto *interpreters = &runtime->interpreters;
 
     HEAD_LOCK(runtime);
     if (interpreters->next_id < 0) {
@@ -314,7 +314,7 @@ static void
 _PyInterpreterState_Delete(_PyRuntimeState *runtime,
                            PyInterpreterState *interp)
 {
-    struct pyinterpreters *interpreters = &runtime->interpreters;
+    auto *interpreters = &runtime->interpreters;
     zapthreads(runtime, interp);
     HEAD_LOCK(runtime);
     PyInterpreterState **p;
@@ -359,7 +359,7 @@ void
 _PyInterpreterState_DeleteExceptMain(_PyRuntimeState *runtime)
 {
     struct _gilstate_runtime_state *gilstate = &runtime->gilstate;
-    struct pyinterpreters *interpreters = &runtime->interpreters;
+    auto *interpreters = &runtime->interpreters;
 
     PyThreadState *tstate = _PyThreadState_Swap(gilstate, NULL);
     if (tstate != NULL && tstate->interp != interpreters->main) {
@@ -1326,7 +1326,7 @@ void
 PyGILState_Release(PyGILState_STATE oldstate)
 {
     _PyRuntimeState *runtime = &_PyRuntime;
-    PyThreadState *tcur = PyThread_tss_get(&runtime->gilstate.autoTSSkey);
+    PyThreadState *tcur = (PyThreadState*)PyThread_tss_get(&runtime->gilstate.autoTSSkey);
     if (tcur == NULL) {
         Py_FatalError("auto-releasing thread-state, "
                       "but no thread-state for this thread");
@@ -1526,7 +1526,7 @@ _register_xidata(struct _xidregistry *xidregistry, PyTypeObject *cls,
 {
     // Note that we effectively replace already registered classes
     // rather than failing.
-    struct _xidregitem *newhead = PyMem_RawMalloc(sizeof(struct _xidregitem));
+    struct _xidregitem *newhead = (_xidregitem*)PyMem_RawMalloc(sizeof(struct _xidregitem));
     if (newhead == NULL)
         return -1;
     newhead->cls = cls;

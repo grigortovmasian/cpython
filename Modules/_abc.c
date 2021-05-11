@@ -580,7 +580,7 @@ _abc__abc_subclasscheck_impl(PyObject *module, PyObject *self,
     if (impl == NULL) {
         return NULL;
     }
-
+    {
     /* 1. Check cache. */
     incache = _in_weak_set(impl->_abc_cache, subclass);
     if (incache < 0) {
@@ -694,7 +694,7 @@ _abc__abc_subclasscheck_impl(PyObject *module, PyObject *self,
         goto end;
     }
     result = Py_False;
-
+    }
 end:
     Py_DECREF(impl);
     Py_XDECREF(subclasses);
@@ -727,7 +727,7 @@ subclasscheck_check_registry(_abc_data *impl, PyObject *subclass,
     }
     // Weakref callback may remove entry from set.
     // So we take snapshot of registry first.
-    PyObject **copy = PyMem_Malloc(sizeof(PyObject*) * registry_size);
+    PyObject **copy = (PyObject**)PyMem_Malloc(sizeof(PyObject*) * registry_size);
     if (copy == NULL) {
         PyErr_NoMemory();
         return -1;

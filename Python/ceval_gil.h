@@ -92,8 +92,9 @@
 
 static void _gil_initialize(struct _gil_runtime_state *gil)
 {
-    _Py_atomic_int uninitialized = {-1};
-    gil->locked = uninitialized;
+    _Py_atomic_int uninitialized;
+    uninitialized._value = -1;
+    gil->locked._value = -1;
     gil->interval = DEFAULT_INTERVAL;
 }
 

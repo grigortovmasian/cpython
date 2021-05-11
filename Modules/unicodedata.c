@@ -91,7 +91,9 @@ static PyMemberDef DB_members[] = {
 };
 
 /* forward declaration */
-static PyTypeObject UCD_Type;
+namespace {
+extern PyTypeObject UCD_Type;
+}
 #define UCD_Check(o) (Py_TYPE(o)==&UCD_Type)
 
 static PyObject*
@@ -534,7 +536,7 @@ nfd_nfkd(PyObject *self, PyObject *input, int k)
                 Py_UCS4 *new_output;
                 osize += 10;
                 space += 10;
-                new_output = PyMem_Realloc(output, osize*sizeof(Py_UCS4));
+                new_output = (Py_UCS4*)PyMem_Realloc(output, osize*sizeof(Py_UCS4));
                 if (new_output == NULL) {
                     PyMem_Free(output);
                     PyErr_NoMemory();
@@ -1383,7 +1385,8 @@ static PyMethodDef unicodedata_functions[] = {
     {NULL, NULL}                /* sentinel */
 };
 
-static PyTypeObject UCD_Type = {
+namespace {
+PyTypeObject UCD_Type = {
         /* The ob_type field must be initialized in the module init function
          * to be portable to Windows without using C++. */
         PyVarObject_HEAD_INIT(NULL, 0)
@@ -1428,7 +1431,7 @@ static PyTypeObject UCD_Type = {
         0,                      /*tp_free*/
         0,                      /*tp_is_gc*/
 };
-
+}
 PyDoc_STRVAR(unicodedata_docstring,
 "This module provides access to the Unicode Character Database which\n\
 defines character properties for all Unicode characters. The data in\n\

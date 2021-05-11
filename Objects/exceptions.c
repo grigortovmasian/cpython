@@ -2014,7 +2014,7 @@ UnicodeDecodeError_init(PyObject *self, PyObject *args, PyObject *kwds)
         Py_buffer view;
         if (PyObject_GetBuffer(ude->object, &view, PyBUF_SIMPLE) != 0)
             goto error;
-        Py_XSETREF(ude->object, PyBytes_FromStringAndSize(view.buf, view.len));
+        Py_XSETREF(ude->object, PyBytes_FromStringAndSize((const char *)view.buf, view.len));
         PyBuffer_Release(&view);
         if (!ude->object)
             goto error;
@@ -2503,6 +2503,10 @@ SimpleExtendsException(PyExc_Warning, ResourceWarning,
 #endif
 #endif /* MS_WINDOWS */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyStatus
 _PyExc_Init(void)
 {
@@ -2746,6 +2750,9 @@ _PyExc_Fini(void)
     Py_CLEAR(errnomap);
 }
 
+#ifdef __cplusplus
+}
+#endif
 /* Helper to do the equivalent of "raise X from Y" in C, but always using
  * the current exception rather than passing one in.
  *

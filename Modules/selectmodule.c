@@ -400,7 +400,9 @@ typedef struct {
     int poll_running;
 } pollObject;
 
-static PyTypeObject poll_Type;
+namespace {
+extern PyTypeObject poll_Type;
+}
 
 /* Update the malloc'ed array of pollfds to match the dictionary
    contained within a pollObject.  Return 1 on success, 0 on an error.
@@ -1201,7 +1203,9 @@ typedef struct {
     SOCKET epfd;                        /* epoll control file descriptor */
 } pyEpoll_Object;
 
-static PyTypeObject pyEpoll_Type;
+namespace {
+extern PyTypeObject pyEpoll_Type;
+}
 #define pyepoll_CHECK(op) (PyObject_TypeCheck((op), &pyEpoll_Type))
 
 static PyObject *
@@ -2210,7 +2214,8 @@ static PyMethodDef poll_methods[] = {
     {NULL, NULL}           /* sentinel */
 };
 
-static PyTypeObject poll_Type = {
+namespace {
+PyTypeObject poll_Type = {
     /* The ob_type field must be initialized in the module init function
      * to be portable to Windows without using C++. */
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -2243,7 +2248,7 @@ static PyTypeObject poll_Type = {
     0,                          /*tp_iternext*/
     poll_methods,               /*tp_methods*/
 };
-
+}
 #ifdef HAVE_SYS_DEVPOLL_H
 
 static PyMethodDef devpoll_methods[] = {
@@ -2311,7 +2316,8 @@ static PyMethodDef pyepoll_methods[] = {
     {NULL,      NULL},
 };
 
-static PyTypeObject pyEpoll_Type = {
+namespace {
+PyTypeObject pyEpoll_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "select.epoll",                                     /* tp_name */
     sizeof(pyEpoll_Object),                             /* tp_basicsize */
@@ -2352,7 +2358,7 @@ static PyTypeObject pyEpoll_Type = {
     select_epoll,                                       /* tp_new */
     0,                                                  /* tp_free */
 };
-
+}
 #endif /* HAVE_EPOLL */
 
 #ifdef HAVE_KQUEUE

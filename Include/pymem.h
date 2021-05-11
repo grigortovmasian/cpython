@@ -109,8 +109,8 @@ PyAPI_FUNC(void) PyMem_Free(void *ptr);
 struct _PyTraceMalloc_Config {
     /* Module initialized?
        Variable protected by the GIL */
-    enum {
-        TRACEMALLOC_NOT_INITIALIZED,
+    enum dummy {
+        TRACEMALLOC_NOT_INITIALIZED=0,
         TRACEMALLOC_INITIALIZED,
         TRACEMALLOC_FINALIZED
     } initialized;
@@ -131,7 +131,7 @@ struct _PyTraceMalloc_Config {
 PyAPI_DATA(struct _PyTraceMalloc_Config) _Py_tracemalloc_config;
 
 #define _PyTraceMalloc_Config_INIT \
-    {.initialized = TRACEMALLOC_NOT_INITIALIZED, \
+    {.initialized = (_PyTraceMalloc_Config::dummy)0, \
      .tracing = 0, \
      .max_nframe = 1, \
      .use_domain = 0}

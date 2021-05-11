@@ -75,12 +75,12 @@ fold_unaryop(expr_ty node, PyArena *arena, int optimize)
     }
 
     typedef PyObject *(*unary_op)(PyObject*);
-    static const unary_op ops[] = {
-        [Invert] = PyNumber_Invert,
-        [Not] = unary_not,
-        [UAdd] = PyNumber_Positive,
-        [USub] = PyNumber_Negative,
-    };
+    static unary_op ops[5];
+    ops[Invert] = PyNumber_Invert;
+    ops[Not] = unary_not;
+    ops[UAdd] = PyNumber_Positive;
+    ops[USub] = PyNumber_Negative;
+
     PyObject *newval = ops[node->v.UnaryOp.op](arg->v.Constant.value);
     return make_const(node, newval, arena);
 }

@@ -639,7 +639,7 @@ _multibytecodec_MultibyteCodec_decode_impl(MultibyteCodecObject *self,
     const char *data;
     Py_ssize_t datalen;
 
-    data = input->buf;
+    data = (const char*)input->buf;
     datalen = input->len;
 
     errorcb = internal_error_callback(errors);
@@ -1148,7 +1148,7 @@ _multibytecodec_MultibyteIncrementalDecoder_decode_impl(MultibyteIncrementalDeco
     Py_ssize_t wsize, size, origpending;
     PyObject *res;
 
-    data = input->buf;
+    data = (char *)input->buf;
     size = input->len;
 
     _PyUnicodeWriter_Init(&buf.writer);
@@ -1165,7 +1165,7 @@ _multibytecodec_MultibyteIncrementalDecoder_decode_impl(MultibyteIncrementalDeco
             goto errorexit;
         }
         wsize = size + self->pendingsize;
-        wdata = PyMem_Malloc(wsize);
+        wdata = (char*)PyMem_Malloc(wsize);
         if (wdata == NULL) {
             PyErr_NoMemory();
             goto errorexit;
@@ -2036,7 +2036,7 @@ _multibytecodec___create_codec(PyObject *module, PyObject *arg)
         return NULL;
     }
 
-    codec = PyCapsule_GetPointer(arg, PyMultibyteCodec_CAPSULE_NAME);
+    codec = (MultibyteCodec*)PyCapsule_GetPointer(arg, PyMultibyteCodec_CAPSULE_NAME);
     if (codec->codecinit != NULL && codec->codecinit(codec->config) != 0)
         return NULL;
 

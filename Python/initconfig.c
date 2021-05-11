@@ -242,7 +242,7 @@ PyStatus PyStatus_Ok(void)
 
 PyStatus PyStatus_Error(const char *err_msg)
 {
-    return (PyStatus){._type = _PyStatus_TYPE_ERROR,
+    return (PyStatus){._type = (PyStatus::st)1,
                           .err_msg = err_msg};
 }
 
@@ -308,7 +308,7 @@ _PyWideStringList_Copy(PyWideStringList *list, const PyWideStringList *list2)
     PyWideStringList copy = _PyWideStringList_INIT;
 
     size_t size = list2->length * sizeof(list2->items[0]);
-    copy.items = PyMem_RawMalloc(size);
+    copy.items = (wchar_t**)PyMem_RawMalloc(size);
     if (copy.items == NULL) {
         return -1;
     }
@@ -1888,7 +1888,7 @@ config_parse_cmdline(PyConfig *config, PyWideStringList *warnoptions,
                    that look like options are left for the
                    command to interpret. */
                 size_t len = wcslen(_PyOS_optarg) + 1 + 1;
-                wchar_t *command = PyMem_RawMalloc(sizeof(wchar_t) * len);
+                wchar_t *command = (wchar_t*)PyMem_RawMalloc(sizeof(wchar_t) * len);
                 if (command == NULL) {
                     return _PyStatus_NO_MEMORY();
                 }
@@ -2531,7 +2531,7 @@ _Py_GetConfigsAsDict(void)
 {
     PyObject *result = NULL;
     PyObject *dict = NULL;
-
+    {
     result = PyDict_New();
     if (result == NULL) {
         goto error;
@@ -2571,7 +2571,7 @@ _Py_GetConfigsAsDict(void)
     Py_CLEAR(dict);
 
     return result;
-
+    }
 error:
     Py_XDECREF(result);
     Py_XDECREF(dict);

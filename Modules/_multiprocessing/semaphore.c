@@ -448,7 +448,7 @@ semlock_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     }
 
     if (!unlink) {
-        name_copy = PyMem_Malloc(strlen(name) + 1);
+        name_copy = (char *)PyMem_Malloc(strlen(name) + 1);
         if (name_copy == NULL) {
             return PyErr_NoMemory();
         }
@@ -492,7 +492,7 @@ semlock_rebuild(PyTypeObject *type, PyObject *args)
         return NULL;
 
     if (name != NULL) {
-        name_copy = PyMem_Malloc(strlen(name) + 1);
+        name_copy = (char*)PyMem_Malloc(strlen(name) + 1);
         if (name_copy == NULL)
             return PyErr_NoMemory();
         strcpy(name_copy, name);

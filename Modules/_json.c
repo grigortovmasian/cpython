@@ -23,8 +23,8 @@
 #define PyEncoder_Check(op) PyObject_TypeCheck(op, &PyEncoderType)
 #define PyEncoder_CheckExact(op) (Py_TYPE(op) == &PyEncoderType)
 
-static PyTypeObject PyScannerType;
-static PyTypeObject PyEncoderType;
+//static PyTypeObject PyScannerType;
+//static PyTypeObject PyEncoderType;
 
 typedef struct _PyScannerObject {
     PyObject_HEAD

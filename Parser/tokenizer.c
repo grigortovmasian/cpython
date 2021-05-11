@@ -620,7 +620,7 @@ translate_newlines(const char *s, int exec_input, struct tok_state *tok) {
     size_t needed_length = strlen(s) + 2, final_length;
     char *buf, *current;
     char c = '\0';
-    buf = PyMem_MALLOC(needed_length);
+    buf = (char*)PyMem_MALLOC(needed_length);
     if (buf == NULL) {
         tok->done = E_NOMEM;
         return NULL;
@@ -651,7 +651,7 @@ translate_newlines(const char *s, int exec_input, struct tok_state *tok) {
     final_length = current - buf + 1;
     if (final_length < needed_length && final_length) {
         /* should never fail */
-        char* result = PyMem_REALLOC(buf, final_length);
+        char* result = (char*)PyMem_REALLOC(buf, final_length);
         if (result == NULL) {
             PyMem_FREE(buf);
         }
@@ -787,7 +787,7 @@ PyTokenizer_FromFile(FILE *fp, const char* enc,
     if (enc != NULL) {
         /* Must copy encoding declaration since it
            gets copied into the parse tree. */
-        tok->encoding = PyMem_MALLOC(strlen(enc)+1);
+        tok->encoding = (char*)PyMem_MALLOC(strlen(enc)+1);
         if (!tok->encoding) {
             PyTokenizer_Free(tok);
             return NULL;
@@ -866,7 +866,7 @@ tok_nextc(struct tok_state *tok)
                 }
                 buflen = PyBytes_GET_SIZE(u);
                 buf = PyBytes_AS_STRING(u);
-                newtok = PyMem_MALLOC(buflen+1);
+                newtok = (char*)PyMem_MALLOC(buflen+1);
                 if (newtok == NULL) {
                     Py_DECREF(u);
                     tok->done = E_NOMEM;
@@ -1050,6 +1050,7 @@ syntaxerror(struct tok_state *tok, const char *format, ...)
 
     errtext = PyUnicode_DecodeUTF8(tok->line_start, tok->cur - tok->line_start,
                                    "replace");
+    {
     if (!errtext) {
         goto error;
     }
@@ -1070,7 +1071,7 @@ syntaxerror(struct tok_state *tok, const char *format, ...)
         PyErr_SetObject(PyExc_SyntaxError, args);
         Py_DECREF(args);
     }
-
+  }
 error:
     Py_XDECREF(errmsg);
     tok->done = E_ERROR;

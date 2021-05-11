@@ -1,14 +1,15 @@
 #ifndef Py_INTERNAL_OBJECT_H
 #define Py_INTERNAL_OBJECT_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
 #endif
 
 #include "pycore_pystate.h"   /* _PyRuntime */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyAPI_FUNC(int) _PyType_CheckConsistency(PyTypeObject *type);
 PyAPI_FUNC(int) _PyDict_CheckConsistency(PyObject *mp, int check_content);

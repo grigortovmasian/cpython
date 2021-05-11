@@ -69,7 +69,7 @@ typedef struct {
     PyObject *dict;
 } fileio;
 
-PyTypeObject PyFileIO_Type;
+//static PyTypeObject PyFileIO_Type;
 
 _Py_IDENTIFIER(name);
 

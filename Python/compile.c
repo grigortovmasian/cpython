@@ -1301,15 +1301,15 @@ merge_consts_recursive(struct compiler *c, PyObject *o)
 
         // Instead of rewriting o, we create new frozenset and embed in the
         // key tuple.  Caller should get merged frozenset from the key tuple.
-        PyObject *new = PyFrozenSet_New(tuple);
+        PyObject *nw = PyFrozenSet_New(tuple);
         Py_DECREF(tuple);
-        if (new == NULL) {
+        if (nw == NULL) {
             Py_DECREF(key);
             return NULL;
         }
         assert(PyTuple_GET_ITEM(key, 1) == o);
         Py_DECREF(o);
-        PyTuple_SET_ITEM(key, 1, new);
+        PyTuple_SET_ITEM(key, 1, nw);
     }
 
     return key;
@@ -1945,8 +1945,8 @@ compiler_visit_kwonlydefaults(struct compiler *c, asdl_seq *kwonlyargs,
     PyObject *keys = NULL;
 
     for (i = 0; i < asdl_seq_LEN(kwonlyargs); i++) {
-        arg_ty arg = asdl_seq_GET(kwonlyargs, i);
-        expr_ty default_ = asdl_seq_GET(kw_defaults, i);
+        arg_ty arg = (arg_ty)asdl_seq_GET(kwonlyargs, i);
+        expr_ty default_ = (expr_ty)asdl_seq_GET(kw_defaults, i);
         if (default_) {
             PyObject *mangled = _Py_Mangle(c->u->u_private, arg->arg);
             if (!mangled) {
@@ -3662,7 +3662,7 @@ starunpack_helper(struct compiler *c, asdl_seq *elts,
     Py_ssize_t n = asdl_seq_LEN(elts);
     Py_ssize_t i, nsubitems = 0, nseen = 0;
     for (i = 0; i < n; i++) {
-        expr_ty elt = asdl_seq_GET(elts, i);
+        expr_ty elt = (expr_ty)asdl_seq_GET(elts, i);
         if (elt->kind == Starred_kind) {
             if (nseen) {
                 ADDOP_I(c, inner_op, nseen);
@@ -3696,7 +3696,7 @@ assignment_helper(struct compiler *c, asdl_seq *elts)
     Py_ssize_t i;
     int seen_star = 0;
     for (i = 0; i < n; i++) {
-        expr_ty elt = asdl_seq_GET(elts, i);
+        expr_ty elt = (expr_ty)asdl_seq_GET(elts, i);
         if (elt->kind == Starred_kind && !seen_star) {
             if ((i >= (1 << 8)) ||
                 (n-i-1 >= (INT_MAX >> 8)))
@@ -4018,7 +4018,7 @@ maybe_optimize_method_call(struct compiler *c, expr_ty e)
     /* Check that there are no *varargs types of arguments. */
     argsl = asdl_seq_LEN(args);
     for (i = 0; i < argsl; i++) {
-        expr_ty elt = asdl_seq_GET(args, i);
+        expr_ty elt = (expr_ty)asdl_seq_GET(args, i);
         if (elt->kind == Starred_kind) {
             return -1;
         }
@@ -4112,7 +4112,7 @@ compiler_subkwargs(struct compiler *c, asdl_seq *keywords, Py_ssize_t begin, Py_
     assert(n > 0);
     if (n > 1) {
         for (i = begin; i < end; i++) {
-            kw = asdl_seq_GET(keywords, i);
+            kw = (keyword_ty)asdl_seq_GET(keywords, i);
             VISIT(c, expr, kw->value);
         }
         keys = PyTuple_New(n);
@@ -4130,7 +4130,7 @@ compiler_subkwargs(struct compiler *c, asdl_seq *keywords, Py_ssize_t begin, Py_
     else {
         /* a for loop only executes once */
         for (i = begin; i < end; i++) {
-            kw = asdl_seq_GET(keywords, i);
+            kw = (keyword_ty)asdl_seq_GET(keywords, i);
             ADDOP_LOAD_CONST(c, kw->arg);
             VISIT(c, expr, kw->value);
         }
@@ -4156,7 +4156,7 @@ compiler_call_helper(struct compiler *c,
     nkwelts = asdl_seq_LEN(keywords);
 
     for (i = 0; i < nkwelts; i++) {
-        keyword_ty kw = asdl_seq_GET(keywords, i);
+        keyword_ty kw = (keyword_ty)asdl_seq_GET(keywords, i);
         if (kw->arg == NULL) {
             mustdictunpack = 1;
             break;
@@ -4165,7 +4165,7 @@ compiler_call_helper(struct compiler *c,
 
     nseen = n;  /* the number of positional arguments on the stack */
     for (i = 0; i < nelts; i++) {
-        expr_ty elt = asdl_seq_GET(args, i);
+        expr_ty elt = (expr_ty)asdl_seq_GET(args, i);
         if (elt->kind == Starred_kind) {
             /* A star-arg. If we've seen positional arguments,
                pack the positional arguments into a tuple. */
@@ -4200,7 +4200,7 @@ compiler_call_helper(struct compiler *c,
         }
         nseen = 0;  /* the number of keyword arguments on the stack following */
         for (i = 0; i < nkwelts; i++) {
-            keyword_ty kw = asdl_seq_GET(keywords, i);
+            keyword_ty kw = (keyword_ty)asdl_seq_GET(keywords, i);
             if (kw->arg == NULL) {
                 /* A keyword argument unpacking. */
                 if (nseen) {
@@ -4237,7 +4237,7 @@ compiler_call_helper(struct compiler *c,
             return 0;
         }
         for (i = 0; i < nkwelts; i++) {
-            keyword_ty kw = asdl_seq_GET(keywords, i);
+            keyword_ty kw = (keyword_ty)asdl_seq_GET(keywords, i);
             Py_INCREF(kw->arg);
             PyTuple_SET_ITEM(names, i, kw->arg);
         }
@@ -4672,7 +4672,7 @@ static int
 compiler_async_with(struct compiler *c, stmt_ty s, int pos)
 {
     basicblock *block, *finally;
-    withitem_ty item = asdl_seq_GET(s->v.AsyncWith.items, pos);
+    withitem_ty item = (withitem_ty)asdl_seq_GET(s->v.AsyncWith.items, pos);
 
     assert(s->kind == AsyncWith_kind);
     if (IS_TOP_LEVEL_AWAIT(c)){
@@ -4771,7 +4771,7 @@ static int
 compiler_with(struct compiler *c, stmt_ty s, int pos)
 {
     basicblock *block, *finally;
-    withitem_ty item = asdl_seq_GET(s->v.With.items, pos);
+    withitem_ty item = (withitem_ty)asdl_seq_GET(s->v.With.items, pos);
 
     assert(s->kind == With_kind);
 

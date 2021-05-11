@@ -136,7 +136,7 @@ grp_getgrgid_impl(PyObject *module, PyObject *id)
     }
 
     while (1) {
-        buf2 = PyMem_RawRealloc(buf, bufsize);
+        buf2 = (char*)PyMem_RawRealloc(buf, bufsize);
         if (buf2 == NULL) {
             p = NULL;
             nomem = 1;
@@ -217,7 +217,7 @@ grp_getgrnam_impl(PyObject *module, PyObject *name)
     }
 
     while(1) {
-        buf2 = PyMem_RawRealloc(buf, bufsize);
+        buf2 = (char *)PyMem_RawRealloc(buf, bufsize);
         if (buf2 == NULL) {
             p = NULL;
             nomem = 1;

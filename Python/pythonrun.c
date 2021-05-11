@@ -393,6 +393,7 @@ pyrun_simple_file(FILE *fp, PyObject *filename, int closeit,
         return -1;
     Py_INCREF(m);
     d = PyModule_GetDict(m);
+    {
     if (PyDict_GetItemString(d, "__file__") == NULL) {
         if (PyDict_SetItemString(d, "__file__", filename) < 0) {
             goto done;
@@ -447,7 +448,8 @@ pyrun_simple_file(FILE *fp, PyObject *filename, int closeit,
     }
     Py_DECREF(v);
     ret = 0;
-  done:
+   }
+   done:
     if (set_file_name) {
         if (PyDict_DelItemString(d, "__file__")) {
             PyErr_Clear();

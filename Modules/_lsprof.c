@@ -51,8 +51,9 @@ typedef struct {
 #define POF_BUILTINS    0x004
 #define POF_NOMEMORY    0x100
 
-static PyTypeObject PyProfiler_Type;
-
+namespace {
+extern PyTypeObject PyProfiler_Type;
+}
 #define PyProfiler_Check(op) PyObject_TypeCheck(op, &PyProfiler_Type)
 #define PyProfiler_CheckExact(op) (Py_TYPE(op) == &PyProfiler_Type)
 
@@ -748,7 +749,8 @@ Profiler(timer=None, timeunit=None, subcalls=True, builtins=True)\n\
     is, in seconds).\n\
 ");
 
-static PyTypeObject PyProfiler_Type = {
+namespace {
+PyTypeObject PyProfiler_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_lsprof.Profiler",                     /* tp_name */
     sizeof(ProfilerObject),                 /* tp_basicsize */
@@ -789,7 +791,7 @@ static PyTypeObject PyProfiler_Type = {
     PyType_GenericNew,                      /* tp_new */
     PyObject_Del,                           /* tp_free */
 };
-
+}
 static PyMethodDef moduleMethods[] = {
     {NULL, NULL}
 };

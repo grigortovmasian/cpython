@@ -393,6 +393,7 @@ pymain_run_startup(PyConfig *config, PyCompilerFlags *cf, int *exitcode)
 {
     int ret;
     PyObject *startup_obj = NULL;
+    {{
     if (!config->use_environment) {
         return 0;
     }
@@ -403,6 +404,7 @@ pymain_run_startup(PyConfig *config, PyCompilerFlags *cf, int *exitcode)
     }
     PyObject *startup_bytes = NULL;
     startup_obj = PyUnicode_FromWideChar(wstartup, wcslen(wstartup));
+    
     if (startup_obj == NULL) {
         goto error;
     }
@@ -444,14 +446,14 @@ pymain_run_startup(PyConfig *config, PyCompilerFlags *cf, int *exitcode)
     PyErr_Clear();
     fclose(fp);
     ret = 0;
-
+    }
 done:
 #ifdef MS_WINDOWS
     Py_XDECREF(startup_bytes);
 #endif
     Py_XDECREF(startup_obj);
     return ret;
-
+     } 
 error:
     ret = pymain_err_print(exitcode);
     goto done;
@@ -559,6 +561,7 @@ pymain_run_python(int *exitcode)
     PyConfig *config = &interp->config;
 
     PyObject *main_importer_path = NULL;
+    {
     if (config->run_filename != NULL) {
         /* If filename is a package (ex: directory or ZIP file) which contains
            __main__.py, main_importer_path is set to filename and will be
@@ -615,7 +618,7 @@ pymain_run_python(int *exitcode)
 
     pymain_repl(config, &cf, exitcode);
     goto done;
-
+    }
 error:
     *exitcode = pymain_exit_err_print();
 

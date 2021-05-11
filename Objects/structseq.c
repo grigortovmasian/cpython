@@ -462,13 +462,13 @@ PyStructSequence_NewType(PyStructSequence_Desc *desc)
     initialize_members(desc, members, n_members);
 
     /* Initialize Slots */
-    slots[0] = (PyType_Slot){Py_tp_dealloc, (destructor)structseq_dealloc};
-    slots[1] = (PyType_Slot){Py_tp_repr, (reprfunc)structseq_repr};
+    slots[0] = (PyType_Slot){Py_tp_dealloc, (void*)structseq_dealloc};
+    slots[1] = (PyType_Slot){Py_tp_repr, (void*)structseq_repr};
     slots[2] = (PyType_Slot){Py_tp_doc, (void *)desc->doc};
-    slots[3] = (PyType_Slot){Py_tp_methods, structseq_methods};
-    slots[4] = (PyType_Slot){Py_tp_new, structseq_new};
+    slots[3] = (PyType_Slot){Py_tp_methods, (void*)structseq_methods};
+    slots[4] = (PyType_Slot){Py_tp_new, (void *)structseq_new};
     slots[5] = (PyType_Slot){Py_tp_members, members};
-    slots[6] = (PyType_Slot){Py_tp_traverse, (traverseproc)structseq_traverse};
+    slots[6] = (PyType_Slot){Py_tp_traverse, (void*)structseq_traverse};
     slots[7] = (PyType_Slot){0, 0};
 
     /* Initialize Spec */
@@ -501,6 +501,10 @@ PyStructSequence_NewType(PyStructSequence_Desc *desc)
     return type;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int _PyStructSequence_Init(void)
 {
     if (_PyUnicode_FromId(&PyId_n_sequence_fields) == NULL
@@ -510,3 +514,8 @@ int _PyStructSequence_Init(void)
 
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
+

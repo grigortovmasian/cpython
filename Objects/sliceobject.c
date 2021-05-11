@@ -100,6 +100,10 @@ PyObject _Py_EllipsisObject = {
  * created and then deleted again
  */
 static PySliceObject *slice_cache = NULL;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void PySlice_Fini(void)
 {
     PySliceObject *obj = slice_cache;
@@ -108,6 +112,9 @@ void PySlice_Fini(void)
         PyObject_GC_Del(obj);
     }
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* start, stop, and step are python objects with None indicating no
    index is present.

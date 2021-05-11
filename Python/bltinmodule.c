@@ -1264,7 +1264,7 @@ map_next(mapobject *lz)
         stack = small_stack;
     }
     else {
-        stack = PyMem_Malloc(niters * sizeof(stack[0]));
+        stack = (PyObject**)PyMem_Malloc(niters * sizeof(stack[0]));
         if (stack == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -2773,6 +2773,9 @@ static struct PyModuleDef builtinsmodule = {
     NULL
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyObject *
 _PyBuiltin_Init(void)
@@ -2850,3 +2853,7 @@ _PyBuiltin_Init(void)
 #undef ADD_TO_ALL
 #undef SETBUILTIN
 }
+#ifdef __cplusplus
+}
+#endif
+

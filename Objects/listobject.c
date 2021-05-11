@@ -137,11 +137,18 @@ PyList_ClearFreeList(void)
     return ret;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 PyList_Fini(void)
 {
     PyList_ClearFreeList();
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void
@@ -2254,7 +2261,7 @@ list_sort_impl(PyListObject *self, PyObject *keyfunc, int reverse)
             /* Leverage stack space we allocated but won't otherwise use */
             keys = &ms.temparray[saved_ob_size+1];
         else {
-            keys = PyMem_MALLOC(sizeof(PyObject *) * saved_ob_size);
+            keys = (PyObject **)PyMem_MALLOC(sizeof(PyObject *) * saved_ob_size);
             if (keys == NULL) {
                 PyErr_NoMemory();
                 goto keyfunc_fail;

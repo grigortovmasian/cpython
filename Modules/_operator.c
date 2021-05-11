@@ -819,8 +819,8 @@ _operator__compare_digest_impl(PyObject *module, PyObject *a, PyObject *b)
             return NULL;
         }
 
-        rc = _tscmp(PyUnicode_DATA(a),
-                    PyUnicode_DATA(b),
+        rc = _tscmp((const unsigned char*)PyUnicode_DATA(a),
+                    (const unsigned char*)PyUnicode_DATA(b),
                     PyUnicode_GET_LENGTH(a),
                     PyUnicode_GET_LENGTH(b));
     }
@@ -940,8 +940,9 @@ typedef struct {
     Py_ssize_t index; // -1 unless *item* is a single non-negative integer index
 } itemgetterobject;
 
-static PyTypeObject itemgetter_type;
-
+namespace {
+extern PyTypeObject itemgetter_type;
+}
 /* AC 3.5: treats first argument as an iterable, otherwise uses *args */
 static PyObject *
 itemgetter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -1091,7 +1092,8 @@ Return a callable object that fetches the given item(s) from its operand.\n\
 After f = itemgetter(2), the call f(r) returns r[2].\n\
 After g = itemgetter(2, 5, 3), the call g(r) returns (r[2], r[5], r[3])");
 
-static PyTypeObject itemgetter_type = {
+namespace {
+PyTypeObject itemgetter_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "operator.itemgetter",              /* tp_name */
     sizeof(itemgetterobject),           /* tp_basicsize */
@@ -1133,7 +1135,7 @@ static PyTypeObject itemgetter_type = {
     itemgetter_new,                     /* tp_new */
     0,                                  /* tp_free */
 };
-
+}
 
 /* attrgetter object **********************************************************/
 
@@ -1143,8 +1145,9 @@ typedef struct {
     PyObject *attr;
 } attrgetterobject;
 
-static PyTypeObject attrgetter_type;
-
+namespace {
+extern  PyTypeObject attrgetter_type;
+}
 /* AC 3.5: treats first argument as an iterable, otherwise uses *args */
 static PyObject *
 attrgetter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -1436,7 +1439,8 @@ After g = attrgetter('name', 'date'), the call g(r) returns (r.name, r.date).\n\
 After h = attrgetter('name.first', 'name.last'), the call h(r) returns\n\
 (r.name.first, r.name.last).");
 
-static PyTypeObject attrgetter_type = {
+namespace {
+PyTypeObject attrgetter_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "operator.attrgetter",              /* tp_name */
     sizeof(attrgetterobject),           /* tp_basicsize */
@@ -1478,7 +1482,7 @@ static PyTypeObject attrgetter_type = {
     attrgetter_new,                     /* tp_new */
     0,                                  /* tp_free */
 };
-
+}
 
 /* methodcaller object **********************************************************/
 
@@ -1489,7 +1493,9 @@ typedef struct {
     PyObject *kwds;
 } methodcallerobject;
 
-static PyTypeObject methodcaller_type;
+namespace {
+extern PyTypeObject methodcaller_type;
+}
 
 /* AC 3.5: variable number of arguments, not currently support by AC */
 static PyObject *
@@ -1702,7 +1708,8 @@ After f = methodcaller('name'), the call f(r) returns r.name().\n\
 After g = methodcaller('name', 'date', foo=1), the call g(r) returns\n\
 r.name('date', foo=1).");
 
-static PyTypeObject methodcaller_type = {
+namespace {
+PyTypeObject methodcaller_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "operator.methodcaller",            /* tp_name */
     sizeof(methodcallerobject),         /* tp_basicsize */
@@ -1744,7 +1751,7 @@ static PyTypeObject methodcaller_type = {
     methodcaller_new,                   /* tp_new */
     0,                                  /* tp_free */
 };
-
+}
 
 /* Initialization function for the module (*must* be called PyInit__operator) */
 

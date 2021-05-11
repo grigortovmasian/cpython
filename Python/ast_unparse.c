@@ -757,7 +757,7 @@ append_ast_index_slice(_PyUnicodeWriter *writer, slice_ty slice)
     expr_ty value = slice->v.Index.value;
     if (value->kind == Tuple_kind) {
         for (Py_ssize_t i = 0; i < asdl_seq_LEN(value->v.Tuple.elts); i++) {
-            expr_ty element = asdl_seq_GET(value->v.Tuple.elts, i);
+            expr_ty element = (expr_ty)asdl_seq_GET(value->v.Tuple.elts, i);
             if (element->kind == Starred_kind) {
                 ++level;
                 break;
@@ -948,8 +948,17 @@ expr_as_unicode(expr_ty e, int level)
     return _PyUnicodeWriter_Finish(&writer);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyObject *
 _PyAST_ExprAsUnicode(expr_ty e)
 {
     return expr_as_unicode(e, PR_TEST);
 }
+
+#ifdef __cplusplus
+}
+#endif
+

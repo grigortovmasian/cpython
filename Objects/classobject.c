@@ -73,7 +73,7 @@ method_vectorcall(PyObject *method, PyObject *const *args,
             newargs = newargs_stack;
         }
         else {
-            newargs = PyMem_Malloc((totalargs+1) * sizeof(PyObject *));
+            newargs = (PyObject**)PyMem_Malloc((totalargs+1) * sizeof(PyObject *));
             if (newargs == NULL) {
                 PyErr_NoMemory();
                 return NULL;
@@ -418,11 +418,18 @@ PyMethod_ClearFreeList(void)
     return freelist_size;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 PyMethod_Fini(void)
 {
     (void)PyMethod_ClearFreeList();
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void

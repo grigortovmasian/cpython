@@ -1,21 +1,26 @@
 #ifndef Py_ATOMIC_H
 #define Py_ATOMIC_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
 #endif
 
-#include "dynamic_annotations.h"
-
+#include "dynamic_annotations.h"   /* _Py_ANNOTATE_MEMORY_ORDER */
 #include "pyconfig.h"
 
 #if defined(HAVE_STD_ATOMIC)
+#ifdef __cplusplus
+#include <atomic>
+#define _Atomic(T) atomic<T>
+using namespace std;
+#else
 #include <stdatomic.h>
 #endif
+#endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -23,6 +28,7 @@ extern "C" {
 #  include <immintrin.h>
 #endif
 #endif
+
 
 /* This is modeled after the atomics interface from C1x, according to
  * the draft at
@@ -58,10 +64,10 @@ typedef struct _Py_atomic_int {
     atomic_thread_fence(ORDER)
 
 #define _Py_atomic_store_explicit(ATOMIC_VAL, NEW_VAL, ORDER) \
-    atomic_store_explicit(&((ATOMIC_VAL)->_value), NEW_VAL, ORDER)
+    atomic_store_explicit(&((ATOMIC_VAL)->_value), NEW_VAL, (std::memory_order)ORDER)
 
 #define _Py_atomic_load_explicit(ATOMIC_VAL, ORDER) \
-    atomic_load_explicit(&((ATOMIC_VAL)->_value), ORDER)
+    atomic_load_explicit(&((ATOMIC_VAL)->_value), (std::memory_order)ORDER)
 
 /* Use builtin atomic operations in GCC >= 4.7 */
 #elif defined(HAVE_BUILTIN_ATOMIC)
@@ -541,16 +547,16 @@ typedef struct _Py_atomic_int {
 
 /* Standardized shortcuts. */
 #define _Py_atomic_store(ATOMIC_VAL, NEW_VAL) \
-    _Py_atomic_store_explicit((ATOMIC_VAL), (NEW_VAL), _Py_memory_order_seq_cst)
+    _Py_atomic_store_explicit((ATOMIC_VAL), (NEW_VAL), (std::memory_order)_Py_memory_order_seq_cst)
 #define _Py_atomic_load(ATOMIC_VAL) \
-    _Py_atomic_load_explicit((ATOMIC_VAL), _Py_memory_order_seq_cst)
+    _Py_atomic_load_explicit((ATOMIC_VAL),(std::memory_order)_Py_memory_order_seq_cst)
 
 /* Python-local extensions */
 
 #define _Py_atomic_store_relaxed(ATOMIC_VAL, NEW_VAL) \
-    _Py_atomic_store_explicit((ATOMIC_VAL), (NEW_VAL), _Py_memory_order_relaxed)
+    _Py_atomic_store_explicit((ATOMIC_VAL), (NEW_VAL),(std::memory_order)_Py_memory_order_relaxed)
 #define _Py_atomic_load_relaxed(ATOMIC_VAL) \
-    _Py_atomic_load_explicit((ATOMIC_VAL), _Py_memory_order_relaxed)
+    _Py_atomic_load_explicit((ATOMIC_VAL),(std::memory_order)_Py_memory_order_relaxed)
 
 #ifdef __cplusplus
 }

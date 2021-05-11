@@ -224,7 +224,7 @@ static void *
 pythread_wrapper(void *arg)
 {
     /* copy func and func_arg and free the temporary structure */
-    pythread_callback *callback = arg;
+    pythread_callback *callback = (pythread_callback*)arg;
     void (*func)(void *) = callback->func;
     void *func_arg = callback->arg;
     PyMem_RawFree(arg);
@@ -268,7 +268,7 @@ PyThread_start_new_thread(void (*func)(void *), void *arg)
     pthread_attr_setscope(&attrs, PTHREAD_SCOPE_SYSTEM);
 #endif
 
-    pythread_callback *callback = PyMem_RawMalloc(sizeof(pythread_callback));
+    pythread_callback *callback = (pythread_callback*)PyMem_RawMalloc(sizeof(pythread_callback));
 
     if (callback == NULL) {
       return PYTHREAD_INVALID_THREAD_ID;

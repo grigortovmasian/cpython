@@ -406,7 +406,7 @@ copy_single(Py_buffer *dest, Py_buffer *src)
         return -1;
 
     if (!last_dim_is_contiguous(dest, src)) {
-        mem = PyMem_Malloc(dest->shape[0] * dest->itemsize);
+        mem = (char *)PyMem_Malloc(dest->shape[0] * dest->itemsize);
         if (mem == NULL) {
             PyErr_NoMemory();
             return -1;
@@ -414,8 +414,8 @@ copy_single(Py_buffer *dest, Py_buffer *src)
     }
 
     copy_base(dest->shape, dest->itemsize,
-              dest->buf, dest->strides, dest->suboffsets,
-              src->buf, src->strides, src->suboffsets,
+              (char *)dest->buf, dest->strides, dest->suboffsets,
+              (char *)src->buf, src->strides, src->suboffsets,
               mem);
 
     if (mem)
@@ -438,7 +438,7 @@ copy_buffer(Py_buffer *dest, Py_buffer *src)
         return -1;
 
     if (!last_dim_is_contiguous(dest, src)) {
-        mem = PyMem_Malloc(dest->shape[dest->ndim-1] * dest->itemsize);
+        mem = (char *)PyMem_Malloc(dest->shape[dest->ndim-1] * dest->itemsize);
         if (mem == NULL) {
             PyErr_NoMemory();
             return -1;
@@ -446,8 +446,8 @@ copy_buffer(Py_buffer *dest, Py_buffer *src)
     }
 
     copy_rec(dest->shape, dest->ndim, dest->itemsize,
-             dest->buf, dest->strides, dest->suboffsets,
-             src->buf, src->strides, src->suboffsets,
+             (char *)dest->buf, dest->strides, dest->suboffsets,
+             (char *)src->buf, src->strides, src->suboffsets,
              mem);
 
     if (mem)
@@ -496,7 +496,7 @@ buffer_to_contiguous(char *mem, Py_buffer *src, char order)
     assert(src->shape != NULL);
     assert(src->strides != NULL);
 
-    strides = PyMem_Malloc(src->ndim * (sizeof *src->strides));
+    strides = (Py_ssize_t*)PyMem_Malloc(src->ndim * (sizeof *src->strides));
     if (strides == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -540,7 +540,7 @@ init_shared_values(Py_buffer *dest, const Py_buffer *src)
     dest->len = src->len;
     dest->itemsize = src->itemsize;
     dest->readonly = src->readonly;
-    dest->format = src->format ? src->format : "B";
+    dest->format = src->format ? src->format : (char *)"B";
     dest->internal = src->internal;
 }
 
@@ -822,7 +822,7 @@ static int
 mbuf_copy_format(_PyManagedBufferObject *mbuf, const char *fmt)
 {
     if (fmt != NULL) {
-        char *cp = PyMem_Malloc(strlen(fmt)+1);
+        char *cp = (char *)PyMem_Malloc(strlen(fmt)+1);
         if (cp == NULL) {
             PyErr_NoMemory();
             return -1;
@@ -1006,7 +1006,7 @@ PyBuffer_ToContiguous(void *buf, Py_buffer *src, Py_ssize_t len, char order)
     }
 
     /* buffer_to_contiguous() assumes PyBUF_FULL */
-    fb = PyMem_Malloc(sizeof *fb + 3 * src->ndim * (sizeof *fb->array));
+    fb = (Py_buffer_full*)PyMem_Malloc(sizeof *fb + 3 * src->ndim * (sizeof *fb->array));
     if (fb == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1022,7 +1022,7 @@ PyBuffer_ToContiguous(void *buf, Py_buffer *src, Py_ssize_t len, char order)
 
     src = &fb->view;
 
-    ret = buffer_to_contiguous(buf, src, order);
+    ret = buffer_to_contiguous((char *)buf, src, order);
     PyMem_Free(fb);
     return ret;
 }
@@ -1134,7 +1134,7 @@ get_native_fmtchar(char *result, const char *fmt)
     case 'n': case 'N': size = sizeof(Py_ssize_t); break;
     case 'f': size = sizeof(float); break;
     case 'd': size = sizeof(double); break;
-    case '?': size = sizeof(_Bool); break;
+    case '?': size = sizeof(bool); break;
     case 'P': size = sizeof(void *); break;
     }
 
@@ -1698,7 +1698,7 @@ unpack_single(const char *ptr, const char *fmt)
     case 'l': UNPACK_SINGLE(ld, ptr, long); goto convert_ld;
 
     /* boolean */
-    case '?': UNPACK_SINGLE(ld, ptr, _Bool); goto convert_bool;
+    case '?': UNPACK_SINGLE(ld, ptr, bool); goto convert_bool;
 
     /* unsigned integers */
     case 'H': UNPACK_SINGLE(lu, ptr, unsigned short); goto convert_lu;
@@ -1864,7 +1864,7 @@ pack_single(char *ptr, PyObject *item, const char *fmt)
         ld = PyObject_IsTrue(item);
         if (ld < 0)
             return -1; /* preserve original error */
-        PACK_SINGLE(ptr, ld, _Bool);
+        PACK_SINGLE(ptr, ld, bool);
          break;
 
     /* bytes object */
@@ -1919,7 +1919,7 @@ struct unpacker {
 static struct unpacker *
 unpacker_new(void)
 {
-    struct unpacker *x = PyMem_Malloc(sizeof *x);
+    struct unpacker *x = (unpacker*)PyMem_Malloc(sizeof *x);
 
     if (x == NULL) {
         PyErr_NoMemory();
@@ -1980,7 +1980,7 @@ struct_get_unpacker(const char *fmt, Py_ssize_t itemsize)
     if (x->unpack_from == NULL)
         goto error;
 
-    x->item = PyMem_Malloc(itemsize);
+    x->item = (char*)PyMem_Malloc(itemsize);
     if (x->item == NULL) {
         PyErr_NoMemory();
         goto error;
@@ -2121,15 +2121,15 @@ memory_tolist(PyMemoryViewObject *mv, PyObject *noargs)
     if (fmt == NULL)
         return NULL;
     if (view->ndim == 0) {
-        return unpack_single(view->buf, fmt);
+        return unpack_single((const char *)view->buf, fmt);
     }
     else if (view->ndim == 1) {
-        return tolist_base(view->buf, view->shape,
+        return tolist_base((const char *)view->buf, view->shape,
                            view->strides, view->suboffsets,
                            fmt);
     }
     else {
-        return tolist_rec(view->buf, view->ndim, view->shape,
+        return tolist_rec((const char *)view->buf, view->ndim, view->shape,
                           view->strides, view->suboffsets,
                           fmt);
     }
@@ -2211,7 +2211,7 @@ memoryview_hex_impl(PyMemoryViewObject *self, PyObject *sep,
     CHECK_RELEASED(self);
 
     if (MV_C_CONTIGUOUS(self->flags)) {
-        return _Py_strhex_with_sep(src->buf, src->len, sep, bytes_per_sep);
+        return _Py_strhex_with_sep((const char *)src->buf, src->len, sep, bytes_per_sep);
     }
 
     bytes = PyBytes_FromStringAndSize(NULL, src->len);
@@ -2445,7 +2445,7 @@ memory_subscript(PyMemoryViewObject *self, PyObject *key)
             const char *fmt = adjust_fmt(view);
             if (fmt == NULL)
                 return NULL;
-            return unpack_single(view->buf, fmt);
+            return unpack_single((const char *)view->buf, fmt);
         }
         else if (key == Py_Ellipsis) {
             Py_INCREF(self);
@@ -2700,7 +2700,7 @@ unpack_cmp(const char *p, const char *q, char fmt,
     case 'l': CMP_SINGLE(p, q, long); return equal;
 
     /* boolean */
-    case '?': CMP_SINGLE(p, q, _Bool); return equal;
+    case '?': CMP_SINGLE(p, q, bool); return equal;
 
     /* unsigned integers */
     case 'H': CMP_SINGLE(p, q, unsigned short); return equal;
@@ -2864,17 +2864,17 @@ memory_richcompare(PyObject *v, PyObject *w, int op)
     }
 
     if (vv->ndim == 0) {
-        equal = unpack_cmp(vv->buf, ww->buf,
+        equal = unpack_cmp((const char*)vv->buf, (const char *)ww->buf,
                            vfmt, unpack_v, unpack_w);
     }
     else if (vv->ndim == 1) {
-        equal = cmp_base(vv->buf, ww->buf, vv->shape,
+        equal = cmp_base((const char*)vv->buf, (const char*)ww->buf, vv->shape,
                          vv->strides, vv->suboffsets,
                          ww->strides, ww->suboffsets,
                          vfmt, unpack_v, unpack_w);
     }
     else {
-        equal = cmp_rec(vv->buf, ww->buf, vv->ndim, vv->shape,
+        equal = cmp_rec((const char *)vv->buf, (const char *)ww->buf, vv->ndim, vv->shape,
                         vv->strides, vv->suboffsets,
                         ww->strides, ww->suboffsets,
                         vfmt, unpack_v, unpack_w);
@@ -2911,7 +2911,7 @@ memory_hash(PyMemoryViewObject *self)
 {
     if (self->hash == -1) {
         Py_buffer *view = &self->view;
-        char *mem = view->buf;
+        char *mem = (char *)view->buf;
         Py_ssize_t ret;
         char fmt;
 
@@ -2934,7 +2934,7 @@ memory_hash(PyMemoryViewObject *self)
         }
 
         if (!MV_C_CONTIGUOUS(self->flags)) {
-            mem = PyMem_Malloc(view->len);
+            mem = (char *)PyMem_Malloc(view->len);
             if (mem == NULL) {
                 PyErr_NoMemory();
                 return -1;

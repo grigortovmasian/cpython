@@ -280,12 +280,18 @@ _PyDict_DebugMallocStats(FILE *out)
                            "free PyDictObject", numfree, sizeof(PyDictObject));
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 PyDict_Fini(void)
 {
     PyDict_ClearFreeList();
 }
+#ifdef __cplusplus
+}
+#endif
 
 #define DK_SIZE(dk) ((dk)->dk_size)
 #if SIZEOF_VOID_P > 4
@@ -555,7 +561,7 @@ static PyDictKeysObject *new_keys_object(Py_ssize_t size)
         dk = keys_free_list[--numfreekeys];
     }
     else {
-        dk = PyObject_MALLOC(sizeof(PyDictKeysObject)
+        dk = (PyDictKeysObject*)PyObject_MALLOC(sizeof(PyDictKeysObject)
                              + es * size
                              + sizeof(PyDictKeyEntry) * usable);
         if (dk == NULL) {
@@ -651,7 +657,7 @@ clone_combined_dict(PyDictObject *orig)
     assert(orig->ma_keys->dk_refcnt == 1);
 
     Py_ssize_t keys_size = _PyDict_KeysSize(orig->ma_keys);
-    PyDictKeysObject *keys = PyObject_Malloc(keys_size);
+    PyDictKeysObject *keys = (PyDictKeysObject*)PyObject_Malloc(keys_size);
     if (keys == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -673,17 +679,17 @@ clone_combined_dict(PyDictObject *orig)
         }
     }
 
-    PyDictObject *new = (PyDictObject *)new_dict(keys, NULL);
-    if (new == NULL) {
+    PyDictObject *nw = (PyDictObject *)new_dict(keys, NULL);
+    if (nw == NULL) {
         /* In case of an error, `new_dict()` takes care of
            cleaning up `keys`. */
         return NULL;
     }
-    new->ma_used = orig->ma_used;
-    ASSERT_CONSISTENT(new);
+    nw->ma_used = orig->ma_used;
+    ASSERT_CONSISTENT(nw);
     if (_PyObject_GC_IS_TRACKED(orig)) {
         /* Maintain tracking. */
-        _PyObject_GC_TRACK(new);
+        _PyObject_GC_TRACK(nw);
     }
 
     /* Since we copied the keys table we now have an extra reference
@@ -692,7 +698,7 @@ clone_combined_dict(PyDictObject *orig)
        keys->dk_refcnt is already set to 1 (after memcpy). */
     _Py_INC_REFTOTAL;
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 PyObject *
@@ -1037,7 +1043,9 @@ insertdict(PyDictObject *mp, PyObject *key, Py_hash_t hash, PyObject *value)
             goto Fail;
     }
 
+    {
     Py_ssize_t ix = mp->ma_keys->dk_lookup(mp, key, hash, &old_value);
+    
     if (ix == DKIX_ERROR)
         goto Fail;
 
@@ -1103,7 +1111,7 @@ insertdict(PyDictObject *mp, PyObject *key, Py_hash_t hash, PyObject *value)
     ASSERT_CONSISTENT(mp);
     Py_DECREF(key);
     return 0;
-
+    }
 Fail:
     Py_DECREF(value);
     Py_DECREF(key);

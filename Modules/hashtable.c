@@ -165,7 +165,7 @@ _Py_hashtable_new_full(size_t key_size, size_t data_size,
     ht->data_size = data_size;
 
     buckets_size = ht->num_buckets * sizeof(ht->buckets[0]);
-    ht->buckets = alloc.malloc(buckets_size);
+    ht->buckets = (_Py_slist_t*)alloc.malloc(buckets_size);
     if (ht->buckets == NULL) {
         alloc.free(ht);
         return NULL;
@@ -330,7 +330,7 @@ _Py_hashtable_set(_Py_hashtable_t *ht, size_t key_size, const void *pkey,
     key_hash = ht->hash_func(ht, pkey);
     index = key_hash & (ht->num_buckets - 1);
 
-    entry = ht->alloc.malloc(HASHTABLE_ITEM_SIZE(ht));
+    entry = (_Py_hashtable_entry_t*)ht->alloc.malloc(HASHTABLE_ITEM_SIZE(ht));
     if (entry == NULL) {
         /* memory allocation failed */
         return -1;
@@ -424,7 +424,7 @@ hashtable_rehash(_Py_hashtable_t *ht)
 
     buckets_size = new_size * sizeof(ht->buckets[0]);
     old_buckets = ht->buckets;
-    ht->buckets = ht->alloc.malloc(buckets_size);
+    ht->buckets = (_Py_slist_t*)ht->alloc.malloc(buckets_size);
     if (ht->buckets == NULL) {
         /* cancel rehash on memory allocation failure */
         ht->buckets = old_buckets ;

@@ -88,8 +88,14 @@ _Py_device_encoding(int fd)
 #if !defined(_Py_FORCE_UTF8_FS_ENCODING) && !defined(MS_WINDOWS)
 
 #define USE_FORCE_ASCII
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern int _Py_normalize_encoding(const char *, char *, size_t);
+#ifdef __cplusplus
+}
+#endif
 
 /* Workaround FreeBSD and OpenIndiana locale encoding issue with the C locale
    and POSIX locale. nl_langinfo(CODESET) announces an alias of the
@@ -124,6 +130,7 @@ static int
 check_force_ascii(void)
 {
     char *loc = setlocale(LC_CTYPE, NULL);
+    {
     if (loc == NULL) {
         goto error;
     }
@@ -214,7 +221,7 @@ check_force_ascii(void)
     /* nl_langinfo(CODESET) is not available: always force ASCII */
     return 1;
 #endif   /* defined(HAVE_LANGINFO_H) && defined(CODESET) */
-
+     }
 error:
     /* if an error occurred, force the ASCII encoding */
     return 1;
@@ -256,10 +263,10 @@ encode_ascii(const wchar_t *text, char **str,
 
     /* +1 for NULL byte */
     if (raw_malloc) {
-        result = PyMem_RawMalloc(len + 1);
+        result = (char *)PyMem_RawMalloc(len + 1);
     }
     else {
-        result = PyMem_Malloc(len + 1);
+        result = (char *)PyMem_Malloc(len + 1);
     }
     if (result == NULL) {
         return -1;
@@ -330,7 +337,7 @@ decode_ascii(const char *arg, wchar_t **wstr, size_t *wlen,
     if (argsize > PY_SSIZE_T_MAX / sizeof(wchar_t)) {
         return -1;
     }
-    res = PyMem_RawMalloc(argsize * sizeof(wchar_t));
+    res = (wchar_t*)PyMem_RawMalloc(argsize * sizeof(wchar_t));
     if (!res) {
         return -1;
     }
@@ -674,10 +681,10 @@ encode_current_locale(const wchar_t *text, char **str,
 
         size += 1; /* nul byte at the end */
         if (raw_malloc) {
-            result = PyMem_RawMalloc(size);
+            result = (char *)PyMem_RawMalloc(size);
         }
         else {
-            result = PyMem_Malloc(size);
+            result = (char *)PyMem_Malloc(size);
         }
         if (result == NULL) {
             return -1;

@@ -14,8 +14,9 @@ class Struct "PyStructObject *" "&PyStructType"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=9b032058a83ed7c3]*/
 
-static PyTypeObject PyStructType;
-
+namespace {
+extern PyTypeObject PyStructType;
+}
 /* The translation function for each format character is table driven */
 typedef struct _formatdef {
     char format;
@@ -65,7 +66,7 @@ typedef struct { char c; float x; } st_float;
 typedef struct { char c; double x; } st_double;
 typedef struct { char c; void *x; } st_void_p;
 typedef struct { char c; size_t x; } st_size_t;
-typedef struct { char c; _Bool x; } st_bool;
+typedef struct { char c; bool x; } st_bool;
 
 #define SHORT_ALIGN (sizeof(st_short) - sizeof(short))
 #define INT_ALIGN (sizeof(st_int) - sizeof(int))
@@ -74,7 +75,7 @@ typedef struct { char c; _Bool x; } st_bool;
 #define DOUBLE_ALIGN (sizeof(st_double) - sizeof(double))
 #define VOID_P_ALIGN (sizeof(st_void_p) - sizeof(void *))
 #define SIZE_T_ALIGN (sizeof(st_size_t) - sizeof(size_t))
-#define BOOL_ALIGN (sizeof(st_bool) - sizeof(_Bool))
+#define BOOL_ALIGN (sizeof(st_bool) - sizeof(bool))
 
 /* We can't support q and Q in native mode unless the compiler does;
    in std mode, they're 8 bytes on all platforms. */
@@ -477,7 +478,7 @@ nu_ulonglong(const char *p, const formatdef *f)
 static PyObject *
 nu_bool(const char *p, const formatdef *f)
 {
-    _Bool x;
+    bool x;
     memcpy((char *)&x, p, sizeof x);
     return PyBool_FromLong(x != 0);
 }
@@ -692,7 +693,7 @@ static int
 np_bool(char *p, PyObject *v, const formatdef *f)
 {
     int y;
-    _Bool x;
+    bool x;
     y = PyObject_IsTrue(v);
     if (y < 0)
         return -1;
@@ -771,7 +772,7 @@ static const formatdef native_table[] = {
     {'N',       sizeof(size_t), SIZE_T_ALIGN,   nu_size_t,      np_size_t},
     {'q',       sizeof(long long), LONG_LONG_ALIGN, nu_longlong, np_longlong},
     {'Q',       sizeof(long long), LONG_LONG_ALIGN, nu_ulonglong,np_ulonglong},
-    {'?',       sizeof(_Bool),      BOOL_ALIGN,     nu_bool,        np_bool},
+    {'?',       sizeof(bool),      BOOL_ALIGN,     nu_bool,        np_bool},
     {'e',       sizeof(short),  SHORT_ALIGN,    nu_halffloat,   np_halffloat},
     {'f',       sizeof(float),  FLOAT_ALIGN,    nu_float,       np_float},
     {'d',       sizeof(double), DOUBLE_ALIGN,   nu_double,      np_double},
@@ -1349,7 +1350,7 @@ prepare_s(PyStructObject *self)
 
     self->s_size = size;
     self->s_len = len;
-    codes = PyMem_MALLOC((ncodes + 1) * sizeof(formatcode));
+    codes = (formatcode *)PyMem_MALLOC((ncodes + 1) * sizeof(formatcode));
     if (codes == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1544,7 +1545,7 @@ Struct_unpack_impl(PyStructObject *self, Py_buffer *buffer)
                      self->s_size);
         return NULL;
     }
-    return s_unpack_internal(self, buffer->buf);
+    return s_unpack_internal(self, (char *)buffer->buf);
 }
 
 /*[clinic input]
@@ -2026,7 +2027,7 @@ static PyGetSetDef s_getsetlist[] = {
     {NULL} /* sentinel */
 };
 
-static
+namespace {
 PyTypeObject PyStructType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "Struct",
@@ -2068,7 +2069,7 @@ PyTypeObject PyStructType = {
     s_new,                                      /* tp_new */
     PyObject_Del,                               /* tp_free */
 };
-
+}
 
 /* ---- Standalone functions  ---- */
 

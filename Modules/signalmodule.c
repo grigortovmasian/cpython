@@ -831,17 +831,17 @@ signal_setitimer_impl(PyObject *module, int which, PyObject *seconds,
                       PyObject *interval)
 /*[clinic end generated code: output=65f9dcbddc35527b input=de43daf194e6f66f]*/
 {
-    struct itimerval new, old;
+    struct itimerval nw, old;
 
-    if (timeval_from_double(seconds, &new.it_value) < 0) {
+    if (timeval_from_double(seconds, &nw.it_value) < 0) {
         return NULL;
     }
-    if (timeval_from_double(interval, &new.it_interval) < 0) {
+    if (timeval_from_double(interval, &nw.it_interval) < 0) {
         return NULL;
     }
 
     /* Let OS check "which" value */
-    if (setitimer(which, &new, &old) != 0) {
+    if (setitimer(which, &nw, &old) != 0) {
         PyErr_SetFromErrno(ItimerError);
         return NULL;
     }
@@ -1746,6 +1746,9 @@ signal_install_handlers(void)
 }
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 _PySignal_Init(int install_signal_handlers)
 {
@@ -1774,6 +1777,9 @@ PyOS_FiniInterrupts(void)
     finisignal();
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 // The caller doesn't have to hold the GIL
 int

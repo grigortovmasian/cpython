@@ -28,6 +28,10 @@ int Py_HasFileSystemDefaultEncoding = 0;
 const char *Py_FileSystemDefaultEncodeErrors = NULL;
 int _Py_HasFileSystemDefaultEncodeErrors = 0;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 _Py_ClearFileSystemEncoding(void)
 {
@@ -69,6 +73,9 @@ _Py_SetFileSystemEncoding(const char *encoding, const char *errors)
 }
 
 
+#ifdef __cplusplus
+}
+#endif
 /* --- _PyArgv ---------------------------------------------------- */
 
 /* Decode bytes_argv using Py_DecodeLocale() */
@@ -567,7 +574,7 @@ _Py_get_xoption(const PyWideStringList *xoptions, const wchar_t *name)
     for (Py_ssize_t i=0; i < xoptions->length; i++) {
         const wchar_t *option = xoptions->items[i];
         size_t len;
-        wchar_t *sep = wcschr(option, L'=');
+        wchar_t *sep = (wchar_t *)wcschr(option, L'=');
         if (sep != NULL) {
             len = (sep - option);
         }
@@ -598,7 +605,7 @@ preconfig_init_utf8_mode(PyPreConfig *config, const _PyPreCmdline *cmdline)
     const wchar_t *xopt;
     xopt = _Py_get_xoption(&cmdline->xoptions, L"utf8");
     if (xopt) {
-        wchar_t *sep = wcschr(xopt, L'=');
+        wchar_t *sep = (wchar_t *)wcschr(xopt, L'=');
         if (sep) {
             xopt = sep + 1;
             if (wcscmp(xopt, L"1") == 0) {
@@ -817,7 +824,7 @@ _PyPreConfig_Read(PyPreConfig *config, const _PyArgv *args)
 #ifdef MS_WINDOWS
     int init_legacy_encoding = Py_LegacyWindowsFSEncodingFlag;
 #endif
-
+    {
     if (args) {
         status = _PyPreCmdline_SetArgv(&cmdline, args);
         if (_PyStatus_EXCEPTION(status)) {
@@ -896,7 +903,7 @@ _PyPreConfig_Read(PyPreConfig *config, const _PyArgv *args)
            with the new encoding */
     }
     status = _PyStatus_OK();
-
+    }
 done:
     if (init_ctype_locale != NULL) {
         setlocale(LC_CTYPE, init_ctype_locale);

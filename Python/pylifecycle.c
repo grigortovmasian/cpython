@@ -755,7 +755,7 @@ _Py_PreInitializeFromPyArgv(const PyPreConfig *src_config, const _PyArgv *args)
 PyStatus
 Py_PreInitializeFromBytesArgs(const PyPreConfig *src_config, Py_ssize_t argc, char **argv)
 {
-    _PyArgv args = {.use_bytes_argv = 1, .argc = argc, .bytes_argv = argv};
+    _PyArgv args = {.argc = argc, .use_bytes_argv = 1,  .bytes_argv = argv};
     return _Py_PreInitializeFromPyArgv(src_config, &args);
 }
 
@@ -763,7 +763,7 @@ Py_PreInitializeFromBytesArgs(const PyPreConfig *src_config, Py_ssize_t argc, ch
 PyStatus
 Py_PreInitializeFromArgs(const PyPreConfig *src_config, Py_ssize_t argc, wchar_t **argv)
 {
-    _PyArgv args = {.use_bytes_argv = 0, .argc = argc, .wchar_argv = argv};
+    _PyArgv args = { .argc = argc, .use_bytes_argv = 0, .wchar_argv = argv};
     return _Py_PreInitializeFromPyArgv(src_config, &args);
 }
 
@@ -801,8 +801,8 @@ _Py_PreInitializeFromConfig(const PyConfig *config,
     }
     else if (args == NULL) {
         _PyArgv config_args = {
-            .use_bytes_argv = 0,
             .argc = config->argv.length,
+            .use_bytes_argv = 0,
             .wchar_argv = config->argv.items};
         return _Py_PreInitializeFromPyArgv(&preconfig, &config_args);
     }
@@ -1459,6 +1459,7 @@ new_interpreter(PyThreadState **tstate_p)
     interp->modules = modules;
 
     PyObject *sysmod = _PyImport_FindBuiltin("sys", modules);
+    {
     if (sysmod != NULL) {
         interp->sysdict = PyModule_GetDict(sysmod);
         if (interp->sysdict == NULL) {
@@ -1540,7 +1541,7 @@ new_interpreter(PyThreadState **tstate_p)
 
     *tstate_p = tstate;
     return _PyStatus_OK();
-
+    }
 handle_error:
     /* Oops, it didn't work.  Undo it all. */
 
@@ -1719,7 +1720,7 @@ create_stdio(const PyConfig *config, PyObject* io,
     _Py_IDENTIFIER(TextIOWrapper);
     _Py_IDENTIFIER(mode);
     const int buffered_stdio = config->buffered_stdio;
-
+    {
     if (!is_valid_fd(fd))
         Py_RETURN_NONE;
 
@@ -1824,7 +1825,7 @@ create_stdio(const PyConfig *config, PyObject* io,
         goto error;
     Py_CLEAR(text);
     return stream;
-
+    }
 error:
     Py_XDECREF(buf);
     Py_XDECREF(stream);
@@ -2108,6 +2109,7 @@ fatal_error(const char *prefix, const char *msg, int status)
     const int fd = fileno(stream);
     static int reentrant = 0;
 
+    {
     if (reentrant) {
         /* Py_FatalError() caused a second fatal error.
            Example: flush_std_files() raises a recursion error. */
@@ -2174,7 +2176,7 @@ fatal_error(const char *prefix, const char *msg, int status)
 #ifdef MS_WINDOWS
     fatal_output_debug(msg);
 #endif /* MS_WINDOWS */
-
+    }
 exit:
     if (status < 0) {
 #if defined(MS_WINDOWS) && defined(_DEBUG)

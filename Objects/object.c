@@ -1123,6 +1123,9 @@ _PyObject_NextNotImplemented(PyObject *self)
     return NULL;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Specialized version of _PyObject_GenericGetAttrWithDict
    specifically for the LOAD_METHOD opcode.
@@ -1211,6 +1214,9 @@ _PyObject_GetMethod(PyObject *obj, PyObject *name, PyObject **method)
                  tp->tp_name, name);
     return 0;
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Generic GetAttr functions - put these in your tp_[gs]etattro slot. */
 

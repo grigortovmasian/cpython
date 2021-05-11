@@ -535,7 +535,7 @@ code_dealloc(PyCodeObject *co)
 
     if (co->co_extra != NULL) {
         PyInterpreterState *interp = _PyInterpreterState_GET_UNSAFE();
-        _PyCodeObjectExtra *co_extra = co->co_extra;
+        _PyCodeObjectExtra *co_extra = (_PyCodeObjectExtra*)co->co_extra;
 
         for (Py_ssize_t i = 0; i < co_extra->ce_size; i++) {
             freefunc free_extra = interp->co_extra_freefuncs[i];
@@ -1066,7 +1066,7 @@ _PyCode_SetExtra(PyObject *code, Py_ssize_t index, void *extra)
 
     if (co_extra == NULL || co_extra->ce_size <= index) {
         Py_ssize_t i = (co_extra == NULL ? 0 : co_extra->ce_size);
-        co_extra = PyMem_Realloc(
+        co_extra = (_PyCodeObjectExtra*)PyMem_Realloc(
                 co_extra,
                 sizeof(_PyCodeObjectExtra) +
                 (interp->co_extra_user_count-1) * sizeof(void*));

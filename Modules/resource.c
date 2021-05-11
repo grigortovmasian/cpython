@@ -283,10 +283,10 @@ resource_prlimit_impl(PyObject *module, pid_t pid, int resource,
         if (py2rlimit(limits, &new_limit) < 0) {
             return NULL;
         }
-        retval = prlimit(pid, resource, &new_limit, &old_limit);
+        retval = prlimit(pid, (__rlimit_resource)resource, &new_limit, &old_limit);
     }
     else {
-        retval = prlimit(pid, resource, NULL, &old_limit);
+        retval = prlimit(pid, (__rlimit_resource)resource, NULL, &old_limit);
     }
 
     if (retval == -1) {

@@ -21,7 +21,9 @@ _Py_IDENTIFIER(ignore);
 typedef struct _warnings_runtime_state WarningsState;
 
 /* Forward declaration of the _warnings module definition. */
-static struct PyModuleDef warningsmodule;
+namespace {
+extern struct PyModuleDef warningsmodule;
+}
 
 /* Given a module object, get its per-module state. */
 static WarningsState *
@@ -1317,8 +1319,8 @@ static PyMethodDef warnings_functions[] = {
     {NULL, NULL}                /* sentinel */
 };
 
-
-static struct PyModuleDef warningsmodule = {
+namespace {
+struct PyModuleDef warningsmodule = {
         PyModuleDef_HEAD_INIT,
         MODULE_NAME,            /* m_name */
         warnings__doc__,        /* m_doc */
@@ -1329,7 +1331,7 @@ static struct PyModuleDef warningsmodule = {
         NULL,                   /* m_clear */
         NULL                    /* m_free */
 };
-
+}
 
 PyMODINIT_FUNC
 _PyWarnings_Init(void)
@@ -1374,9 +1376,16 @@ error:
     return NULL;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // We need this to ensure that warnings still work until late in finalization.
 void
 _PyWarnings_Fini(PyInterpreterState *interp)
 {
     _Warnings_ClearState(&interp->warnings);
 }
+#ifdef __cplusplus
+}
+#endif

@@ -374,9 +374,10 @@ sha_final(unsigned char digest[SHA_DIGESTSIZE], SHAobject *sha_info)
  * ------------------------------------------------------------------------
  */
 
-static PyTypeObject SHA224type;
-static PyTypeObject SHA256type;
-
+namespace {
+extern PyTypeObject SHA224type;
+extern PyTypeObject SHA256type;
+}
 
 static SHAobject *
 newSHA224object(void)
@@ -480,7 +481,7 @@ SHA256Type_update(SHAobject *self, PyObject *obj)
 
     GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
 
-    sha_update(self, buf.buf, buf.len);
+    sha_update(self, (SHA_BYTE*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     Py_RETURN_NONE;
@@ -526,7 +527,8 @@ static PyMemberDef SHA_members[] = {
     {NULL}  /* Sentinel */
 };
 
-static PyTypeObject SHA224type = {
+namespace {
+PyTypeObject SHA224type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_sha256.sha224",   /*tp_name*/
     sizeof(SHAobject),  /*tp_basicsize*/
@@ -560,7 +562,7 @@ static PyTypeObject SHA224type = {
     SHA_getseters,      /* tp_getset */
 };
 
-static PyTypeObject SHA256type = {
+PyTypeObject SHA256type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_sha256.sha256",   /*tp_name*/
     sizeof(SHAobject),  /*tp_basicsize*/
@@ -593,7 +595,7 @@ static PyTypeObject SHA256type = {
     SHA_members,        /* tp_members */
     SHA_getseters,      /* tp_getset */
 };
-
+}
 
 /* The single module-level function: new() */
 
@@ -609,32 +611,32 @@ static PyObject *
 _sha256_sha256_impl(PyObject *module, PyObject *string)
 /*[clinic end generated code: output=fa644436dcea5c31 input=09cce3fb855056b2]*/
 {
-    SHAobject *new;
+    SHAobject *nw;
     Py_buffer buf;
 
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
-    if ((new = newSHA256object()) == NULL) {
+    if ((nw = newSHA256object()) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    sha_init(new);
+    sha_init(nw);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        sha_update(new, buf.buf, buf.len);
+        sha_update(nw, (SHA_BYTE*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 /*[clinic input]
@@ -649,32 +651,32 @@ static PyObject *
 _sha256_sha224_impl(PyObject *module, PyObject *string)
 /*[clinic end generated code: output=21e3ba22c3404f93 input=27a04ba24c353a73]*/
 {
-    SHAobject *new;
+    SHAobject *nw;
     Py_buffer buf;
 
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
-    if ((new = newSHA224object()) == NULL) {
+    if ((nw = newSHA224object()) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    sha224_init(new);
+    sha224_init(nw);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        sha_update(new, buf.buf, buf.len);
+        sha_update(nw, (SHA_BYTE*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 

@@ -70,7 +70,7 @@ scan_eol(bytesio *self, Py_ssize_t len)
 
     if (len) {
         start = PyBytes_AS_STRING(self->buf) + self->pos;
-        n = memchr(start, '\n', len);
+        n = (const char*)memchr(start, '\n', len);
         if (n)
             /* Get the length from the current position to the end of
                the line. */
@@ -679,7 +679,7 @@ _io_BytesIO_write(bytesio *self, PyObject *b)
         return NULL;
 
     if (buf.len != 0)
-        n = write_bytes(self, buf.buf, buf.len);
+        n = write_bytes(self, (const char*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     return n >= 0 ? PyLong_FromSsize_t(n) : NULL;

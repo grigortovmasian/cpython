@@ -653,7 +653,7 @@ _PyFrame_New_NoTrack(PyThreadState *tstate, PyCodeObject *code,
         Py_INCREF(builtins);
     }
     if (code->co_zombieframe != NULL) {
-        f = code->co_zombieframe;
+        f = (PyFrameObject*)code->co_zombieframe;
         code->co_zombieframe = NULL;
         _Py_NewReference((PyObject *)f);
         assert(f->f_code == code);
@@ -996,11 +996,18 @@ PyFrame_ClearFreeList(void)
     return freelist_size;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 PyFrame_Fini(void)
 {
     (void)PyFrame_ClearFreeList();
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void

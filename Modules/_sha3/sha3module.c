@@ -142,19 +142,20 @@ typedef struct {
     PyThread_type_lock lock;
 } SHA3object;
 
-static PyTypeObject SHA3_224type;
-static PyTypeObject SHA3_256type;
-static PyTypeObject SHA3_384type;
-static PyTypeObject SHA3_512type;
+namespace {
+extern PyTypeObject SHA3_224type;
+extern PyTypeObject SHA3_256type;
+extern PyTypeObject SHA3_384type;
+extern PyTypeObject SHA3_512type;
 #ifdef PY_WITH_KECCAK
-static PyTypeObject Keccak_224type;
-static PyTypeObject Keccak_256type;
-static PyTypeObject Keccak_384type;
-static PyTypeObject Keccak_512type;
+extern PyTypeObject Keccak_224type;
+extern PyTypeObject Keccak_256type;
+extern PyTypeObject Keccak_384type;
+extern PyTypeObject Keccak_512type;
 #endif
-static PyTypeObject SHAKE128type;
-static PyTypeObject SHAKE256type;
-
+extern PyTypeObject SHAKE128type;
+extern PyTypeObject SHAKE256type;
+}
 #include "clinic/sha3module.c.h"
 
 static SHA3object *
@@ -224,11 +225,11 @@ py_sha3_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
              * thus it's safe to release the GIL without locking the object.
              */
             Py_BEGIN_ALLOW_THREADS
-            res = SHA3_process(&self->hash_state, buf.buf, buf.len * 8);
+            res = SHA3_process(&self->hash_state, (const BitSequence*)buf.buf, buf.len * 8);
             Py_END_ALLOW_THREADS
         }
         else {
-            res = SHA3_process(&self->hash_state, buf.buf, buf.len * 8);
+            res = SHA3_process(&self->hash_state, (const BitSequence*)buf.buf, buf.len * 8);
         }
         if (res != SUCCESS) {
             PyErr_SetString(PyExc_RuntimeError,
@@ -372,12 +373,12 @@ _sha3_sha3_224_update(SHA3object *self, PyObject *data)
     if (self->lock) {
         Py_BEGIN_ALLOW_THREADS
         PyThread_acquire_lock(self->lock, 1);
-        res = SHA3_process(&self->hash_state, buf.buf, buf.len * 8);
+        res = SHA3_process(&self->hash_state, (const BitSequence*)buf.buf, buf.len * 8);
         PyThread_release_lock(self->lock);
         Py_END_ALLOW_THREADS
     }
     else {
-        res = SHA3_process(&self->hash_state, buf.buf, buf.len * 8);
+        res = SHA3_process(&self->hash_state, (const BitSequence*)buf.buf, buf.len * 8);
     }
 
     if (res != SUCCESS) {
@@ -486,7 +487,7 @@ static PyGetSetDef SHA3_getseters[] = {
 
 
 #define SHA3_TYPE(type_obj, type_name, type_doc, type_methods) \
-    static PyTypeObject type_obj = { \
+    namespace {PyTypeObject type_obj = { \
         PyVarObject_HEAD_INIT(NULL, 0) \
         type_name,          /* tp_name */ \
         sizeof(SHA3object), /* tp_basicsize */ \
@@ -526,7 +527,7 @@ static PyGetSetDef SHA3_getseters[] = {
         0,                  /* tp_init */ \
         0,                  /* tp_alloc */ \
         py_sha3_new,        /* tp_new */ \
-    }
+    };}
 
 PyDoc_STRVAR(sha3_224__doc__,
 "sha3_224([data]) -> SHA3 object\n\

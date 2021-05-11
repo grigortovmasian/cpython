@@ -1,6 +1,10 @@
 #include "Python.h"
 #include "asdl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 asdl_seq *
 _Py_asdl_seq_new(Py_ssize_t size, PyArena *arena)
 {
@@ -32,6 +36,7 @@ _Py_asdl_seq_new(Py_ssize_t size, PyArena *arena)
     return seq;
 }
 
+
 asdl_int_seq *
 _Py_asdl_int_seq_new(Py_ssize_t size, PyArena *arena)
 {
@@ -62,3 +67,6 @@ _Py_asdl_int_seq_new(Py_ssize_t size, PyArena *arena)
     seq->size = size;
     return seq;
 }
+#ifdef __cplusplus
+}
+#endif

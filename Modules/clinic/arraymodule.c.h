@@ -553,7 +553,7 @@ array__array_reconstructor(PyObject *module, PyObject *const *args, Py_ssize_t n
                         "integer argument expected, got float" );
         goto exit;
     }
-    mformat_code = _PyLong_AsInt(args[2]);
+    mformat_code = (machine_format_code)_PyLong_AsInt(args[2]);
     if (mformat_code == -1 && PyErr_Occurred()) {
         goto exit;
     }

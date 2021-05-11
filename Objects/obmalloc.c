@@ -3,9 +3,15 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Defined in tracemalloc.c */
 extern void _PyMem_DumpTraceback(int fd, const void *ptr);
+#ifdef __cplusplus
+}
+#endif
 
 
 /* Python's malloc wrappers (see pymem.h) */
@@ -641,7 +647,7 @@ _PyMem_RawWcsdup(const wchar_t *str)
     }
 
     size_t size = (len + 1) * sizeof(wchar_t);
-    wchar_t *str2 = PyMem_RawMalloc(size);
+    wchar_t *str2 = (wchar_t*)PyMem_RawMalloc(size);
     if (str2 == NULL) {
         return NULL;
     }
@@ -655,7 +661,7 @@ _PyMem_RawStrdup(const char *str)
 {
     assert(str != NULL);
     size_t size = strlen(str) + 1;
-    char *copy = PyMem_RawMalloc(size);
+    char *copy = (char *)PyMem_RawMalloc(size);
     if (copy == NULL) {
         return NULL;
     }
@@ -668,7 +674,7 @@ _PyMem_Strdup(const char *str)
 {
     assert(str != NULL);
     size_t size = strlen(str) + 1;
-    char *copy = PyMem_Malloc(size);
+    char *copy = (char*)PyMem_Malloc(size);
     if (copy == NULL) {
         return NULL;
     }
@@ -1685,6 +1691,7 @@ pymalloc_free(void *ctx, void *p)
      * was full and is in no list -- it's not in the freeblocks
      * list in any case).
      */
+    {
     assert(pool->ref.count > 0);            /* else it was empty */
     *(block **)p = lastfree = pool->freeblock;
     pool->freeblock = (block *)p;
@@ -1878,7 +1885,7 @@ pymalloc_free(void *ctx, void *p)
            || ao->prevarena->nextarena == ao);
 
     goto success;
-
+    }
 success:
     return 1;
 }

@@ -13,7 +13,9 @@ class _tuplegetter "_tuplegetterobject *" "&tuplegetter_type"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=a8ece4ccad7e30ac]*/
 
-static PyTypeObject tuplegetter_type;
+namespace {
+extern PyTypeObject tuplegetter_type;
+}
 #include "clinic/_collectionsmodule.c.h"
 
 /* collections module implementation of a deque() datatype
@@ -94,7 +96,9 @@ typedef struct {
     PyObject *weakreflist;
 } dequeobject;
 
-static PyTypeObject deque_type;
+namespace {
+extern PyTypeObject deque_type;
+}
 
 /* For debug builds, add error checking to track the endpoints
  * in the chain of links.  The goal is to make sure that link
@@ -133,7 +137,7 @@ newblock(void) {
         numfreeblocks--;
         return freeblocks[numfreeblocks];
     }
-    b = PyMem_Malloc(sizeof(block));
+    b = (block*)PyMem_Malloc(sizeof(block));
     if (b != NULL) {
         return b;
     }
@@ -1617,8 +1621,8 @@ PyDoc_STRVAR(deque_doc,
 "deque([iterable[, maxlen]]) --> deque object\n\
 \n\
 A list-like sequence optimized for data accesses near its endpoints.");
-
-static PyTypeObject deque_type = {
+namespace {
+PyTypeObject deque_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "collections.deque",                /* tp_name */
     sizeof(dequeobject),                /* tp_basicsize */
@@ -1661,7 +1665,7 @@ static PyTypeObject deque_type = {
     deque_new,                          /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 /*********************** Deque Iterator **************************/
 
 typedef struct {
@@ -1673,7 +1677,9 @@ typedef struct {
     Py_ssize_t counter;    /* number of items remaining for iteration */
 } dequeiterobject;
 
-static PyTypeObject dequeiter_type;
+namespace {
+extern PyTypeObject dequeiter_type;
+}
 
 static PyObject *
 deque_iter(dequeobject *deque)
@@ -1786,7 +1792,8 @@ static PyMethodDef dequeiter_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
-static PyTypeObject dequeiter_type = {
+namespace {
+PyTypeObject dequeiter_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_collections._deque_iterator",             /* tp_name */
     sizeof(dequeiterobject),                    /* tp_basicsize */
@@ -1828,10 +1835,12 @@ static PyTypeObject dequeiter_type = {
     dequeiter_new,                              /* tp_new */
     0,
 };
-
+}
 /*********************** Deque Reverse Iterator **************************/
 
-static PyTypeObject dequereviter_type;
+namespace {
+extern PyTypeObject dequereviter_type;
+}
 
 static PyObject *
 deque_reviter(dequeobject *deque, PyObject *Py_UNUSED(ignored))
@@ -1908,7 +1917,8 @@ dequereviter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject*)it;
 }
 
-static PyTypeObject dequereviter_type = {
+namespace {
+PyTypeObject dequereviter_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_collections._deque_reverse_iterator",     /* tp_name */
     sizeof(dequeiterobject),                    /* tp_basicsize */
@@ -1950,7 +1960,7 @@ static PyTypeObject dequereviter_type = {
     dequereviter_new,                           /* tp_new */
     0,
 };
-
+}
 /* defaultdict type *********************************************************/
 
 typedef struct {
@@ -1958,7 +1968,9 @@ typedef struct {
     PyObject *default_factory;
 } defdictobject;
 
-static PyTypeObject defdict_type; /* Forward */
+namespace {
+extern PyTypeObject defdict_type; /* Forward */
+}
 
 PyDoc_STRVAR(defdict_missing_doc,
 "__missing__(key) # Called by __getitem__ for missing key; pseudo-code:\n\
@@ -2187,7 +2199,8 @@ passed to the dict constructor, including keyword arguments.\n\
 /* See comment in xxsubtype.c */
 #define DEFERRED_ADDRESS(ADDR) 0
 
-static PyTypeObject defdict_type = {
+namespace {
+PyTypeObject defdict_type = {
     PyVarObject_HEAD_INIT(DEFERRED_ADDRESS(&PyType_Type), 0)
     "collections.defaultdict",          /* tp_name */
     sizeof(defdictobject),              /* tp_basicsize */
@@ -2230,7 +2243,7 @@ static PyTypeObject defdict_type = {
     0,                                  /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 /* helper function for Counter  *********************************************/
 
 /*[clinic input]
@@ -2466,7 +2479,8 @@ static PyMethodDef tuplegetter_methods[] = {
     {NULL},
 };
 
-static PyTypeObject tuplegetter_type = {
+namespace {
+PyTypeObject tuplegetter_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_collections._tuplegetter",                /* tp_name */
     sizeof(_tuplegetterobject),                 /* tp_basicsize */
@@ -2508,7 +2522,7 @@ static PyTypeObject tuplegetter_type = {
     tuplegetter_new,                            /* tp_new */
     0,
 };
-
+}
 
 /* module level code ********************************************************/
 

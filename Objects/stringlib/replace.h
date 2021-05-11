@@ -31,7 +31,7 @@ STRINGLIB(replace_1char_inplace)(STRINGLIB_CHAR* s, STRINGLIB_CHAR* end,
                        use FASTSEARCH() or memchr() */
 #if STRINGLIB_SIZEOF_CHAR == 1
                     s++;
-                    s = memchr(s, u1, end - s);
+                    s = (STRINGLIB_CHAR *)memchr(s, u1, end - s);
                     if (s == NULL)
                         return;
 #else

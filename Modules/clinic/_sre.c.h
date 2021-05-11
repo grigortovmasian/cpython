@@ -941,7 +941,7 @@ PyDoc_STRVAR(_sre_SRE_Match_expand__doc__,
     {"expand", (PyCFunction)(void(*)(void))_sre_SRE_Match_expand, METH_FASTCALL|METH_KEYWORDS, _sre_SRE_Match_expand__doc__},
 
 static PyObject *
-_sre_SRE_Match_expand_impl(MatchObject *self, PyObject *template);
+_sre_SRE_Match_expand_impl(MatchObject *self, PyObject *templat);
 
 static PyObject *
 _sre_SRE_Match_expand(MatchObject *self, PyObject *const *args, Py_ssize_t nargs, PyObject *kwnames)
@@ -950,14 +950,14 @@ _sre_SRE_Match_expand(MatchObject *self, PyObject *const *args, Py_ssize_t nargs
     static const char * const _keywords[] = {"template", NULL};
     static _PyArg_Parser _parser = {NULL, _keywords, "expand", 0};
     PyObject *argsbuf[1];
-    PyObject *template;
+    PyObject *templat;
 
     args = _PyArg_UnpackKeywords(args, nargs, NULL, kwnames, &_parser, 1, 1, 0, argsbuf);
     if (!args) {
         goto exit;
     }
-    template = args[0];
-    return_value = _sre_SRE_Match_expand_impl(self, template);
+    templat = args[0];
+    return_value = _sre_SRE_Match_expand_impl(self, templat);
 
 exit:
     return return_value;

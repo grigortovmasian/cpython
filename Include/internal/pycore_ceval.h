@@ -1,8 +1,5 @@
 #ifndef Py_INTERNAL_CEVAL_H
 #define Py_INTERNAL_CEVAL_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
@@ -11,6 +8,10 @@ extern "C" {
 #include "pycore_atomic.h"
 #include "pycore_pystate.h"
 #include "pythread.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyAPI_FUNC(void) _Py_FinishPendingCalls(_PyRuntimeState *runtime);
 PyAPI_FUNC(void) _PyEval_Initialize(struct _ceval_runtime_state *);

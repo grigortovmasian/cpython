@@ -959,7 +959,7 @@ audioop_tomono_impl(PyObject *module, Py_buffer *fragment, int width,
     double maxval, minval;
     PyObject *rv;
 
-    cp = fragment->buf;
+    cp = (signed char*)fragment->buf;
     len = fragment->len;
     if (!audioop_check_parameters(len, width))
         return NULL;
@@ -1414,7 +1414,7 @@ audioop_ratecv_impl(PyObject *module, Py_buffer *fragment, int width,
         goto exit;
     }
     ncp = PyBytes_AsString(str);
-    cp = fragment->buf;
+    cp = (char *)fragment->buf;
 
     for (;;) {
         while (d < 0) {
@@ -1538,7 +1538,7 @@ audioop_ulaw2lin_impl(PyObject *module, Py_buffer *fragment, int width)
         return NULL;
     ncp = (signed char *)PyBytes_AsString(rv);
 
-    cp = fragment->buf;
+    cp = (unsigned char*)fragment->buf;
     for (i = 0; i < fragment->len*width; i += width) {
         int val = st_ulaw2linear16(*cp++) << 16;
         SETSAMPLE32(width, ncp, i, val);
@@ -1611,7 +1611,7 @@ audioop_alaw2lin_impl(PyObject *module, Py_buffer *fragment, int width)
     if (rv == NULL)
         return NULL;
     ncp = (signed char *)PyBytes_AsString(rv);
-    cp = fragment->buf;
+    cp = (unsigned char*)fragment->buf;
 
     for (i = 0; i < fragment->len*width; i += width) {
         val = st_alaw2linear16(*cp++) << 16;
@@ -1807,7 +1807,7 @@ audioop_adpcm2lin_impl(PyObject *module, Py_buffer *fragment, int width,
     if (str == NULL)
         return NULL;
     ncp = (signed char *)PyBytes_AsString(str);
-    cp = fragment->buf;
+    cp = (signed char*)fragment->buf;
 
     step = stepsizeTable[index];
     bufferstep = 0;

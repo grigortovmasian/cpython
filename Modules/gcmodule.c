@@ -1869,6 +1869,10 @@ _PyGC_CollectNoFail(void)
     return n;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 _PyGC_DumpShutdownStats(_PyRuntimeState *runtime)
 {
@@ -1906,6 +1910,7 @@ _PyGC_DumpShutdownStats(_PyRuntimeState *runtime)
     }
 }
 
+
 void
 _PyGC_Fini(_PyRuntimeState *runtime)
 {
@@ -1913,6 +1918,9 @@ _PyGC_Fini(_PyRuntimeState *runtime)
     Py_CLEAR(state->garbage);
     Py_CLEAR(state->callbacks);
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* for debugging */
 void

@@ -853,7 +853,7 @@ faulthandler_register_py(PyObject *self,
         return NULL;
 
     if (user_signals == NULL) {
-        user_signals = PyMem_Malloc(NSIG * sizeof(user_signal_t));
+        user_signals = (user_signal_t*)PyMem_Malloc(NSIG * sizeof(user_signal_t));
         if (user_signals == NULL)
             return PyErr_NoMemory();
         memset(user_signals, 0, NSIG * sizeof(user_signal_t));
@@ -1322,6 +1322,10 @@ faulthandler_init_enable(void)
     return 0;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyStatus
 _PyFaulthandler_Init(int enable)
 {
@@ -1363,6 +1367,13 @@ _PyFaulthandler_Init(int enable)
     }
     return _PyStatus_OK();
 }
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void _PyFaulthandler_Fini(void)
 {
@@ -1415,3 +1426,6 @@ void _PyFaulthandler_Fini(void)
     }
 #endif
 }
+#ifdef __cplusplus
+}
+#endif

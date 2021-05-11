@@ -31,8 +31,8 @@ Py_FrozenMain(int argc, char **argv)
     wchar_t **argv_copy2 = NULL;
 
     if (argc > 0) {
-        argv_copy = PyMem_RawMalloc(sizeof(wchar_t*) * argc);
-        argv_copy2 = PyMem_RawMalloc(sizeof(wchar_t*) * argc);
+        argv_copy = (wchar_t**)PyMem_RawMalloc(sizeof(wchar_t*) * argc);
+        argv_copy2 = (wchar_t**)PyMem_RawMalloc(sizeof(wchar_t*) * argc);
         if (!argv_copy || !argv_copy2) {
             fprintf(stderr, "out of memory\n");
             goto error;

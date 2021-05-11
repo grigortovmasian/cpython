@@ -456,7 +456,7 @@ _mpd_to_string(char **result, const mpd_t *dec, int flags, mpd_ssize_t dplace)
             /* diagnostic code */
             mem += dec->digits;
         }
-        cp = decstring = mpd_alloc(mem, sizeof *decstring);
+        cp = decstring = (char*)mpd_alloc(mem, sizeof *decstring);
         if (cp == NULL) {
             *result = NULL;
             return -1;
@@ -564,7 +564,7 @@ _mpd_to_string(char **result, const mpd_t *dec, int flags, mpd_ssize_t dplace)
         }
         mem += (MPD_EXPDIGITS+1+6);
 
-        cp = decstring = mpd_alloc(mem, sizeof *decstring);
+        cp = decstring = (char*)mpd_alloc(mem, sizeof *decstring);
         if (cp == NULL) {
             *result = NULL;
             return -1;
@@ -1115,7 +1115,7 @@ _mpd_apply_lconv(mpd_mbstr_t *result, const mpd_spec_t *spec, uint32_t *status)
     _mpd_add_sep_dot(result, sign, intpart, n_int, dot,
                      rest, n_rest, spec);
 
-    result->data = mpd_alloc(result->nbytes+1, 1);
+    result->data = (char*)mpd_alloc(result->nbytes+1, 1);
     if (result->data == NULL) {
         *status |= MPD_Malloc_error;
         mpd_free(decstring);
@@ -1147,7 +1147,7 @@ _mpd_add_pad(mpd_mbstr_t *result, const mpd_spec_t *spec, uint32_t *status)
         /* max value: MPD_MAX_PREC * 4 */
         add_bytes = add_chars * (mpd_ssize_t)n_fill;
 
-        cp = result->data = mpd_realloc(result->data,
+        cp = result->data = (char*)mpd_realloc(result->data,
                                         result->nbytes+add_bytes+1,
                                         sizeof *result->data, &err);
         if (err) {

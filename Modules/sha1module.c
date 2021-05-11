@@ -295,8 +295,9 @@ sha1_done(struct sha1_state *sha1, unsigned char *out)
  * ------------------------------------------------------------------------
  */
 
-static PyTypeObject SHA1type;
-
+namespace {
+extern PyTypeObject SHA1type;
+}
 
 static SHA1object *
 newSHA1object(void)
@@ -390,7 +391,7 @@ SHA1Type_update(SHA1object *self, PyObject *obj)
 
     GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
 
-    sha1_process(&self->hash_state, buf.buf, buf.len);
+    sha1_process(&self->hash_state, (const unsigned char*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     Py_RETURN_NONE;
@@ -439,7 +440,8 @@ static PyGetSetDef SHA1_getseters[] = {
     {NULL}  /* Sentinel */
 };
 
-static PyTypeObject SHA1type = {
+namespace {
+PyTypeObject SHA1type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_sha1.sha1",               /*tp_name*/
     sizeof(SHA1object), /*tp_basicsize*/
@@ -472,7 +474,7 @@ static PyTypeObject SHA1type = {
     NULL,               /* tp_members */
     SHA1_getseters,      /* tp_getset */
 };
-
+}
 
 /* The single module-level function: new() */
 
@@ -488,32 +490,32 @@ static PyObject *
 _sha1_sha1_impl(PyObject *module, PyObject *string)
 /*[clinic end generated code: output=e5982830d1dece51 input=27ea54281d995ec2]*/
 {
-    SHA1object *new;
+    SHA1object *nw;
     Py_buffer buf;
 
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
-    if ((new = newSHA1object()) == NULL) {
+    if ((nw = newSHA1object()) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    sha1_init(&new->hash_state);
+    sha1_init(&nw->hash_state);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        sha1_process(&new->hash_state, buf.buf, buf.len);
+        sha1_process(&nw->hash_state, (const unsigned char*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 

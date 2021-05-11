@@ -116,7 +116,7 @@ _PyByteArray_FromBufferObject(PyObject *obj)
 PyObject *
 PyByteArray_FromStringAndSize(const char *bytes, Py_ssize_t size)
 {
-    PyByteArrayObject *new;
+    PyByteArrayObject *nw;
     Py_ssize_t alloc;
 
     if (size < 0) {
@@ -130,31 +130,31 @@ PyByteArray_FromStringAndSize(const char *bytes, Py_ssize_t size)
         return PyErr_NoMemory();
     }
 
-    new = PyObject_New(PyByteArrayObject, &PyByteArray_Type);
-    if (new == NULL)
+    nw = PyObject_New(PyByteArrayObject, &PyByteArray_Type);
+    if (nw == NULL)
         return NULL;
 
     if (size == 0) {
-        new->ob_bytes = NULL;
+        nw->ob_bytes = NULL;
         alloc = 0;
     }
     else {
         alloc = size + 1;
-        new->ob_bytes = PyObject_Malloc(alloc);
-        if (new->ob_bytes == NULL) {
-            Py_DECREF(new);
+        nw->ob_bytes = (char *)PyObject_Malloc(alloc);
+        if (nw->ob_bytes == NULL) {
+            Py_DECREF(nw);
             return PyErr_NoMemory();
         }
         if (bytes != NULL && size > 0)
-            memcpy(new->ob_bytes, bytes, size);
-        new->ob_bytes[size] = '\0';  /* Trailing null byte */
+            memcpy(nw->ob_bytes, bytes, size);
+        nw->ob_bytes[size] = '\0';  /* Trailing null byte */
     }
-    Py_SIZE(new) = size;
-    new->ob_alloc = alloc;
-    new->ob_start = new->ob_bytes;
-    new->ob_exports = 0;
+    Py_SIZE(nw) = size;
+    nw->ob_alloc = alloc;
+    nw->ob_start = nw->ob_bytes;
+    nw->ob_exports = 0;
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 Py_ssize_t
@@ -246,7 +246,7 @@ PyByteArray_Resize(PyObject *self, Py_ssize_t requested_size)
         }
     }
 
-    obj->ob_bytes = obj->ob_start = sval;
+    obj->ob_bytes = obj->ob_start = (char*)sval;
     Py_SIZE(self) = size;
     obj->ob_alloc = alloc;
     obj->ob_bytes[size] = '\0'; /* Trailing null byte */
@@ -579,7 +579,7 @@ bytearray_setslice(PyByteArrayObject *self, Py_ssize_t lo, Py_ssize_t hi,
     if (hi > Py_SIZE(self))
         hi = Py_SIZE(self);
 
-    res = bytearray_setslice_linear(self, lo, hi, bytes, needed);
+    res = bytearray_setslice_linear(self, lo, hi, (char*)bytes, needed);
     if (vbytes.len != -1)
         PyBuffer_Release(&vbytes);
     return res;
@@ -786,7 +786,7 @@ bytearray_init(PyByteArrayObject *self, PyObject *args, PyObject *kwds)
 
     if (PyUnicode_Check(arg)) {
         /* Encode via the codec registry */
-        PyObject *encoded, *new;
+        PyObject *encoded, *nw;
         if (encoding == NULL) {
             PyErr_SetString(PyExc_TypeError,
                             "string argument without an encoding");
@@ -796,11 +796,11 @@ bytearray_init(PyByteArrayObject *self, PyObject *args, PyObject *kwds)
         if (encoded == NULL)
             return -1;
         assert(PyBytes_Check(encoded));
-        new = bytearray_iconcat(self, encoded);
+        nw = bytearray_iconcat(self, encoded);
         Py_DECREF(encoded);
-        if (new == NULL)
+        if (nw == NULL)
             return -1;
-        Py_DECREF(new);
+        Py_DECREF(nw);
         return 0;
     }
 
@@ -937,7 +937,7 @@ bytearray_repr(PyByteArrayObject *self)
     }
 
     newsize += 6 + length * 4;
-    buffer = PyObject_Malloc(newsize);
+    buffer = (char*)PyObject_Malloc(newsize);
     if (buffer == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -1338,12 +1338,12 @@ replaced.
 
 static PyObject *
 bytearray_replace_impl(PyByteArrayObject *self, Py_buffer *old,
-                       Py_buffer *new, Py_ssize_t count)
+                       Py_buffer *nw, Py_ssize_t count)
 /*[clinic end generated code: output=d39884c4dc59412a input=aa379d988637c7fb]*/
 {
     return stringlib_replace((PyObject *)self,
                              (const char *)old->buf, old->len,
-                             (const char *)new->buf, new->len, count);
+                             (const char *)nw->buf, nw->len, count);
 }
 
 /*[clinic input]
@@ -1378,7 +1378,7 @@ bytearray_split_impl(PyByteArrayObject *self, PyObject *sep,
 
     if (PyObject_GetBuffer(sep, &vsub, PyBUF_SIMPLE) != 0)
         return NULL;
-    sub = vsub.buf;
+    sub = (const char *)vsub.buf;
     n = vsub.len;
 
     list = stringlib_split(
@@ -1489,7 +1489,7 @@ bytearray_rsplit_impl(PyByteArrayObject *self, PyObject *sep,
 
     if (PyObject_GetBuffer(sep, &vsub, PyBUF_SIMPLE) != 0)
         return NULL;
-    sub = vsub.buf;
+    sub = (const char*)vsub.buf;
     n = vsub.len;
 
     list = stringlib_rsplit(

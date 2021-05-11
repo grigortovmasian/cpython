@@ -217,7 +217,7 @@ PyLocale_localeconv(PyObject* self, PyObject *Py_UNUSED(ignored))
     PyObject* result;
     struct lconv *lc;
     PyObject *x;
-
+    {
     result = PyDict_New();
     if (!result) {
         return NULL;
@@ -301,7 +301,7 @@ PyLocale_localeconv(PyObject* self, PyObject *Py_UNUSED(ignored))
     RESULT("grouping", x);
 
     return result;
-
+    }
   failed:
     Py_DECREF(result);
     return NULL;
@@ -383,7 +383,7 @@ PyLocale_strxfrm(PyObject* self, PyObject* args)
     }
     if (n2 >= (size_t)n1) {
         /* more space needed */
-        wchar_t * new_buf = PyMem_Realloc(buf, (n2+1)*sizeof(wchar_t));
+        wchar_t * new_buf = (wchar_t*)PyMem_Realloc(buf, (n2+1)*sizeof(wchar_t));
         if (!new_buf) {
             PyErr_NoMemory();
             goto exit;

@@ -85,7 +85,9 @@ typedef struct {
     uint32_t state[N];
 } RandomObject;
 
-static PyTypeObject Random_Type;
+namespace {
+extern PyTypeObject Random_Type;
+}
 
 #define RandomObject_Check(v)      (Py_TYPE(v) == &Random_Type)
 
@@ -527,7 +529,8 @@ static PyMethodDef random_methods[] = {
 PyDoc_STRVAR(random_doc,
 "Random() -> create a random number generator with its own internal state.");
 
-static PyTypeObject Random_Type = {
+namespace {
+PyTypeObject Random_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_random.Random",                   /*tp_name*/
     sizeof(RandomObject),               /*tp_basicsize*/
@@ -570,7 +573,7 @@ static PyTypeObject Random_Type = {
     PyObject_Free,                      /*tp_free*/
     0,                                  /*tp_is_gc*/
 };
-
+}
 PyDoc_STRVAR(module_doc,
 "Module implements the Mersenne Twister random number generator.");
 

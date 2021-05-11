@@ -49,7 +49,7 @@ validate_comprehension(asdl_seq *gens)
         return 0;
     }
     for (i = 0; i < asdl_seq_LEN(gens); i++) {
-        comprehension_ty comp = asdl_seq_GET(gens, i);
+        comprehension_ty comp = (comprehension_ty)asdl_seq_GET(gens, i);
         if (!validate_expr(comp->target, Store) ||
             !validate_expr(comp->iter, Load) ||
             !validate_exprs(comp->ifs, Load, 0))
@@ -71,7 +71,7 @@ validate_slice(slice_ty slice)
         if (!validate_nonempty_seq(slice->v.ExtSlice.dims, "dims", "ExtSlice"))
             return 0;
         for (i = 0; i < asdl_seq_LEN(slice->v.ExtSlice.dims); i++)
-            if (!validate_slice(asdl_seq_GET(slice->v.ExtSlice.dims, i)))
+            if (!validate_slice((slice_ty)asdl_seq_GET(slice->v.ExtSlice.dims, i)))
                 return 0;
         return 1;
     }
@@ -98,7 +98,7 @@ validate_args(asdl_seq *args)
 {
     Py_ssize_t i;
     for (i = 0; i < asdl_seq_LEN(args); i++) {
-        arg_ty arg = asdl_seq_GET(args, i);
+        arg_ty arg = (arg_ty)asdl_seq_GET(args, i);
         if (arg->annotation && !validate_expr(arg->annotation, Load))
             return 0;
     }
@@ -237,7 +237,7 @@ validate_expr(expr_ty exp, expr_context_ty ctx)
         }
         check_ctx = 0;
         /* set actual_ctx to prevent gcc warning */
-        actual_ctx = 0;
+        actual_ctx = (expr_context_ty)0;
     }
     if (check_ctx && actual_ctx != ctx) {
         PyErr_Format(PyExc_ValueError, "expression must have %s context but has %s instead",
@@ -430,7 +430,7 @@ validate_stmt(stmt_ty stmt)
         if (!validate_nonempty_seq(stmt->v.With.items, "items", "With"))
             return 0;
         for (i = 0; i < asdl_seq_LEN(stmt->v.With.items); i++) {
-            withitem_ty item = asdl_seq_GET(stmt->v.With.items, i);
+            withitem_ty item = (withitem_ty)asdl_seq_GET(stmt->v.With.items, i);
             if (!validate_expr(item->context_expr, Load) ||
                 (item->optional_vars && !validate_expr(item->optional_vars, Store)))
                 return 0;
@@ -440,7 +440,7 @@ validate_stmt(stmt_ty stmt)
         if (!validate_nonempty_seq(stmt->v.AsyncWith.items, "items", "AsyncWith"))
             return 0;
         for (i = 0; i < asdl_seq_LEN(stmt->v.AsyncWith.items); i++) {
-            withitem_ty item = asdl_seq_GET(stmt->v.AsyncWith.items, i);
+            withitem_ty item = (withitem_ty)asdl_seq_GET(stmt->v.AsyncWith.items, i);
             if (!validate_expr(item->context_expr, Load) ||
                 (item->optional_vars && !validate_expr(item->optional_vars, Store)))
                 return 0;
@@ -470,7 +470,7 @@ validate_stmt(stmt_ty stmt)
             return 0;
         }
         for (i = 0; i < asdl_seq_LEN(stmt->v.Try.handlers); i++) {
-            excepthandler_ty handler = asdl_seq_GET(stmt->v.Try.handlers, i);
+            excepthandler_ty handler = (excepthandler_ty)asdl_seq_GET(stmt->v.Try.handlers, i);
             if ((handler->v.ExceptHandler.type &&
                  !validate_expr(handler->v.ExceptHandler.type, Load)) ||
                 !validate_body(handler->v.ExceptHandler.body, "ExceptHandler"))
@@ -518,7 +518,7 @@ validate_stmts(asdl_seq *seq)
 {
     Py_ssize_t i;
     for (i = 0; i < asdl_seq_LEN(seq); i++) {
-        stmt_ty stmt = asdl_seq_GET(seq, i);
+        stmt_ty stmt = (stmt_ty)asdl_seq_GET(seq, i);
         if (stmt) {
             if (!validate_stmt(stmt))
                 return 0;
@@ -537,7 +537,7 @@ validate_exprs(asdl_seq *exprs, expr_context_ty ctx, int null_ok)
 {
     Py_ssize_t i;
     for (i = 0; i < asdl_seq_LEN(exprs); i++) {
-        expr_ty expr = asdl_seq_GET(exprs, i);
+        expr_ty expr = (expr_ty)asdl_seq_GET(exprs, i);
         if (expr) {
             if (!validate_expr(expr, ctx))
                 return 0;
@@ -3985,7 +3985,7 @@ get_last_end_pos(asdl_seq *s, int *end_lineno, int *end_col_offset)
     Py_ssize_t tot = asdl_seq_LEN(s);
     // There must be no empty suites.
     assert(tot > 0);
-    stmt_ty last = asdl_seq_GET(s, tot - 1);
+    stmt_ty last = (stmt_ty)asdl_seq_GET(s, tot - 1);
     *end_lineno = last->end_lineno;
     *end_col_offset = last->end_col_offset;
 }
@@ -4613,7 +4613,7 @@ parsenumber_raw(struct compiling *c, const char *s)
     const char *end;
     long x;
     double dx;
-    Py_complex compl;
+    Py_complex comp;
     int imflag;
 
     assert(s != NULL);
@@ -4635,11 +4635,11 @@ parsenumber_raw(struct compiling *c, const char *s)
     }
     /* XXX Huge floats may silently fail */
     if (imflag) {
-        compl.real = 0.;
-        compl.imag = PyOS_string_to_double(s, (char **)&end, NULL);
-        if (compl.imag == -1.0 && PyErr_Occurred())
+        comp.real = 0.;
+        comp.imag = PyOS_string_to_double(s, (char **)&end, NULL);
+        if (comp.imag == -1.0 && PyErr_Occurred())
             return NULL;
-        return PyComplex_FromCComplex(compl);
+        return PyComplex_FromCComplex(comp);
     }
     else
     {
@@ -4662,7 +4662,7 @@ parsenumber(struct compiling *c, const char *s)
         return parsenumber_raw(c, s);
     }
     /* Create a duplicate without underscores. */
-    dup = PyMem_Malloc(strlen(s) + 1);
+    dup = (char*)PyMem_Malloc(strlen(s) + 1);
     if (dup == NULL) {
         return PyErr_NoMemory();
     }
@@ -4899,7 +4899,7 @@ fstring_compile_expr(const char *expr_start, const char *expr_end,
 
     len = expr_end - expr_start;
     /* Allocate 3 extra bytes: open paren, close paren, null byte. */
-    str = PyMem_Malloc(len + 3);
+    str = (char *)PyMem_Malloc(len + 3);
     if (str == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -5439,7 +5439,7 @@ ExprList_Append(ExprList *l, expr_ty exp)
             Py_ssize_t i;
             /* We're still using the cached data. Switch to
                alloc-ing. */
-            l->p = PyMem_Malloc(sizeof(expr_ty) * new_size);
+            l->p = (_expr**)PyMem_Malloc(sizeof(expr_ty) * new_size);
             if (!l->p)
                 return -1;
             /* Copy the cached data into the new buffer. */
@@ -5447,7 +5447,7 @@ ExprList_Append(ExprList *l, expr_ty exp)
                 l->p[i] = l->data[i];
         } else {
             /* Just realloc. */
-            expr_ty *tmp = PyMem_Realloc(l->p, sizeof(expr_ty) * new_size);
+            expr_ty *tmp = (_expr**)PyMem_Realloc(l->p, sizeof(expr_ty) * new_size);
             if (!tmp) {
                 PyMem_Free(l->p);
                 l->p = NULL;

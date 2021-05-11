@@ -46,7 +46,9 @@ typedef struct arrayobject {
     int ob_exports;  /* Number of exported buffers */
 } arrayobject;
 
-static PyTypeObject Arraytype;
+namespace {
+extern PyTypeObject Arraytype;
+}
 
 typedef struct {
     PyObject_HEAD
@@ -55,7 +57,9 @@ typedef struct {
     PyObject* (*getitem)(struct arrayobject *, Py_ssize_t);
 } arrayiterobject;
 
-static PyTypeObject PyArrayIter_Type;
+namespace {
+extern PyTypeObject PyArrayIter_Type;
+}
 
 #define PyArrayIter_Check(op) PyObject_TypeCheck(op, &PyArrayIter_Type)
 
@@ -523,7 +527,7 @@ d_setitem(arrayobject *ap, Py_ssize_t i, PyObject *v)
     static int \
     code##_compareitems(const void *lhs, const void *rhs, Py_ssize_t length) \
     { \
-        const type *a = lhs, *b = rhs; \
+        const type *a = (const type *)lhs, *b = (const type *)rhs; \
         for (Py_ssize_t i = 0; i < length; ++i) \
             if (a[i] != b[i]) \
                 return a[i] < b[i] ? -1 : 1; \
@@ -1829,10 +1833,10 @@ typecode_to_mformat_code(char typecode)
 
     case 'u':
         if (sizeof(Py_UNICODE) == 2) {
-            return UTF16_LE + is_big_endian;
+            return (machine_format_code)(UTF16_LE + is_big_endian);
         }
         if (sizeof(Py_UNICODE) == 4) {
-            return UTF32_LE + is_big_endian;
+            return (machine_format_code)(UTF32_LE + is_big_endian);
         }
         return UNKNOWN_FORMAT;
 
@@ -1894,11 +1898,11 @@ typecode_to_mformat_code(char typecode)
     }
     switch (intsize) {
     case 2:
-        return UNSIGNED_INT16_LE + is_big_endian + (2 * is_signed);
+        return (machine_format_code)(UNSIGNED_INT16_LE + is_big_endian + (2 * is_signed));
     case 4:
-        return UNSIGNED_INT32_LE + is_big_endian + (2 * is_signed);
+        return (machine_format_code)(UNSIGNED_INT32_LE + is_big_endian + (2 * is_signed));
     case 8:
-        return UNSIGNED_INT64_LE + is_big_endian + (2 * is_signed);
+        return (machine_format_code)(UNSIGNED_INT64_LE + is_big_endian + (2 * is_signed));
     default:
         return UNKNOWN_FORMAT;
     }
@@ -2833,7 +2837,8 @@ itemsize -- the length in bytes of one array item\n\
 
 static PyObject *array_iter(arrayobject *ao);
 
-static PyTypeObject Arraytype = {
+namespace {
+PyTypeObject Arraytype = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "array.array",
     sizeof(arrayobject),
@@ -2874,7 +2879,7 @@ static PyTypeObject Arraytype = {
     array_new,                                  /* tp_new */
     PyObject_Del,                               /* tp_free */
 };
-
+}
 
 /*********************** Array Iterator **************************/
 
@@ -2988,7 +2993,8 @@ static PyMethodDef arrayiter_methods[] = {
     {NULL, NULL} /* sentinel */
 };
 
-static PyTypeObject PyArrayIter_Type = {
+namespace {
+PyTypeObject PyArrayIter_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "arrayiterator",                        /* tp_name */
     sizeof(arrayiterobject),                /* tp_basicsize */
@@ -3019,7 +3025,7 @@ static PyTypeObject PyArrayIter_Type = {
     (iternextfunc)arrayiter_next,               /* tp_iternext */
     arrayiter_methods,                      /* tp_methods */
 };
-
+}
 
 /*********************** Install Module **************************/
 
@@ -3070,7 +3076,7 @@ array_modexec(PyObject *m)
 }
 
 static PyModuleDef_Slot arrayslots[] = {
-    {Py_mod_exec, array_modexec},
+    {Py_mod_exec, (void *)array_modexec},
     {0, NULL}
 };
 

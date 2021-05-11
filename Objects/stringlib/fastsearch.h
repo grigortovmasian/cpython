@@ -47,7 +47,7 @@ STRINGLIB(find_char)(const STRINGLIB_CHAR* s, Py_ssize_t n, STRINGLIB_CHAR ch)
     e = s + n;
     if (n > MEMCHR_CUT_OFF) {
 #if STRINGLIB_SIZEOF_CHAR == 1
-        p = memchr(s, ch, n);
+        p = (STRINGLIB_CHAR *)memchr(s, ch, n);
         if (p != NULL)
             return (p - s);
         return -1;
@@ -61,7 +61,7 @@ STRINGLIB(find_char)(const STRINGLIB_CHAR* s, Py_ssize_t n, STRINGLIB_CHAR ch)
            and UCS4 representations. */
         if (needle != 0) {
             do {
-                void *candidate = memchr(p, needle,
+                void *candidate = (void*)memchr(p, needle,
                                          (e - p) * sizeof(STRINGLIB_CHAR));
                 if (candidate == NULL)
                     return -1;
@@ -106,7 +106,7 @@ STRINGLIB(rfind_char)(const STRINGLIB_CHAR* s, Py_ssize_t n, STRINGLIB_CHAR ch)
 
     if (n > MEMCHR_CUT_OFF) {
 #if STRINGLIB_SIZEOF_CHAR == 1
-        p = memrchr(s, ch, n);
+        p = (STRINGLIB_CHAR *)memrchr(s, ch, n);
         if (p != NULL)
             return (p - s);
         return -1;
@@ -121,7 +121,7 @@ STRINGLIB(rfind_char)(const STRINGLIB_CHAR* s, Py_ssize_t n, STRINGLIB_CHAR ch)
            and UCS4 representations. */
         if (needle != 0) {
             do {
-                void *candidate = memrchr(s, needle,
+                void *candidate = (void *)memrchr(s, needle,
                                           n * sizeof(STRINGLIB_CHAR));
                 if (candidate == NULL)
                     return -1;

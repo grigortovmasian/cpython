@@ -71,7 +71,14 @@
   };
 
   /* magic number for constant division by MPD_RADIX */
-  const mpd_uint_t mprime_rdx = 15581492618384294730ULL;
+#ifdef __cplusplus
+extern "C" {
+#endif
+  
+ mpd_uint_t mprime_rdx = 15581492618384294730ULL;
+#ifdef __cplusplus
+}
+#endif
 
 #elif defined(CONFIG_32)
 

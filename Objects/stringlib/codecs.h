@@ -287,7 +287,7 @@ STRINGLIB(utf8_encoder)(PyObject *unicode,
         return PyErr_NoMemory();
     }
 
-    p = _PyBytesWriter_Alloc(&writer, size * max_char_size);
+    p = (char *) _PyBytesWriter_Alloc(&writer, size * max_char_size);
     if (p == NULL)
         return NULL;
 
@@ -390,7 +390,7 @@ STRINGLIB(utf8_encoder)(PyObject *unicode,
                 writer.min_size -= max_char_size * (newpos - startpos);
 
                 if (PyBytes_Check(rep)) {
-                    p = _PyBytesWriter_WriteBytes(&writer, p,
+                    p = (char *)_PyBytesWriter_WriteBytes(&writer, p,
                                                   PyBytes_AS_STRING(rep),
                                                   PyBytes_GET_SIZE(rep));
                 }
@@ -406,7 +406,7 @@ STRINGLIB(utf8_encoder)(PyObject *unicode,
                         goto error;
                     }
 
-                    p = _PyBytesWriter_WriteBytes(&writer, p,
+                    p = (char *)_PyBytesWriter_WriteBytes(&writer, p,
                                                   PyUnicode_DATA(rep),
                                                   PyUnicode_GET_LENGTH(rep));
                 }

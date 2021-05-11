@@ -241,10 +241,11 @@ PyCode_Optimize(PyObject *code, PyObject* consts, PyObject *names,
     unsigned int cumlc = 0, lastlc = 0;
     unsigned int *blocks = NULL;
 
+    {
     /* Bail out if an exception is set */
     if (PyErr_Occurred())
         goto exitError;
-
+    
     /* Bypass optimization when the lnotab table is too complex */
     assert(PyBytes_Check(lnotab_obj));
     lnotab = (unsigned char*)PyBytes_AS_STRING(lnotab_obj);
@@ -303,7 +304,7 @@ PyCode_Optimize(PyObject *code, PyObject* consts, PyObject *names,
                 /* Skip over LOAD_CONST trueconst
                    POP_JUMP_IF_FALSE xx.  This improves
                    "while 1" performance.  */
-            case LOAD_CONST:
+            case LOAD_CONST: {
                 cumlc = lastlc + 1;
                 if (nextop != POP_JUMP_IF_FALSE  ||
                     !ISBASICBLOCK(blocks, op_start, i + 1)) {
@@ -319,12 +320,12 @@ PyCode_Optimize(PyObject *code, PyObject* consts, PyObject *names,
                     cumlc = 0;
                 }
                 break;
-
+	        }
                 /* Try to fold tuples of constants.
                    Skip over BUILD_SEQN 1 UNPACK_SEQN 1.
                    Replace BUILD_SEQN 2 UNPACK_SEQN 2 with ROT2.
                    Replace BUILD_SEQN 3 UNPACK_SEQN 3 with ROT3 ROT2. */
-            case BUILD_TUPLE:
+            case BUILD_TUPLE: {
                 j = get_arg(codestr, i);
                 if (j > 0 && lastlc >= j) {
                     h = lastn_const_start(codestr, op_start, j);
@@ -364,8 +365,9 @@ PyCode_Optimize(PyObject *code, PyObject* consts, PyObject *names,
                       -->  x:POP_JUMP_IF_FALSE y+1
                    where y+1 is the instruction following the second test.
                 */
+		}
             case JUMP_IF_FALSE_OR_POP:
-            case JUMP_IF_TRUE_OR_POP:
+            case JUMP_IF_TRUE_OR_POP: {
                 h = get_arg(codestr, i) / sizeof(_Py_CODEUNIT);
                 tgt = find_op(codestr, codelen, h);
 
@@ -397,6 +399,7 @@ PyCode_Optimize(PyObject *code, PyObject* consts, PyObject *names,
                         break;
                     }
                 }
+				      }
                 /* Intentional fallthrough */
 
                 /* Replace jumps to unconditional jumps */
@@ -526,7 +529,7 @@ PyCode_Optimize(PyObject *code, PyObject* consts, PyObject *names,
     code = PyBytes_FromStringAndSize((char *)codestr, h * sizeof(_Py_CODEUNIT));
     PyMem_Free(codestr);
     return code;
-
+    }
  exitError:
     code = NULL;
 

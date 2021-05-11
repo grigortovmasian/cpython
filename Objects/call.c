@@ -114,6 +114,9 @@ _PyObject_FastCallDict(PyObject *callable, PyObject *const *args,
     return _Py_CheckFunctionResult(callable, res, NULL);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyObject *
 _PyObject_MakeTpCall(PyObject *callable, PyObject *const *args, Py_ssize_t nargs, PyObject *keywords)
@@ -168,6 +171,10 @@ _PyObject_MakeTpCall(PyObject *callable, PyObject *const *args, Py_ssize_t nargs
     result = _Py_CheckFunctionResult(callable, result, NULL);
     return result;
 }
+#ifdef __cplusplus
+}
+#endif
+
 
 
 PyObject *
@@ -834,7 +841,7 @@ _PyObject_FastCall_Prepend(PyObject *callable, PyObject *obj,
         args2 = small_stack;
     }
     else {
-        args2 = PyMem_Malloc(nargs * sizeof(PyObject *));
+        args2 = (PyObject**)PyMem_Malloc(nargs * sizeof(PyObject *));
         if (args2 == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -872,7 +879,7 @@ _PyObject_Call_Prepend(PyObject *callable,
         stack = small_stack;
     }
     else {
-        stack = PyMem_Malloc((argcount + 1) * sizeof(PyObject *));
+        stack = (PyObject**)PyMem_Malloc((argcount + 1) * sizeof(PyObject *));
         if (stack == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -1167,7 +1174,7 @@ object_vacall(PyObject *base, PyObject *callable, va_list vargs)
         stack = small_stack;
     }
     else {
-        stack = PyMem_Malloc(nargs * sizeof(stack[0]));
+        stack = (PyObject **)PyMem_Malloc(nargs * sizeof(stack[0]));
         if (stack == NULL) {
             PyErr_NoMemory();
             return NULL;
@@ -1193,8 +1200,12 @@ object_vacall(PyObject *base, PyObject *callable, va_list vargs)
 }
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Private API for the LOAD_METHOD opcode. */
 extern int _PyObject_GetMethod(PyObject *, PyObject *, PyObject **);
+
 
 PyObject *
 PyObject_CallMethodObjArgs(PyObject *obj, PyObject *name, ...)
@@ -1218,6 +1229,9 @@ PyObject_CallMethodObjArgs(PyObject *obj, PyObject *name, ...)
     Py_DECREF(callable);
     return result;
 }
+#ifdef __cplusplus
+}
+#endif
 
 
 PyObject *
@@ -1317,7 +1331,7 @@ _PyStack_UnpackDict(PyObject *const *args, Py_ssize_t nargs, PyObject *kwargs,
         return -1;
     }
 
-    stack = PyMem_Malloc((nargs + nkwargs) * sizeof(stack[0]));
+    stack = (PyObject**)PyMem_Malloc((nargs + nkwargs) * sizeof(stack[0]));
     if (stack == NULL) {
         PyErr_NoMemory();
         return -1;

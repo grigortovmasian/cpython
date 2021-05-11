@@ -1464,11 +1464,18 @@ PyAsyncGen_ClearFreeLists(void)
     return ret;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 PyAsyncGen_Fini(void)
 {
     PyAsyncGen_ClearFreeLists();
 }
+#ifdef __cplusplus
+}
+#endif
 
 
 static PyObject *

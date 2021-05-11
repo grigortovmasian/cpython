@@ -16,7 +16,7 @@ static node *parsetok(struct tok_state *, grammar *, int, perrdetail *, int *);
 static int initerr(perrdetail *err_ret, PyObject * filename);
 
 typedef struct {
-    struct {
+    struct dummy {
         int lineno;
         char *comment;
     } *items;
@@ -27,7 +27,7 @@ typedef struct {
 static int
 growable_comment_array_init(growable_comment_array *arr, size_t initial_size) {
     assert(initial_size > 0);
-    arr->items = malloc(initial_size * sizeof(*arr->items));
+    arr->items = (growable_comment_array::dummy*)malloc(initial_size * sizeof(*arr->items));
     arr->size = initial_size;
     arr->num_items = 0;
 
@@ -38,7 +38,7 @@ static int
 growable_comment_array_add(growable_comment_array *arr, int lineno, char *comment) {
     if (arr->num_items >= arr->size) {
         arr->size *= 2;
-        arr->items = realloc(arr->items, arr->size * sizeof(*arr->items));
+        arr->items = (growable_comment_array::dummy*)realloc(arr->items, arr->size * sizeof(*arr->items));
         if (!arr->items) {
             return 0;
         }
@@ -447,7 +447,7 @@ parsetok(struct tok_state *tok, grammar *g, int start, perrdetail *err_ret,
          */
         node* r = PyNode_New(encoding_decl);
         if (r)
-            r->n_str = PyObject_MALLOC(strlen(tok->encoding)+1);
+            r->n_str = (char *)PyObject_MALLOC(strlen(tok->encoding)+1);
         if (!r || !r->n_str) {
             err_ret->error = E_NOMEM;
             if (r)

@@ -71,7 +71,15 @@ mpd_uint_t _mpd_baseshiftr(mpd_uint_t *dest, mpd_uint_t *src, mpd_size_t slen,
 
 
 #ifdef CONFIG_64
-extern const mpd_uint_t mprime_rdx;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern  mpd_uint_t mprime_rdx;
+
+#ifdef __cplusplus
+}
+#endif
 
 /*
  * Algorithm from: Division by Invariant Integers using Multiplication,

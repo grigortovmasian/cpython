@@ -98,7 +98,7 @@ _PyImport_LoadDynamicModuleWithSpec(PyObject *spec, FILE *fp)
     dl_funcptr exportfunc;
     PyModuleDef *def;
     PyObject *(*p0)(void);
-
+    {
     name_unicode = PyObject_GetAttrString(spec, "name");
     if (name_unicode == NULL) {
         return NULL;
@@ -234,7 +234,7 @@ _PyImport_LoadDynamicModuleWithSpec(PyObject *spec, FILE *fp)
     Py_DECREF(path);
 
     return m;
-
+    }
 error:
     Py_DECREF(name_unicode);
     Py_XDECREF(name);

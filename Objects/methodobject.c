@@ -351,11 +351,18 @@ PyCFunction_ClearFreeList(void)
     return freelist_size;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 PyCFunction_Fini(void)
 {
     (void)PyCFunction_ClearFreeList();
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void

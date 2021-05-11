@@ -220,10 +220,10 @@ py_blake2b_new_impl(PyTypeObject *type, PyObject *data, int digest_size,
 
         if (buf.len >= HASHLIB_GIL_MINSIZE) {
             Py_BEGIN_ALLOW_THREADS
-            blake2b_update(&self->state, buf.buf, buf.len);
+            blake2b_update(&self->state, (const uint8_t*)buf.buf, buf.len);
             Py_END_ALLOW_THREADS
         } else {
-            blake2b_update(&self->state, buf.buf, buf.len);
+            blake2b_update(&self->state, (const uint8_t*)buf.buf, buf.len);
         }
         PyBuffer_Release(&buf);
     }
@@ -282,11 +282,11 @@ _blake2_blake2b_update(BLAKE2bObject *self, PyObject *data)
     if (self->lock != NULL) {
        Py_BEGIN_ALLOW_THREADS
        PyThread_acquire_lock(self->lock, 1);
-       blake2b_update(&self->state, buf.buf, buf.len);
+       blake2b_update(&self->state, (const uint8_t*)buf.buf, buf.len);
        PyThread_release_lock(self->lock);
        Py_END_ALLOW_THREADS
     } else {
-        blake2b_update(&self->state, buf.buf, buf.len);
+        blake2b_update(&self->state, (const uint8_t*)buf.buf, buf.len);
     }
     PyBuffer_Release(&buf);
 

@@ -1920,6 +1920,10 @@ PyTypeObject PyFloat_Type = {
     float_new,                                  /* tp_new */
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int
 _PyFloat_Init(void)
 {
@@ -1977,6 +1981,9 @@ _PyFloat_Init(void)
     }
     return 1;
 }
+#ifdef __cplusplus
+}
+#endif
 
 int
 PyFloat_ClearFreeList(void)
@@ -1992,12 +1999,18 @@ PyFloat_ClearFreeList(void)
     numfree = 0;
     return i;
 }
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 PyFloat_Fini(void)
 {
     (void)PyFloat_ClearFreeList();
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Print summary info about the state of the optimized allocator */
 void

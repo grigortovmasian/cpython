@@ -99,10 +99,12 @@ typedef struct {
 
 #undef MPD
 #undef CTX
-static PyTypeObject PyDec_Type;
 static PyTypeObject *PyDecSignalDict_Type;
-static PyTypeObject PyDecContext_Type;
-static PyTypeObject PyDecContextManager_Type;
+namespace {
+extern PyTypeObject PyDec_Type;
+extern PyTypeObject PyDecContext_Type;
+extern PyTypeObject PyDecContextManager_Type;
+}
 #define PyDec_CheckExact(v) (Py_TYPE(v) == &PyDec_Type)
 #define PyDec_Check(v) PyObject_TypeCheck(v, &PyDec_Type)
 #define PyDecSignalDict_Check(v) (Py_TYPE(v) == PyDecSignalDict_Type)
@@ -1807,7 +1809,8 @@ static PyMethodDef ctxmanager_methods[] = {
   {NULL, NULL}
 };
 
-static PyTypeObject PyDecContextManager_Type =
+namespace {
+PyTypeObject PyDecContextManager_Type =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
     "decimal.ContextManager",               /* tp_name */
@@ -1838,7 +1841,7 @@ static PyTypeObject PyDecContextManager_Type =
     0,                                      /* tp_iternext */
     ctxmanager_methods,                     /* tp_methods */
 };
-
+}
 
 /******************************************************************************/
 /*                           New Decimal Object                               */
@@ -1913,11 +1916,11 @@ numeric_as_ascii(const PyObject *u, int strip_ws, int ignore_underscores)
         return NULL;
     }
 
-    kind = PyUnicode_KIND(u);
+    kind = (PyUnicode_Kind)PyUnicode_KIND(u);
     data = PyUnicode_DATA(u);
     len =  PyUnicode_GET_LENGTH(u);
 
-    cp = res = PyMem_Malloc(len+1);
+    cp = res = (char*)PyMem_Malloc(len+1);
     if (res == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -2503,7 +2506,7 @@ dectuple_as_str(PyObject *dectuple)
     tsize = PyTuple_Size(digits);
     /* [sign][coeffdigits+1][E][-][expdigits+1]['\0'] */
     mem = 1 + tsize + 3 + MPD_EXPDIGITS + 2;
-    cp = decstring = PyMem_Malloc(mem);
+    cp = decstring = (char*)PyMem_Malloc(mem);
     if (decstring == NULL) {
         PyErr_NoMemory();
         goto error;
@@ -3142,7 +3145,7 @@ dec_repr(PyObject *dec)
 static char *
 dec_strdup(const char *src, Py_ssize_t size)
 {
-    char *dest = PyMem_Malloc(size+1);
+    char *dest = (char*)PyMem_Malloc(size+1);
     if (dest == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -4829,7 +4832,8 @@ static PyMethodDef dec_methods [] =
   { NULL, NULL, 1 }
 };
 
-static PyTypeObject PyDec_Type =
+namespace {
+PyTypeObject PyDec_Type =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
     "decimal.Decimal",                      /* tp_name */
@@ -4872,7 +4876,7 @@ static PyTypeObject PyDec_Type =
     dec_new,                                /* tp_new */
     PyObject_Del,                           /* tp_free */
 };
-
+}
 
 /******************************************************************************/
 /*                         Context Object, Part 2                             */
@@ -5515,7 +5519,8 @@ static PyMethodDef context_methods [] =
   { NULL, NULL, 1 }
 };
 
-static PyTypeObject PyDecContext_Type =
+namespace {
+PyTypeObject PyDecContext_Type =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
     "decimal.Context",                         /* tp_name */
@@ -5557,7 +5562,7 @@ static PyTypeObject PyDecContext_Type =
     context_new,                               /* tp_new */
     PyObject_Del,                              /* tp_free */
 };
-
+}
 
 static PyMethodDef _decimal_methods [] =
 {

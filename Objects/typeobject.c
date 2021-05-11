@@ -236,12 +236,19 @@ PyType_ClearCache(void)
     return cur_version_tag;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 _PyType_Fini(void)
 {
     PyType_ClearCache();
     clear_slotdefs();
 }
+#ifdef __cplusplus
+}
+#endif
 
 void
 PyType_Modified(PyTypeObject *type)
@@ -2851,7 +2858,7 @@ PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
     for (slot = spec->slots; slot->slot; slot++) {
         if (slot->slot == Py_tp_members) {
             nmembers = 0;
-            for (memb = slot->pfunc; memb->name != NULL; memb++) {
+            for (memb = (PyMemberDef*)slot->pfunc; memb->name != NULL; memb++) {
                 nmembers++;
             }
         }
@@ -2869,7 +2876,7 @@ PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
     }
 
     /* Set the type name and qualname */
-    s = strrchr(spec->name, '.');
+    s = (char *)strrchr(spec->name, '.');
     if (s == NULL)
         s = (char*)spec->name;
     else
@@ -2891,9 +2898,9 @@ PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
         /* See whether Py_tp_base(s) was specified */
         for (slot = spec->slots; slot->slot; slot++) {
             if (slot->slot == Py_tp_base)
-                base = slot->pfunc;
+                base = (PyTypeObject*)slot->pfunc;
             else if (slot->slot == Py_tp_bases) {
-                bases = slot->pfunc;
+                bases = (PyObject*)slot->pfunc;
             }
         }
         if (!bases) {
@@ -2958,9 +2965,9 @@ PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
         else if (slot->slot == Py_tp_doc) {
             /* For the docstring slot, which usually points to a static string
                literal, we need to make a copy */
-            const char *old_doc = _PyType_DocWithoutSignature(type->tp_name, slot->pfunc);
+            const char *old_doc = _PyType_DocWithoutSignature(type->tp_name, (const char *)slot->pfunc);
             size_t len = strlen(old_doc)+1;
-            char *tp_doc = PyObject_MALLOC(len);
+            char *tp_doc = (char *)PyObject_MALLOC(len);
             if (tp_doc == NULL) {
                 type->tp_doc = NULL;
                 PyErr_NoMemory();
@@ -2995,7 +3002,7 @@ PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
     }
 
     /* Set type.__module__ */
-    s = strrchr(spec->name, '.');
+    s = (char *)strrchr(spec->name, '.');
     if (s != NULL) {
         int err;
         modname = PyUnicode_FromStringAndSize(

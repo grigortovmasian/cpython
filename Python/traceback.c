@@ -227,6 +227,9 @@ PyTypeObject PyTraceBack_Type = {
     tb_new,                                     /* tp_new */
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 PyObject*
 _PyTraceBack_FromFrame(PyObject *tb_next, PyFrameObject *frame)
@@ -238,6 +241,9 @@ _PyTraceBack_FromFrame(PyObject *tb_next, PyFrameObject *frame)
                          PyFrame_GetLineNumber(frame));
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 int
 PyTraceBack_Here(PyFrameObject *frame)
@@ -415,7 +421,7 @@ _Py_DisplaySourceLine(PyObject *f, PyObject *filename, int lineno, int indent)
     found_encoding = PyTokenizer_FindEncodingFilename(fd, filename);
     if (found_encoding == NULL)
         PyErr_Clear();
-    encoding = (found_encoding != NULL) ? found_encoding : "utf-8";
+    encoding = (found_encoding != NULL) ? found_encoding : (char *)"utf-8";
     /* Reset position */
     if (lseek(fd, 0, SEEK_SET) == (off_t)-1) {
         Py_DECREF(io);
@@ -627,6 +633,9 @@ PyTraceBack_Print(PyObject *v, PyObject *f)
    into the file fd.
 
    This function is signal safe. */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 _Py_DumpDecimal(int fd, unsigned long value)
@@ -649,6 +658,9 @@ _Py_DumpDecimal(int fd, unsigned long value)
 
     _Py_write_noraise(fd, ptr, end - ptr);
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Format an integer in range [0; 0xffffffff] to hexadecimal of 'width' digits,
    and write it into the file fd.
@@ -677,6 +689,10 @@ _Py_DumpHexadecimal(int fd, unsigned long value, Py_ssize_t width)
 
     _Py_write_noraise(fd, ptr, end - ptr);
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 _Py_DumpASCII(int fd, PyObject *text)
@@ -747,6 +763,9 @@ _Py_DumpASCII(int fd, PyObject *text)
         PUTS(fd, "...");
     }
 }
+#ifdef __cplusplus
+}
+#endif
 
 /* Write a frame into the file fd: "File "xxx", line xxx in xxx".
 
@@ -822,6 +841,10 @@ dump_traceback(int fd, PyThreadState *tstate, int write_header)
     }
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Dump the traceback of a Python thread into fd. Use write() to write the
    traceback and retry if write() is interrupted by a signal (failed with
    EINTR), but don't call the Python signal handler.
@@ -834,6 +857,9 @@ _Py_DumpTraceback(int fd, PyThreadState *tstate)
     dump_traceback(fd, tstate, 1);
 }
 
+#ifdef __cplusplus
+}
+#endif
 /* Write the thread identifier into the file 'fd': "Current thread 0xHHHH:\" if
    is_current is true, "Thread 0xHHHH:\n" otherwise.
 
@@ -851,6 +877,10 @@ write_thread_id(int fd, PyThreadState *tstate, int is_current)
                         sizeof(unsigned long) * 2);
     PUTS(fd, " (most recent call first):\n");
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Dump the traceback of all Python threads into fd. Use write() to write the
    traceback and retry if write() is interrupted by a signal (failed with
@@ -920,4 +950,7 @@ _Py_DumpTracebackThreads(int fd, PyInterpreterState *interp,
 
     return NULL;
 }
+#ifdef __cplusplus
+}
+#endif
 

@@ -113,7 +113,7 @@ mpd_calloc(mpd_size_t nmemb, mpd_size_t size)
 void *
 mpd_realloc(void *ptr, mpd_size_t nmemb, mpd_size_t size, uint8_t *err)
 {
-    void *new;
+    void *nw;
     mpd_size_t req, overflow;
 
     req = mul_size_t_overflow(nmemb, size, &overflow);
@@ -122,13 +122,13 @@ mpd_realloc(void *ptr, mpd_size_t nmemb, mpd_size_t size, uint8_t *err)
         return ptr;
     }
 
-    new = mpd_reallocfunc(ptr, req);
-    if (new == NULL) {
+    nw = mpd_reallocfunc(ptr, req);
+    if (nw == NULL) {
         *err = 1;
         return ptr;
     }
 
-    return new;
+    return nw;
 }
 
 /* struct hack malloc with overflow checking */
@@ -160,12 +160,12 @@ mpd_qnew_size(mpd_ssize_t nwords)
 
     nwords = (nwords < MPD_MINALLOC) ? MPD_MINALLOC : nwords;
 
-    result = mpd_alloc(1, sizeof *result);
+    result = (mpd_t*)mpd_alloc(1, sizeof *result);
     if (result == NULL) {
         return NULL;
     }
 
-    result->data = mpd_alloc(nwords, sizeof *result->data);
+    result->data = (mpd_uint_t*)mpd_alloc(nwords, sizeof *result->data);
     if (result->data == NULL) {
         mpd_free(result);
         return NULL;
@@ -217,7 +217,7 @@ mpd_switch_to_dyn(mpd_t *result, mpd_ssize_t nwords, uint32_t *status)
 
     assert(nwords >= result->alloc);
 
-    result->data = mpd_alloc(nwords, sizeof *result->data);
+    result->data = (mpd_uint_t*)mpd_alloc(nwords, sizeof *result->data);
     if (result->data == NULL) {
         result->data = p;
         mpd_set_qnan(result);
@@ -244,7 +244,7 @@ mpd_switch_to_dyn_zero(mpd_t *result, mpd_ssize_t nwords, uint32_t *status)
 {
     mpd_uint_t *p = result->data;
 
-    result->data = mpd_calloc(nwords, sizeof *result->data);
+    result->data = (mpd_uint_t*)mpd_calloc(nwords, sizeof *result->data);
     if (result->data == NULL) {
         result->data = p;
         mpd_set_qnan(result);
@@ -279,7 +279,7 @@ mpd_realloc_dyn(mpd_t *result, mpd_ssize_t nwords, uint32_t *status)
 {
     uint8_t err = 0;
 
-    result->data = mpd_realloc(result->data, nwords, sizeof *result->data, &err);
+    result->data = (mpd_uint_t*)mpd_realloc(result->data, nwords, sizeof *result->data, &err);
     if (!err) {
         result->alloc = nwords;
     }

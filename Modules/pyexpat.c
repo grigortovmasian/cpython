@@ -73,7 +73,9 @@ typedef struct {
 
 #define CHARACTER_DATA_BUFFER_SIZE 8192
 
-static PyTypeObject Xmlparsetype;
+namespace {
+extern PyTypeObject Xmlparsetype;
+}
 
 typedef void (*xmlhandlersetter)(XML_Parser self, void *meth);
 typedef void* xmlhandler;
@@ -85,8 +87,9 @@ struct HandlerInfo {
     PyGetSetDef getset;
 };
 
-static struct HandlerInfo handler_info[64];
-
+namespace {
+extern struct HandlerInfo handler_info[64];
+}
 /* Set an integer attribute on the error object; return true on success,
  * false on an exception.
  */
@@ -658,7 +661,7 @@ RC_HANDLER(int, ExternalEntityRef,
                  conv_string_to_unicode ,context, string_intern(self, base),
                  string_intern(self, systemId), string_intern(self, publicId)),
                 rc = PyLong_AsLong(rv);, rc,
-                XML_GetUserData(parser))
+                (xmlparseobject*)XML_GetUserData(parser))
 
 /* XXX UnknownEncodingHandler */
 
@@ -729,7 +732,7 @@ pyexpat_xmlparser_Parse_impl(xmlparseobject *self, PyObject *data,
     else {
         if (PyObject_GetBuffer(data, &view, PyBUF_SIMPLE) < 0)
             return NULL;
-        s = view.buf;
+        s = (const char *)view.buf;
         slen = view.len;
     }
 
@@ -826,7 +829,7 @@ pyexpat_xmlparser_ParseFile(xmlparseobject *self, PyObject *file)
             return get_parse_result(self, 0);
         }
 
-        bytes_read = readinst(buf, BUF_SIZE, readmethod);
+        bytes_read = readinst((char*)buf, BUF_SIZE, readmethod);
         if (bytes_read < 0) {
             Py_DECREF(readmethod);
             return NULL;
@@ -941,7 +944,7 @@ pyexpat_xmlparser_ExternalEntityParserCreate_impl(xmlparseobject *self,
     PyObject_GC_Track(new_parser);
 
     if (self->buffer != NULL) {
-        new_parser->buffer = PyMem_Malloc(new_parser->buffer_size);
+        new_parser->buffer = (XML_Char*)PyMem_Malloc(new_parser->buffer_size);
         if (new_parser->buffer == NULL) {
             Py_DECREF(new_parser);
             return PyErr_NoMemory();
@@ -996,7 +999,7 @@ static PyObject *
 pyexpat_xmlparser_SetParamEntityParsing_impl(xmlparseobject *self, int flag)
 /*[clinic end generated code: output=18668ee8e760d64c input=8aea19b4b15e9af1]*/
 {
-    flag = XML_SetParamEntityParsing(self->itself, flag);
+    flag = XML_SetParamEntityParsing(self->itself, (XML_ParamEntityParsing)flag);
     return PyLong_FromLong(flag);
 }
 
@@ -1225,7 +1228,7 @@ xmlparse_handler_setter(xmlparseobject *self, PyObject *v, struct HandlerInfo *h
            elaborate system of handlers and state could remove the
            C handler more effectively. */
         if (handlernum == CharacterData && self->in_callback)
-            c_handler = noop_character_data_handler;
+            c_handler = (xmlhandler)noop_character_data_handler;
         v = NULL;
     }
     else if (v != NULL) {
@@ -1271,7 +1274,7 @@ xmlparse_buffer_text_setter(xmlparseobject *self, PyObject *v, void *closure)
         return -1;
     if (b) {
         if (self->buffer == NULL) {
-            self->buffer = PyMem_Malloc(self->buffer_size);
+            self->buffer = (XML_Char*)PyMem_Malloc(self->buffer_size);
             if (self->buffer == NULL) {
                 PyErr_NoMemory();
                 return -1;
@@ -1337,7 +1340,7 @@ xmlparse_buffer_size_setter(xmlparseobject *self, PyObject *v, void *closure)
         /* free existing buffer */
         PyMem_Free(self->buffer);
     }
-    self->buffer = PyMem_Malloc(new_buffer_size);
+    self->buffer = (XML_Char*)PyMem_Malloc(new_buffer_size);
     if (self->buffer == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -1463,7 +1466,8 @@ xmlparse_clear(xmlparseobject *op)
 
 PyDoc_STRVAR(Xmlparsetype__doc__, "XML parser");
 
-static PyTypeObject Xmlparsetype = {
+namespace {
+PyTypeObject Xmlparsetype = {
         PyVarObject_HEAD_INIT(NULL, 0)
         "pyexpat.xmlparser",            /*tp_name*/
         sizeof(xmlparseobject),         /*tp_basicsize*/
@@ -1496,7 +1500,7 @@ static PyTypeObject Xmlparsetype = {
         xmlparse_members,               /* tp_members */
         xmlparse_getsetlist,            /* tp_getset */
 };
-
+}
 /* End of code for xmlparser objects */
 /* -------------------------------------------------------- */
 
@@ -1560,7 +1564,7 @@ static PyObject *
 pyexpat_ErrorString_impl(PyObject *module, long code)
 /*[clinic end generated code: output=2feae50d166f2174 input=cc67de010d9e62b3]*/
 {
-    return Py_BuildValue("z", XML_ErrorString((int)code));
+    return Py_BuildValue("z", XML_ErrorString((XML_Error)code));
 }
 
 /* List of methods defined in the module */
@@ -1850,7 +1854,7 @@ MODULE_INITFUNC(void)
 
     /* initialize pyexpat dispatch table */
     capi.size = sizeof(capi);
-    capi.magic = PyExpat_CAPI_MAGIC;
+    capi.magic = (char*)PyExpat_CAPI_MAGIC;
     capi.MAJOR_VERSION = XML_MAJOR_VERSION;
     capi.MINOR_VERSION = XML_MINOR_VERSION;
     capi.MICRO_VERSION = XML_MICRO_VERSION;
@@ -1900,7 +1904,8 @@ clear_handlers(xmlparseobject *self, int initial)
     }
 }
 
-static struct HandlerInfo handler_info[] = {
+namespace {
+struct HandlerInfo handler_info[] = {
 
 #define HANDLER_INFO(name) \
     {#name, (xmlhandlersetter)XML_Set##name, (xmlhandler)my_##name},
@@ -1934,3 +1939,4 @@ static struct HandlerInfo handler_info[] = {
 
     {NULL, NULL, NULL} /* sentinel */
 };
+}

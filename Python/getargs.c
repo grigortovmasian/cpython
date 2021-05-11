@@ -978,7 +978,7 @@ convertsimple(PyObject *arg, const char **p_format, va_list *p_va, int flags,
             STORE_SIZE(count);
             format++;
         } else {
-            if (strlen(*p) != (size_t)count) {
+            if (strlen((const char*)(*p)) != (size_t)count) {
                 PyErr_SetString(PyExc_ValueError, "embedded null byte");
                 RETURN_ERR_OCCURRED;
             }

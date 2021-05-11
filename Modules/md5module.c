@@ -318,8 +318,9 @@ md5_done(struct md5_state *md5, unsigned char *out)
  * ------------------------------------------------------------------------
  */
 
-static PyTypeObject MD5type;
-
+namespace {
+extern PyTypeObject MD5type;
+}
 
 static MD5object *
 newMD5object(void)
@@ -413,7 +414,7 @@ MD5Type_update(MD5object *self, PyObject *obj)
 
     GET_BUFFER_VIEW_OR_ERROUT(obj, &buf);
 
-    md5_process(&self->hash_state, buf.buf, buf.len);
+    md5_process(&self->hash_state, (const unsigned char*)buf.buf, buf.len);
 
     PyBuffer_Release(&buf);
     Py_RETURN_NONE;
@@ -462,7 +463,8 @@ static PyGetSetDef MD5_getseters[] = {
     {NULL}  /* Sentinel */
 };
 
-static PyTypeObject MD5type = {
+namespace {
+PyTypeObject MD5type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_md5.md5",         /*tp_name*/
     sizeof(MD5object),  /*tp_basicsize*/
@@ -495,7 +497,7 @@ static PyTypeObject MD5type = {
     NULL,               /* tp_members */
     MD5_getseters,      /* tp_getset */
 };
-
+}
 
 /* The single module-level function: new() */
 
@@ -511,32 +513,32 @@ static PyObject *
 _md5_md5_impl(PyObject *module, PyObject *string)
 /*[clinic end generated code: output=2cfd0f8c091b97e6 input=d12ef8f72d684f7b]*/
 {
-    MD5object *new;
+    MD5object *nw;
     Py_buffer buf;
 
     if (string)
         GET_BUFFER_VIEW_OR_ERROUT(string, &buf);
 
-    if ((new = newMD5object()) == NULL) {
+    if ((nw = newMD5object()) == NULL) {
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
 
-    md5_init(&new->hash_state);
+    md5_init(&nw->hash_state);
 
     if (PyErr_Occurred()) {
-        Py_DECREF(new);
+        Py_DECREF(nw);
         if (string)
             PyBuffer_Release(&buf);
         return NULL;
     }
     if (string) {
-        md5_process(&new->hash_state, buf.buf, buf.len);
+        md5_process(&nw->hash_state, (const unsigned char*)buf.buf, buf.len);
         PyBuffer_Release(&buf);
     }
 
-    return (PyObject *)new;
+    return (PyObject *)nw;
 }
 
 

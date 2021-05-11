@@ -30,21 +30,23 @@ class itertools.count "countobject *" "&count_type"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=ea05c93c6d94726a]*/
 
-static PyTypeObject groupby_type;
-static PyTypeObject _grouper_type;
-static PyTypeObject teedataobject_type;
-static PyTypeObject tee_type;
-static PyTypeObject cycle_type;
-static PyTypeObject dropwhile_type;
-static PyTypeObject takewhile_type;
-static PyTypeObject starmap_type;
-static PyTypeObject combinations_type;
-static PyTypeObject cwr_type;
-static PyTypeObject permutations_type;
-static PyTypeObject accumulate_type;
-static PyTypeObject compress_type;
-static PyTypeObject filterfalse_type;
-static PyTypeObject count_type;
+namespace {
+extern PyTypeObject groupby_type;
+extern PyTypeObject _grouper_type;
+extern PyTypeObject teedataobject_type;
+extern PyTypeObject tee_type;
+extern PyTypeObject cycle_type;
+extern PyTypeObject dropwhile_type;
+extern PyTypeObject takewhile_type;
+extern PyTypeObject starmap_type;
+extern PyTypeObject combinations_type;
+extern PyTypeObject cwr_type;
+extern PyTypeObject permutations_type;
+extern PyTypeObject accumulate_type;
+extern PyTypeObject compress_type;
+extern PyTypeObject filterfalse_type;
+extern PyTypeObject count_type;
+}
 
 #include "clinic/itertoolsmodule.c.h"
 
@@ -235,7 +237,8 @@ static PyMethodDef groupby_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
-static PyTypeObject groupby_type = {
+namespace {
+PyTypeObject groupby_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.groupby",                /* tp_name */
     sizeof(groupbyobject),              /* tp_basicsize */
@@ -278,7 +281,7 @@ static PyTypeObject groupby_type = {
     itertools_groupby,                  /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* _grouper object (internal) ************************************************/
 
@@ -383,8 +386,8 @@ static PyMethodDef _grouper_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-
-static PyTypeObject _grouper_type = {
+namespace {
+PyTypeObject _grouper_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools._grouper",               /* tp_name */
     sizeof(_grouperobject),             /* tp_basicsize */
@@ -426,7 +429,7 @@ static PyTypeObject _grouper_type = {
     itertools__grouper,                 /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* tee object and with supporting function and objects ***********************/
 
@@ -456,7 +459,7 @@ typedef struct {
     PyObject *weakreflist;
 } teeobject;
 
-static PyTypeObject teedataobject_type;
+//static PyTypeObject teedataobject_type;
 
 static PyObject *
 teedataobject_newinternal(PyObject *it)
@@ -639,7 +642,8 @@ static PyMethodDef teedataobject_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
-static PyTypeObject teedataobject_type = {
+namespace {
+PyTypeObject teedataobject_type = {
     PyVarObject_HEAD_INIT(0, 0)                 /* Must fill in type value later */
     "itertools._tee_dataobject",                /* tp_name */
     sizeof(teedataobject),                      /* tp_basicsize */
@@ -681,9 +685,9 @@ static PyTypeObject teedataobject_type = {
     itertools_teedataobject,                    /* tp_new */
     PyObject_GC_Del,                            /* tp_free */
 };
+}
 
-
-static PyTypeObject tee_type;
+//static PyTypeObject tee_type;
 
 static PyObject *
 tee_next(teeobject *to)
@@ -828,7 +832,8 @@ static PyMethodDef tee_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
-static PyTypeObject tee_type = {
+namespace {
+PyTypeObject tee_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools._tee",                   /* tp_name */
     sizeof(teeobject),                  /* tp_basicsize */
@@ -870,7 +875,7 @@ static PyTypeObject tee_type = {
     itertools__tee,                     /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 /*[clinic input]
 itertools.tee
     iterable: object
@@ -950,7 +955,7 @@ typedef struct {
     int firstpass;
 } cycleobject;
 
-static PyTypeObject cycle_type;
+//static PyTypeObject cycle_type;
 
 /*[clinic input]
 @classmethod
@@ -1094,7 +1099,8 @@ static PyMethodDef cycle_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject cycle_type = {
+namespace {
+PyTypeObject cycle_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.cycle",                  /* tp_name */
     sizeof(cycleobject),                /* tp_basicsize */
@@ -1137,7 +1143,7 @@ static PyTypeObject cycle_type = {
     itertools_cycle,                    /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* dropwhile object **********************************************************/
 
@@ -1148,7 +1154,7 @@ typedef struct {
     long start;
 } dropwhileobject;
 
-static PyTypeObject dropwhile_type;
+//static PyTypeObject dropwhile_type;
 
 /*[clinic input]
 @classmethod
@@ -1261,7 +1267,8 @@ static PyMethodDef dropwhile_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject dropwhile_type = {
+namespace {
+PyTypeObject dropwhile_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.dropwhile",              /* tp_name */
     sizeof(dropwhileobject),            /* tp_basicsize */
@@ -1304,7 +1311,7 @@ static PyTypeObject dropwhile_type = {
     itertools_dropwhile,                /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* takewhile object **********************************************************/
 
@@ -1315,7 +1322,7 @@ typedef struct {
     long stop;
 } takewhileobject;
 
-static PyTypeObject takewhile_type;
+//static PyTypeObject takewhile_type;
 
 /*[clinic input]
 @classmethod
@@ -1423,7 +1430,8 @@ static PyMethodDef takewhile_reduce_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject takewhile_type = {
+namespace {
+PyTypeObject takewhile_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.takewhile",              /* tp_name */
     sizeof(takewhileobject),            /* tp_basicsize */
@@ -1466,7 +1474,7 @@ static PyTypeObject takewhile_type = {
     itertools_takewhile,                /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* islice object *************************************************************/
 
@@ -1479,7 +1487,9 @@ typedef struct {
     Py_ssize_t cnt;
 } isliceobject;
 
-static PyTypeObject islice_type;
+namespace {
+extern PyTypeObject islice_type;
+}
 
 static PyObject *
 islice_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -1682,7 +1692,8 @@ specified as another value, step determines how many values are\n\
 skipped between successive calls.  Works like a slice() on a list\n\
 but returns an iterator.");
 
-static PyTypeObject islice_type = {
+namespace {
+PyTypeObject islice_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.islice",                 /* tp_name */
     sizeof(isliceobject),               /* tp_basicsize */
@@ -1725,7 +1736,7 @@ static PyTypeObject islice_type = {
     islice_new,                         /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* starmap object ************************************************************/
 
@@ -1735,7 +1746,7 @@ typedef struct {
     PyObject *it;
 } starmapobject;
 
-static PyTypeObject starmap_type;
+//static PyTypeObject starmap_type;
 
 /*[clinic input]
 @classmethod
@@ -1823,7 +1834,8 @@ static PyMethodDef starmap_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject starmap_type = {
+namespace {
+PyTypeObject starmap_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.starmap",                /* tp_name */
     sizeof(starmapobject),              /* tp_basicsize */
@@ -1866,7 +1878,7 @@ static PyTypeObject starmap_type = {
     itertools_starmap,                  /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* chain object **************************************************************/
 
@@ -1876,8 +1888,9 @@ typedef struct {
     PyObject *active;                   /* Currently running input iterator */
 } chainobject;
 
-static PyTypeObject chain_type;
-
+namespace {
+extern PyTypeObject chain_type;
+}
 static PyObject *
 chain_new_internal(PyTypeObject *type, PyObject *source)
 {
@@ -2044,7 +2057,8 @@ static PyMethodDef chain_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
-static PyTypeObject chain_type = {
+namespace {
+PyTypeObject chain_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.chain",                  /* tp_name */
     sizeof(chainobject),                /* tp_basicsize */
@@ -2087,7 +2101,7 @@ static PyTypeObject chain_type = {
     chain_new,                          /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* product object ************************************************************/
 
@@ -2099,8 +2113,9 @@ typedef struct {
     int stopped;            /* set to 1 when the iterator is exhausted */
 } productobject;
 
-static PyTypeObject product_type;
-
+namespace {
+extern PyTypeObject product_type;
+}
 static PyObject *
 product_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -2402,7 +2417,8 @@ product(A, repeat=4) means the same as product(A, A, A, A).\n\n\
 product('ab', range(3)) --> ('a',0) ('a',1) ('a',2) ('b',0) ('b',1) ('b',2)\n\
 product((0,1), (0,1), (0,1)) --> (0,0,0) (0,0,1) (0,1,0) (0,1,1) (1,0,0) ...");
 
-static PyTypeObject product_type = {
+namespace {
+PyTypeObject product_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.product",                /* tp_name */
     sizeof(productobject),              /* tp_basicsize */
@@ -2445,7 +2461,7 @@ static PyTypeObject product_type = {
     product_new,                        /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* combinations object *******************************************************/
 
@@ -2458,7 +2474,7 @@ typedef struct {
     int stopped;            /* set to 1 when the iterator is exhausted */
 } combinationsobject;
 
-static PyTypeObject combinations_type;
+//static PyTypeObject combinations_type;
 
 
 /*[clinic input]
@@ -2715,7 +2731,8 @@ static PyMethodDef combinations_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject combinations_type = {
+namespace {
+PyTypeObject combinations_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.combinations",           /* tp_name */
     sizeof(combinationsobject),         /* tp_basicsize */
@@ -2758,7 +2775,7 @@ static PyTypeObject combinations_type = {
     itertools_combinations,             /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* combinations with replacement object **************************************/
 
@@ -2797,7 +2814,7 @@ typedef struct {
     int stopped;            /* set to 1 when the cwr iterator is exhausted */
 } cwrobject;
 
-static PyTypeObject cwr_type;
+//static PyTypeObject cwr_type;
 
 /*[clinic input]
 @classmethod
@@ -3044,7 +3061,8 @@ static PyMethodDef cwr_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject cwr_type = {
+namespace {
+PyTypeObject cwr_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.combinations_with_replacement",          /* tp_name */
     sizeof(cwrobject),                                  /* tp_basicsize */
@@ -3087,7 +3105,7 @@ static PyTypeObject cwr_type = {
     itertools_combinations_with_replacement,            /* tp_new */
     PyObject_GC_Del,                                    /* tp_free */
 };
-
+}
 
 /* permutations object ********************************************************
 
@@ -3124,7 +3142,7 @@ typedef struct {
     int stopped;            /* set to 1 when the iterator is exhausted */
 } permutationsobject;
 
-static PyTypeObject permutations_type;
+//static PyTypeObject permutations_type;
 
 /*[clinic input]
 @classmethod
@@ -3435,7 +3453,8 @@ static PyMethodDef permuations_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject permutations_type = {
+namespace {
+PyTypeObject permutations_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.permutations",           /* tp_name */
     sizeof(permutationsobject),         /* tp_basicsize */
@@ -3478,7 +3497,7 @@ static PyTypeObject permutations_type = {
     itertools_permutations,             /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* accumulate object ********************************************************/
 
@@ -3490,7 +3509,7 @@ typedef struct {
     PyObject *initial;
 } accumulateobject;
 
-static PyTypeObject accumulate_type;
+//static PyTypeObject accumulate_type;
 
 /*[clinic input]
 @classmethod
@@ -3643,7 +3662,8 @@ static PyMethodDef accumulate_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject accumulate_type = {
+namespace {
+PyTypeObject accumulate_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.accumulate",             /* tp_name */
     sizeof(accumulateobject),           /* tp_basicsize */
@@ -3686,7 +3706,7 @@ static PyTypeObject accumulate_type = {
     itertools_accumulate,               /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* compress object ************************************************************/
 
@@ -3703,7 +3723,7 @@ typedef struct {
     PyObject *selectors;
 } compressobject;
 
-static PyTypeObject compress_type;
+//static PyTypeObject compress_type;
 
 /*[clinic input]
 @classmethod
@@ -3810,7 +3830,8 @@ static PyMethodDef compress_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject compress_type = {
+namespace {
+PyTypeObject compress_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.compress",               /* tp_name */
     sizeof(compressobject),             /* tp_basicsize */
@@ -3853,7 +3874,7 @@ static PyTypeObject compress_type = {
     itertools_compress,                 /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* filterfalse object ************************************************************/
 
@@ -3863,7 +3884,7 @@ typedef struct {
     PyObject *it;
 } filterfalseobject;
 
-static PyTypeObject filterfalse_type;
+//static PyTypeObject filterfalse_type;
 
 /*[clinic input]
 @classmethod
@@ -3964,7 +3985,8 @@ static PyMethodDef filterfalse_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject filterfalse_type = {
+namespace {
+PyTypeObject filterfalse_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.filterfalse",            /* tp_name */
     sizeof(filterfalseobject),          /* tp_basicsize */
@@ -4007,7 +4029,7 @@ static PyTypeObject filterfalse_type = {
     itertools_filterfalse,              /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* count object ************************************************************/
 
@@ -4035,7 +4057,7 @@ slow_mode:  when cnt == PY_SSIZE_T_MAX, step is not int(1), or cnt is a float.
     Either long_cnt or long_step may be a float, Fraction, or Decimal.
 */
 
-static PyTypeObject count_type;
+//static PyTypeObject count_type;
 
 /*[clinic input]
 @classmethod
@@ -4214,7 +4236,8 @@ static PyMethodDef count_methods[] = {
     {NULL,              NULL}   /* sentinel */
 };
 
-static PyTypeObject count_type = {
+namespace {
+PyTypeObject count_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.count",                  /* tp_name */
     sizeof(countobject),                /* tp_basicsize */
@@ -4257,7 +4280,7 @@ static PyTypeObject count_type = {
     itertools_count,                    /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* repeat object ************************************************************/
 
@@ -4267,8 +4290,9 @@ typedef struct {
     Py_ssize_t cnt;
 } repeatobject;
 
-static PyTypeObject repeat_type;
-
+namespace {
+extern PyTypeObject repeat_type;
+}
 static PyObject *
 repeat_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -4369,7 +4393,8 @@ PyDoc_STRVAR(repeat_doc,
 for the specified number of times.  If not specified, returns the object\n\
 endlessly.");
 
-static PyTypeObject repeat_type = {
+namespace {
+PyTypeObject repeat_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.repeat",                 /* tp_name */
     sizeof(repeatobject),               /* tp_basicsize */
@@ -4412,7 +4437,7 @@ static PyTypeObject repeat_type = {
     repeat_new,                         /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* ziplongest object *********************************************************/
 
@@ -4425,7 +4450,9 @@ typedef struct {
     PyObject *fillvalue;
 } ziplongestobject;
 
-static PyTypeObject ziplongest_type;
+namespace {
+extern PyTypeObject ziplongest_type;
+}
 
 static PyObject *
 zip_longest_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -4647,7 +4674,8 @@ are exhausted, the fillvalue is substituted in their place.  The fillvalue\n\
 defaults to None or can be specified by a keyword argument.\n\
 ");
 
-static PyTypeObject ziplongest_type = {
+namespace {
+PyTypeObject ziplongest_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "itertools.zip_longest",            /* tp_name */
     sizeof(ziplongestobject),           /* tp_basicsize */
@@ -4690,7 +4718,7 @@ static PyTypeObject ziplongest_type = {
     zip_longest_new,                    /* tp_new */
     PyObject_GC_Del,                    /* tp_free */
 };
-
+}
 
 /* module level code ********************************************************/
 

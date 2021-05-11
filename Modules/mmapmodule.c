@@ -243,7 +243,7 @@ mmap_read_line_method(mmap_object *self,
     if (!remaining)
         return PyBytes_FromString("");
     start = self->data + self->pos;
-    eol = memchr(start, '\n', remaining);
+    eol = (char *)memchr(start, '\n', remaining);
     if (!eol)
         eol = self->data + self->size;
     else
@@ -289,7 +289,7 @@ mmap_gfind(mmap_object *self,
     } else {
         const char *p, *start_p, *end_p;
         int sign = reverse ? -1 : 1;
-        const char *needle = view.buf;
+        const char *needle = (const char *)view.buf;
         Py_ssize_t len = view.len;
 
         if (start < 0)
@@ -553,7 +553,7 @@ mmap_resize_method(mmap_object *self,
             PyErr_SetFromErrno(PyExc_OSError);
             return NULL;
         }
-        self->data = newmap;
+        self->data = (char *)newmap;
         self->size = new_size;
         Py_RETURN_NONE;
 #endif /* HAVE_MREMAP */
@@ -1236,7 +1236,7 @@ new_mmap_object(PyTypeObject *type, PyObject *args, PyObject *kwdict)
         }
     }
 
-    m_obj->data = mmap(NULL, map_size,
+    m_obj->data = (char *)mmap(NULL, map_size,
                        prot, flags,
                        fd, offset);
 

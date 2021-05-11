@@ -176,8 +176,9 @@ typedef struct {
 } PickleState;
 
 /* Forward declaration of the _pickle module definition. */
-static struct PyModuleDef _picklemodule;
-
+namespace {
+extern struct PyModuleDef _picklemodule;
+}
 /* Given a module object, get its per-module state. */
 static PickleState *
 _Pickle_GetState(PyObject *module)
@@ -465,7 +466,7 @@ Pdata_New(void)
     self->mark_set = 0;
     self->fence = 0;
     self->allocated = 8;
-    self->data = PyMem_MALLOC(self->allocated * sizeof(PyObject *));
+    self->data = (PyObject**)PyMem_MALLOC(self->allocated * sizeof(PyObject *));
     if (self->data)
         return (PyObject *)self;
     Py_DECREF(self);
@@ -706,9 +707,10 @@ typedef struct {
 /* Forward declarations */
 static int save(PicklerObject *, PyObject *, int);
 static int save_reduce(PicklerObject *, PyObject *, PyObject *);
-static PyTypeObject Pickler_Type;
-static PyTypeObject Unpickler_Type;
-
+namespace {
+extern PyTypeObject Pickler_Type;
+extern PyTypeObject Unpickler_Type;
+}
 #include "clinic/_pickle.c.h"
 
 /*************************************************************************
@@ -724,7 +726,7 @@ static PyTypeObject Unpickler_Type;
 static PyMemoTable *
 PyMemoTable_New(void)
 {
-    PyMemoTable *memo = PyMem_MALLOC(sizeof(PyMemoTable));
+    PyMemoTable *memo = (PyMemoTable*)PyMem_MALLOC(sizeof(PyMemoTable));
     if (memo == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -733,7 +735,7 @@ PyMemoTable_New(void)
     memo->mt_used = 0;
     memo->mt_allocated = MT_MINSIZE;
     memo->mt_mask = MT_MINSIZE - 1;
-    memo->mt_table = PyMem_MALLOC(MT_MINSIZE * sizeof(PyMemoEntry));
+    memo->mt_table = (PyMemoEntry*)PyMem_MALLOC(MT_MINSIZE * sizeof(PyMemoEntry));
     if (memo->mt_table == NULL) {
         PyMem_FREE(memo);
         PyErr_NoMemory();
@@ -747,29 +749,29 @@ PyMemoTable_New(void)
 static PyMemoTable *
 PyMemoTable_Copy(PyMemoTable *self)
 {
-    PyMemoTable *new = PyMemoTable_New();
-    if (new == NULL)
+    PyMemoTable *nw = PyMemoTable_New();
+    if (nw == NULL)
         return NULL;
 
-    new->mt_used = self->mt_used;
-    new->mt_allocated = self->mt_allocated;
-    new->mt_mask = self->mt_mask;
+    nw->mt_used = self->mt_used;
+    nw->mt_allocated = self->mt_allocated;
+    nw->mt_mask = self->mt_mask;
     /* The table we get from _New() is probably smaller than we wanted.
        Free it and allocate one that's the right size. */
-    PyMem_FREE(new->mt_table);
-    new->mt_table = PyMem_NEW(PyMemoEntry, self->mt_allocated);
-    if (new->mt_table == NULL) {
-        PyMem_FREE(new);
+    PyMem_FREE(nw->mt_table);
+    nw->mt_table = PyMem_NEW(PyMemoEntry, self->mt_allocated);
+    if (nw->mt_table == NULL) {
+        PyMem_FREE(nw);
         PyErr_NoMemory();
         return NULL;
     }
     for (size_t i = 0; i < self->mt_allocated; i++) {
         Py_XINCREF(self->mt_table[i].me_key);
     }
-    memcpy(new->mt_table, self->mt_table,
+    memcpy(nw->mt_table, self->mt_table,
            sizeof(PyMemoEntry) * self->mt_allocated);
 
-    return new;
+    return nw;
 }
 
 static Py_ssize_t
@@ -1209,7 +1211,7 @@ _Unpickler_SetStringInput(UnpicklerObject *self, PyObject *input)
         PyBuffer_Release(&self->buffer);
     if (PyObject_GetBuffer(input, &self->buffer, PyBUF_CONTIG_RO) < 0)
         return -1;
-    self->input_buffer = self->buffer.buf;
+    self->input_buffer = (char *)self->buffer.buf;
     self->input_len = self->buffer.len;
     self->next_read_idx = 0;
     self->prefetched_idx = self->input_len;
@@ -1456,7 +1458,7 @@ static Py_ssize_t
 _Unpickler_CopyLine(UnpicklerObject *self, char *line, Py_ssize_t len,
                     char **result)
 {
-    char *input_line = PyMem_Realloc(self->input_line, len + 1);
+    char *input_line = (char *)PyMem_Realloc(self->input_line, len + 1);
     if (input_line == NULL) {
         PyErr_NoMemory();
         return -1;
@@ -2593,7 +2595,7 @@ raw_unicode_escape(PyObject *obj)
     data = PyUnicode_DATA(obj);
     kind = PyUnicode_KIND(obj);
 
-    p = _PyBytesWriter_Alloc(&writer, size);
+    p = (char *)_PyBytesWriter_Alloc(&writer, size);
     if (p == NULL)
         goto error;
     writer.overallocate = 1;
@@ -2603,7 +2605,7 @@ raw_unicode_escape(PyObject *obj)
         /* Map 32-bit characters to '\Uxxxxxxxx' */
         if (ch >= 0x10000) {
             /* -1: subtract 1 preallocated byte */
-            p = _PyBytesWriter_Prepare(&writer, p, 10-1);
+            p =(char *)_PyBytesWriter_Prepare(&writer, p, 10-1);
             if (p == NULL)
                 goto error;
 
@@ -2624,7 +2626,7 @@ raw_unicode_escape(PyObject *obj)
                  ch == 0x1a)
         {
             /* -1: subtract 1 preallocated byte */
-            p = _PyBytesWriter_Prepare(&writer, p, 6-1);
+            p = (char *)_PyBytesWriter_Prepare(&writer, p, 6-1);
             if (p == NULL)
                 goto error;
 
@@ -3899,7 +3901,7 @@ save_pers(PicklerObject *self, PyObject *obj)
             }
 
             if (_Pickler_Write(self, &persid_op, 1) < 0 ||
-                _Pickler_Write(self, PyUnicode_DATA(pid_str),
+                _Pickler_Write(self, (const char *)PyUnicode_DATA(pid_str),
                                PyUnicode_GET_LENGTH(pid_str)) < 0 ||
                 _Pickler_Write(self, "\n", 1) < 0) {
                 Py_DECREF(pid_str);
@@ -5071,7 +5073,8 @@ static PyGetSetDef Pickler_getsets[] = {
     {NULL}
 };
 
-static PyTypeObject Pickler_Type = {
+namespace {
+PyTypeObject Pickler_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_pickle.Pickler"  ,                /*tp_name*/
     sizeof(PicklerObject),              /*tp_basicsize*/
@@ -5113,7 +5116,7 @@ static PyTypeObject Pickler_Type = {
     PyObject_GC_Del,                    /*tp_free*/
     0,                                  /*tp_is_gc*/
 };
-
+}
 /* Temporary helper for calling self.find_class().
 
    XXX: It would be nice to able to avoid Python function call overhead, by
@@ -7632,7 +7635,8 @@ static PyGetSetDef Unpickler_getsets[] = {
     {NULL}
 };
 
-static PyTypeObject Unpickler_Type = {
+namespace {
+PyTypeObject Unpickler_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_pickle.Unpickler",                /*tp_name*/
     sizeof(UnpicklerObject),            /*tp_basicsize*/
@@ -7674,7 +7678,7 @@ static PyTypeObject Unpickler_Type = {
     PyObject_GC_Del,                    /*tp_free*/
     0,                                  /*tp_is_gc*/
 };
-
+}
 /*[clinic input]
 
 _pickle.dump
@@ -7978,7 +7982,8 @@ pickle_traverse(PyObject *m, visitproc visit, void *arg)
     return 0;
 }
 
-static struct PyModuleDef _picklemodule = {
+namespace {
+struct PyModuleDef _picklemodule = {
     PyModuleDef_HEAD_INIT,
     "_pickle",            /* m_name */
     pickle_module_doc,    /* m_doc */
@@ -7989,6 +7994,7 @@ static struct PyModuleDef _picklemodule = {
     pickle_clear,         /* m_clear */
     (freefunc)pickle_free /* m_free */
 };
+}
 
 PyMODINIT_FUNC
 PyInit__pickle(void)

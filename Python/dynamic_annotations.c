@@ -31,8 +31,9 @@
 # include <windows.h>
 #endif
 
+
 #ifdef __cplusplus
-# error "This file should be built as pure C to avoid name mangling"
+extern "C" {
 #endif
 
 #include <stdlib.h>
@@ -152,3 +153,8 @@ int RunningOnValgrind(void) {
 }
 
 #endif  /* DYNAMIC_ANNOTATIONS_ENABLED == 1 */
+
+#ifdef __cplusplus
+}
+#endif
+

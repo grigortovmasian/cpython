@@ -56,7 +56,7 @@ typedef enum {
     STATE_PENDING,
     STATE_CANCELLED,
     STATE_FINISHED
-} fut_state;
+} fut_stateEnum;
 
 #define FutureObj_HEAD(prefix)                                              \
     PyObject_HEAD                                                           \
@@ -67,7 +67,7 @@ typedef enum {
     PyObject *prefix##_exception;                                           \
     PyObject *prefix##_result;                                              \
     PyObject *prefix##_source_tb;                                           \
-    fut_state prefix##_state;                                               \
+    fut_stateEnum prefix##_state;                                               \
     int prefix##_log_tb;                                                    \
     int prefix##_blocking;                                                  \
     PyObject *dict;                                                         \
@@ -106,11 +106,11 @@ typedef struct {
 #endif
 } PyRunningLoopHolder;
 
-
-static PyTypeObject FutureType;
-static PyTypeObject TaskType;
-static PyTypeObject PyRunningLoopHolder_Type;
-
+namespace {
+extern PyTypeObject FutureType;
+extern PyTypeObject TaskType;
+extern PyTypeObject PyRunningLoopHolder_Type;
+}
 
 #define Future_CheckExact(obj) (Py_TYPE(obj) == &FutureType)
 #define Task_CheckExact(obj) (Py_TYPE(obj) == &TaskType)
@@ -232,6 +232,7 @@ get_running_loop(PyObject **loop)
     PyObject *rl;
 
     PyThreadState *ts = PyThreadState_Get();
+    {
     if (ts->id == cached_running_holder_tsid && cached_running_holder != NULL) {
         // Fast path, check the cache.
         rl = cached_running_holder;  // borrowed
@@ -275,7 +276,7 @@ get_running_loop(PyObject **loop)
     Py_INCREF(running_loop);
     *loop = running_loop;
     return 0;
-
+    }
 not_found:
     *loop = NULL;
     return 0;
@@ -1428,7 +1429,8 @@ static PyGetSetDef FutureType_getsetlist[] = {
 
 static void FutureObj_dealloc(PyObject *self);
 
-static PyTypeObject FutureType = {
+namespace {
+PyTypeObject FutureType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_asyncio.Future",
     sizeof(FutureObj),                       /* tp_basicsize */
@@ -1448,7 +1450,7 @@ static PyTypeObject FutureType = {
     .tp_new = PyType_GenericNew,
     .tp_finalize = (destructor)FutureObj_finalize,
 };
-
+}
 static void
 FutureObj_dealloc(PyObject *self)
 {
@@ -1744,13 +1746,13 @@ static PyTypeObject TaskStepMethWrapper_Type = {
     "TaskStepMethWrapper",
     .tp_basicsize = sizeof(TaskStepMethWrapper),
     .tp_itemsize = 0,
-    .tp_getset = TaskStepMethWrapper_getsetlist,
     .tp_dealloc = (destructor)TaskStepMethWrapper_dealloc,
     .tp_call = (ternaryfunc)TaskStepMethWrapper_call,
     .tp_getattro = PyObject_GenericGetAttr,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
     .tp_traverse = (traverseproc)TaskStepMethWrapper_traverse,
     .tp_clear = (inquiry)TaskStepMethWrapper_clear,
+    .tp_getset = TaskStepMethWrapper_getsetlist,
 };
 
 static PyObject *
@@ -2486,11 +2488,11 @@ static PyGetSetDef TaskType_getsetlist[] = {
     {NULL} /* Sentinel */
 };
 
-static PyTypeObject TaskType = {
+namespace {
+PyTypeObject TaskType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_asyncio.Task",
     sizeof(TaskObj),                       /* tp_basicsize */
-    .tp_base = &FutureType,
     .tp_dealloc = TaskObj_dealloc,
     .tp_as_async = &FutureType_as_async,
     .tp_repr = (reprfunc)FutureObj_repr,
@@ -2502,12 +2504,13 @@ static PyTypeObject TaskType = {
     .tp_iter = (getiterfunc)future_new_iter,
     .tp_methods = TaskType_methods,
     .tp_getset = TaskType_getsetlist,
+    .tp_base = &FutureType,
     .tp_dictoffset = offsetof(TaskObj, dict),
     .tp_init = (initproc)_asyncio_Task___init__,
     .tp_new = PyType_GenericNew,
     .tp_finalize = (destructor)TaskObj_finalize,
 };
-
+}
 static void
 TaskObj_dealloc(PyObject *self)
 {
@@ -3213,16 +3216,16 @@ PyRunningLoopHolder_tp_dealloc(PyRunningLoopHolder *rl)
     PyObject_Free(rl);
 }
 
-
-static PyTypeObject PyRunningLoopHolder_Type = {
+namespace {
+PyTypeObject PyRunningLoopHolder_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_RunningLoopHolder",
     sizeof(PyRunningLoopHolder),
+    .tp_dealloc = (destructor)PyRunningLoopHolder_tp_dealloc,
     .tp_getattro = PyObject_GenericGetAttr,
     .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_dealloc = (destructor)PyRunningLoopHolder_tp_dealloc,
 };
-
+}
 
 /*********************** Module **************************/
 

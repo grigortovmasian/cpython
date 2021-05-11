@@ -45,7 +45,9 @@ _csv_free(void *m)
    _csv_clear((PyObject *)m);
 }
 
-static struct PyModuleDef _csvmodule;
+namespace {
+extern struct PyModuleDef _csvmodule;
+}
 
 #define _csvstate_global ((_csvstate *)PyModule_GetState(PyState_FindModule(&_csvmodule)))
 
@@ -69,7 +71,7 @@ static const StyleDesc quote_styles[] = {
     { QUOTE_ALL,        "QUOTE_ALL" },
     { QUOTE_NONNUMERIC, "QUOTE_NONNUMERIC" },
     { QUOTE_NONE,       "QUOTE_NONE" },
-    { 0 }
+    { (QuoteStyle)0 }
 };
 
 typedef struct {
@@ -86,7 +88,9 @@ typedef struct {
 
 } DialectObj;
 
-static PyTypeObject Dialect_Type;
+namespace {
+extern PyTypeObject Dialect_Type;
+}
 
 typedef struct {
     PyObject_HEAD
@@ -104,7 +108,9 @@ typedef struct {
     unsigned long line_num;     /* Source-file line number */
 } ReaderObj;
 
-static PyTypeObject Reader_Type;
+namespace {
+extern PyTypeObject Reader_Type;
+}
 
 #define ReaderObject_Check(v)   (Py_TYPE(v) == &Reader_Type)
 
@@ -121,7 +127,9 @@ typedef struct {
     int num_fields;             /* number of fields in record */
 } WriterObj;
 
-static PyTypeObject Writer_Type;
+namespace {
+extern PyTypeObject Writer_Type;
+}
 
 /*
  * DIALECT class
@@ -462,7 +470,8 @@ PyDoc_STRVAR(Dialect_Type_doc,
 "\n"
 "The Dialect type records CSV parsing and generation options.\n");
 
-static PyTypeObject Dialect_Type = {
+namespace {
+PyTypeObject Dialect_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_csv.Dialect",                         /* tp_name */
     sizeof(DialectObj),                     /* tp_basicsize */
@@ -504,7 +513,7 @@ static PyTypeObject Dialect_Type = {
     dialect_new,                                /* tp_new */
     0,                                          /* tp_free */
 };
-
+}
 /*
  * Return an instance of the dialect type, given a Python instance or kwarg
  * description of the dialect
@@ -894,8 +903,8 @@ static struct PyMemberDef Reader_memberlist[] = {
     { NULL }
 };
 
-
-static PyTypeObject Reader_Type = {
+namespace {
+PyTypeObject Reader_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_csv.reader",                          /*tp_name*/
     sizeof(ReaderObj),                      /*tp_basicsize*/
@@ -930,6 +939,7 @@ static PyTypeObject Reader_Type = {
     0,                                      /*tp_getset*/
 
 };
+}
 
 static PyObject *
 csv_reader(PyObject *module, PyObject *args, PyObject *keyword_args)
@@ -1325,7 +1335,8 @@ PyDoc_STRVAR(Writer_Type_doc,
 "in CSV format from sequence input.\n"
 );
 
-static PyTypeObject Writer_Type = {
+namespace {
+PyTypeObject Writer_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "_csv.writer",                          /*tp_name*/
     sizeof(WriterObj),                      /*tp_basicsize*/
@@ -1359,7 +1370,7 @@ static PyTypeObject Writer_Type = {
     Writer_memberlist,                      /*tp_members*/
     0,                                      /*tp_getset*/
 };
-
+}
 static PyObject *
 csv_writer(PyObject *module, PyObject *args, PyObject *keyword_args)
 {
@@ -1609,7 +1620,8 @@ static struct PyMethodDef csv_methods[] = {
     { NULL, NULL }
 };
 
-static struct PyModuleDef _csvmodule = {
+namespace {
+struct PyModuleDef _csvmodule = {
     PyModuleDef_HEAD_INIT,
     "_csv",
     csv_module_doc,
@@ -1620,6 +1632,7 @@ static struct PyModuleDef _csvmodule = {
     _csv_clear,
     _csv_free
 };
+}
 
 PyMODINIT_FUNC
 PyInit__csv(void)

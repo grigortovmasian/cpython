@@ -419,6 +419,10 @@ tupleitem(PyTupleObject *a, Py_ssize_t i)
     return a->ob_item[i];
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PyObject *
 _PyTuple_FromArray(PyObject *const *src, Py_ssize_t n)
 {
@@ -434,6 +438,10 @@ _PyTuple_FromArray(PyObject *const *src, Py_ssize_t n)
     }
     return (PyObject *)tuple;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 static PyObject *
 tupleslice(PyTupleObject *a, Py_ssize_t ilow,
@@ -952,6 +960,10 @@ PyTuple_ClearFreeList(void)
     return freelist_size;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void
 PyTuple_Fini(void)
 {
@@ -966,6 +978,9 @@ PyTuple_Fini(void)
     show_track();
 #endif
 }
+#ifdef __cplusplus
+}
+#endif
 
 /*********************** Tuple Iterator **************************/
 

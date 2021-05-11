@@ -5,7 +5,9 @@
 #include "Python.h"
 #include "Python-ast.h"
 
-static PyTypeObject AST_type;
+namespace {
+extern PyTypeObject AST_type;
+}
 static PyTypeObject *mod_type;
 static PyObject* ast2obj_mod(void*);
 static PyTypeObject *Module_type;
@@ -655,7 +657,8 @@ static PyGetSetDef ast_type_getsets[] = {
     {NULL}
 };
 
-static PyTypeObject AST_type = {
+namespace {
+PyTypeObject AST_type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "_ast.AST",
     sizeof(AST_object),
@@ -696,7 +699,7 @@ static PyTypeObject AST_type = {
     PyType_GenericNew,       /* tp_new */
     PyObject_GC_Del,         /* tp_free */
 };
-
+}
 
 static PyTypeObject* make_type(char *type, PyTypeObject* base, char**fields, int num_fields)
 {

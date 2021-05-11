@@ -1,8 +1,5 @@
 #ifndef Py_INTERNAL_LIFECYCLE_H
 #define Py_INTERNAL_LIFECYCLE_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef Py_BUILD_CORE
 #  error "this header requires Py_BUILD_CORE define"
@@ -11,6 +8,9 @@ extern "C" {
 #include "pycore_initconfig.h"   /* _PyArgv */
 #include "pycore_pystate.h"      /* _PyRuntimeState */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* True if the main interpreter thread exited due to an unhandled
  * KeyboardInterrupt exception, suggesting the user pressed ^C. */
 PyAPI_DATA(int) _Py_UnhandledKeyboardInterrupt;
