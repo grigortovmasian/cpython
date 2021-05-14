@@ -1,10 +1,57 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* Abstract Object Interface (many thanks to Jim Fulton) */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h" /* we need the offsetof() macro from there */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "longintrepr.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 
 

@@ -1,7 +1,22 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 
 /* Module support implementation */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define FLAG_SIZE_T 1
 typedef double va_double;

@@ -1,14 +1,53 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* Complex math module */
 
 /* much code borrowed from mathmodule.c */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "_math.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 /* we need DBL_MAX, DBL_MIN, DBL_EPSILON, DBL_MANT_DIG and FLT_RADIX from
    float.h.  We assume that FLT_RADIX is either 2 or 16. */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <float.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include "clinic/cmathmodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 /*[clinic input]
 module cmath
 [clinic start generated code]*/

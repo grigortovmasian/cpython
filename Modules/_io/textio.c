@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
     An implementation of Text I/O as defined by PEP 3116 - "New I/O"
 
@@ -7,10 +14,42 @@
 */
 
 #define PY_SSIZE_T_CLEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "_iomodule.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 module _io
@@ -3133,7 +3172,15 @@ textiowrapper_chunk_size_set(textio *self, PyObject *arg, void *context)
     return 0;
 }
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/textio.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyMethodDef incrementalnewlinedecoder_methods[] = {
     _IO_INCREMENTALNEWLINEDECODER_DECODE_METHODDEF

@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 
 /* System module */
 
@@ -14,24 +21,136 @@ Data members:
 - ps1, ps2: optional primary and secondary prompts (strings)
 */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "code.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "frameobject.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_initconfig.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pylifecycle.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pymem.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pathconfig.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_tupleobject.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pythread.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pydtrace.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include "osdefs.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <locale.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef MS_WINDOWS
 #define WIN32_LEAN_AND_MEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* MS_WINDOWS */
 
 #ifdef MS_COREDLL
@@ -45,7 +164,15 @@ module sys
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=3726b388feee8cea]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/sysmodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 _Py_IDENTIFIER(_);
 _Py_IDENTIFIER(__sizeof__);
@@ -1596,7 +1723,15 @@ sys_getdlopenflags_impl(PyObject *module)
 
 #ifdef USE_MALLOPT
 /* Link with -lmalloc (or -lmpc) on an SGI */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <malloc.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 sys.mdebug

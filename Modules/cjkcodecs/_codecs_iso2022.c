@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
  * _codecs_iso2022.c: Codecs collection for ISO-2022 encodings.
  *
@@ -10,10 +17,42 @@
 #define EMULATE_JISX0213_2000_ENCODE_INVALID MAP_UNMAPPABLE
 #define EMULATE_JISX0213_2000_DECODE_INVALID MAP_UNMAPPABLE
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "cjkcodecs.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "alg_jisx0201.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "emu_jisx0213_2000.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "mappings_jisx0213_pair.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* STATE
 

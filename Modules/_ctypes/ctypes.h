@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 #if defined (__SVR4) && defined (__sun)
 #   include <alloca.h>
 #endif

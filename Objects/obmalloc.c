@@ -1,7 +1,38 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pymem.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <stdbool.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -719,7 +750,15 @@ PyObject_Free(void *ptr)
 #ifdef WITH_PYMALLOC
 
 #ifdef WITH_VALGRIND
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <valgrind/valgrind.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* If we're using GCC, use __builtin_expect() to reduce overhead of
    the valgrind checks */

@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /****************************************************************
  *
  * The author of this software is David M. Gay.
@@ -78,7 +85,15 @@
  *      _control87(PC_53, MCW_PC);
  * does this with many compilers.  Whether this or another call is
  * appropriate depends on the compiler; for this to work, it may be
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
  * necessary to #include "float.h" or another system-dependent header
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
  * file.
  */
 
@@ -114,13 +129,29 @@
 
 /* Linking of Python's #defines to Gay's #defines starts here. */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* if PY_NO_SHORT_FLOAT_REPR is defined, then don't even try to compile
    the following code */
 #ifndef PY_NO_SHORT_FLOAT_REPR
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "float.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define MALLOC PyMem_Malloc
 #define FREE PyMem_Free

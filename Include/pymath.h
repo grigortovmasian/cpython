@@ -1,7 +1,22 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 #ifndef Py_PYMATH_H
 #define Py_PYMATH_H
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pyconfig.h" /* include for defines */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /**************************************************************************
 Symbols and macros to supply platform-independent interfaces to mathematical

@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 #ifndef Py_LONGOBJECT_H
 #define Py_LONGOBJECT_H
 #ifdef __cplusplus

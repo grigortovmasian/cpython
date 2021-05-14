@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*  C implementation for the date/time type documented at
  *  http://www.zope.org/Members/fdrake/DateTimeWiki/FrontPage
  */
@@ -7,11 +14,43 @@
  * the capsule are defined below */
 #define _PY_DATETIME_IMPL
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "datetime.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <time.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef MS_WINDOWS
 #  include <winsock2.h>         /* struct timeval */
@@ -41,7 +80,15 @@ class datetime.date "PyDateTime_Date *" "&PyDateTime_DateType"
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=25138ad6a696b785]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_datetimemodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* We require that C int be at least 32 bits, and use int virtually
  * everywhere.  In just a few cases we use a temp long, where a Python

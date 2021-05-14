@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 #ifndef Py_LIMITED_API
 #ifndef PY_NO_SHORT_FLOAT_REPR
 #ifdef __cplusplus

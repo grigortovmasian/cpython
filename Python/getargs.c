@@ -1,11 +1,50 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 
 /* New getargs implementation */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_tupleobject.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <float.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 
 #ifdef __cplusplus

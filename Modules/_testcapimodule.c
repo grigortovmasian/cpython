@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
  * C Extension module to test Python interpreter C APIs.
  *
@@ -12,20 +19,84 @@
 
 #define PY_SSIZE_T_CLEAN
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "datetime.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "marshal.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pythread.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <float.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <signal.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef MS_WINDOWS
 #  include <winsock2.h>         /* struct timeval */
 #endif
 
 #ifdef HAVE_SYS_WAIT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/wait.h>           /* For W_STOPCODE */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef Py_BUILD_CORE
@@ -401,7 +472,15 @@ test_lazy_hash_inheritance(PyObject* self, PyObject *Py_UNUSED(ignored))
    function.  A giant macro would be even worse than this.  A C++ template
    would be perfect.
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
    The "report an error" functions are deliberately not part of the #include
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
    file:  if the test fails, you can set a breakpoint in the appropriate
    error function directly, and crawl back from there in the debugger.
 */
@@ -421,7 +500,15 @@ raise_test_long_error(const char* msg)
 #define F_U_TO_PY       PyLong_FromUnsignedLong
 #define F_PY_TO_U       PyLong_AsUnsignedLong
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "testcapi_long.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyObject *
 test_long_api(PyObject* self, PyObject *Py_UNUSED(ignored))
@@ -449,7 +536,15 @@ raise_test_longlong_error(const char* msg)
 #define F_U_TO_PY       PyLong_FromUnsignedLongLong
 #define F_PY_TO_U       PyLong_AsUnsignedLongLong
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "testcapi_long.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyObject *
 test_longlong_api(PyObject* self, PyObject *args)

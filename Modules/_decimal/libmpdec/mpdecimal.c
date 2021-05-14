@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
  * Copyright (c) 2008-2016 Stefan Krah. All rights reserved.
  *
@@ -26,28 +33,148 @@
  */
 
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "mpdecimal.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdio.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdlib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <string.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <limits.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <math.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "basearith.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "bits.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "convolute.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "crt.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "mpalloc.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "typearith.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "umodarith.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef PPRO
   #if defined(_MSC_VER)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
     #include <float.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
     #pragma float_control(precise, on)
     #pragma fenv_access(on)
   #elif !defined(__OpenBSD__) && !defined(__NetBSD__)
     /* C99 */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
     #include <fenv.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
     #pragma STDC FENV_ACCESS ON
   #endif
 #endif

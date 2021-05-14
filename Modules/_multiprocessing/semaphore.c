@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
  * A type which wraps a semaphore
  *
@@ -7,7 +14,15 @@
  * Licensed to PSF under a Contributor Agreement.
  */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "multiprocessing.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 enum { RECURSIVE_MUTEX, SEMAPHORE };
 

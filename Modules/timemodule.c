@@ -1,23 +1,78 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* Time module */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef HAVE_SYS_TIMES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/times.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SYS_TYPES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(HAVE_SYS_RESOURCE_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/resource.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef QUICKWIN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <io.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(HAVE_PTHREAD_H)
@@ -25,12 +80,36 @@
 #endif
 
 #if defined(__WATCOMC__) && !defined(__QNX__)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <i86.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
 #ifdef MS_WINDOWS
 #define WIN32_LEAN_AND_MEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pythread.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* MS_WINDOWS */
 #endif /* !__WATCOMC__ || __QNX__ */
 

@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* pickle accelerator C extensor: _pickle module.
  *
  * It is built as a built-in module (Py_BUILD_CORE_BUILTIN define) on Windows
@@ -8,8 +15,24 @@
 #  error "Py_BUILD_CORE_BUILTIN or Py_BUILD_CORE_MODULE must be defined"
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 PyDoc_STRVAR(pickle_module_doc,
 "Optimized C implementation for the Python pickle module.");
@@ -711,7 +734,15 @@ namespace {
 extern PyTypeObject Pickler_Type;
 extern PyTypeObject Unpickler_Type;
 }
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_pickle.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*************************************************************************
  A custom hashtable mapping void* to Python ints. This is used by the pickler

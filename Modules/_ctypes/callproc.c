@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
  * History: First version dated from 3/97, derived from my SCMLIB version
  * for win16.
@@ -54,29 +61,109 @@
 
  */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef MS_WIN32
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <tchar.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "ctypes_dlfcn.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef MS_WIN32
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <malloc.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
 #endif
 
 #include <ffi.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "ctypes.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifdef HAVE_ALLOCA_H
 /* AIX needs alloca.h for alloca() */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <alloca.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef _Py_MEMORY_SANITIZER
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sanitizer/msan_interface.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(_DEBUG) || defined(__MINGW32__)

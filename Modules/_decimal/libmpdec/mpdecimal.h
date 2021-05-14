@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
  * Copyright (c) 2008-2016 Stefan Krah. All rights reserved.
  *
@@ -40,19 +47,91 @@ extern "C" {
 
 
 #ifndef _MSC_VER
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
   #include "pyconfig.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
 #endif
 
 #include <stdio.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdlib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <string.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <limits.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <assert.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdint.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <inttypes.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef _MSC_VER
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
   #include "vccompat.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
   #ifndef UNUSED
     #define UNUSED
   #endif

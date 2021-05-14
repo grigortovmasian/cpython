@@ -1,9 +1,32 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 #ifndef Py_PYPORT_H
 #define Py_PYPORT_H
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pyconfig.h" /* include for defines */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <inttypes.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 
 /* Defines to build Python and its standard library:
@@ -203,26 +226,82 @@ typedef int Py_ssize_clean_t;
  * see https://bugs.python.org/issue28126 */
 #define Py_MEMCPY memcpy
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdlib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef HAVE_IEEEFP_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ieeefp.h>  /* needed for 'finite' declaration on some platforms */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
 #endif
 
 #include <math.h> /* Moved here from the math section, before extern "C" */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /********************************************
  * WRAPPER FOR <time.h> and/or <sys/time.h> *
  ********************************************/
 
 #ifdef TIME_WITH_SYS_TIME
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/time.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <time.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else /* !TIME_WITH_SYS_TIME */
 #ifdef HAVE_SYS_TIME_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/time.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else /* !HAVE_SYS_TIME_H */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <time.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* !HAVE_SYS_TIME_H */
 #endif /* !TIME_WITH_SYS_TIME */
 
@@ -234,7 +313,15 @@ typedef int Py_ssize_clean_t;
 /* NB caller must include <sys/types.h> */
 
 #ifdef HAVE_SYS_SELECT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/select.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* !HAVE_SYS_SELECT_H */
 
 /*******************************
@@ -242,9 +329,25 @@ typedef int Py_ssize_clean_t;
  *******************************/
 
 #ifdef HAVE_SYS_STAT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/stat.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #elif defined(HAVE_STAT_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stat.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifndef S_IFMT
@@ -271,7 +374,15 @@ typedef int Py_ssize_clean_t;
 #endif
 
 #ifdef __cplusplus
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 /* Move this down here since some C++ #include's don't like to be included
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
    inside an extern "C" */
 extern "C" {
 #endif
@@ -572,7 +683,15 @@ extern int gethostname(char *, int);
 #endif
 
 #ifdef HAVE__GETPTY
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>          /* we need to import mode_t */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 extern char * _getpty(int *, int, mode_t, int);
 #endif
 
@@ -580,7 +699,15 @@ extern char * _getpty(int *, int, mode_t, int);
    if TCGETA, TCSETA, TCSETAW, or TCSETAF are used.  sys/termio.h must
    be included before termios.h or it will generate an error. */
 #if defined(HAVE_SYS_TERMIO_H) && !defined(__hpux)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/termio.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 
@@ -602,8 +729,24 @@ extern char * _getpty(int *, int, mode_t, int);
     * with a slightly different signature.
     * See issue #10910
     */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <wctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #undef isalnum
 #define isalnum(c) iswalnum(btowc(c))
 #undef isalpha

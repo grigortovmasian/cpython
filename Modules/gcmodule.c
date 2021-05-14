@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
 
   Reference Cycle Garbage Collection
@@ -23,14 +30,78 @@
 
 */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_context.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pymem.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "frameobject.h"        /* for PyFrame_ClearFreeList */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pydtrace.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pytime.h"             /* for _PyTime_GetMonotonicClock() */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 module gc
@@ -1266,7 +1337,15 @@ collect_generations(struct _gc_runtime_state *state)
     return n;
 }
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/gcmodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 gc.enable

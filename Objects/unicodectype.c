@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
    Unicode character type helpers.
 
@@ -8,7 +15,15 @@
 
 */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define ALPHA_MASK 0x01
 #define DECIMAL_MASK 0x02
@@ -40,7 +55,15 @@ typedef struct {
     const unsigned short flags;
 } _PyUnicode_TypeRecord;
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "unicodetype_db.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static const _PyUnicode_TypeRecord *
 gettyperecord(Py_UCS4 code)

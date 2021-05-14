@@ -1,10 +1,41 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifdef MS_WINDOWS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <winsock2.h>         /* struct timeval */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(__APPLE__)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <mach/mach_time.h>   /* mach_absolute_time(), mach_timebase_info() */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #define _PyTime_check_mul_overflow(a, b) \

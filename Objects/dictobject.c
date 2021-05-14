@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* Dictionary object implementation using a hash table */
 
 /* The distribution includes a separate file, Objects/dictnotes.txt,
@@ -110,11 +117,51 @@ converting the dict to the combined table.
  */
 #define PyDict_MINSIZE 8
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_object.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "dict-common.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "stringlib/eq.h"    /* to get unicode_eq() */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /*[clinic input]
 class dict "PyDictObject *" "&PyDict_Type"
@@ -254,7 +301,15 @@ static int numfree = 0;
 static PyDictKeysObject *keys_free_list[PyDict_MAXFREELIST];
 static int numfreekeys = 0;
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/dictobject.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 int
 PyDict_ClearFreeList(void)

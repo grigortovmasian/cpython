@@ -1,10 +1,49 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef STDC_HEADERS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stddef.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>          /* For size_t */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 /*[clinic input]
@@ -16,7 +55,15 @@ class _tuplegetter "_tuplegetterobject *" "&tuplegetter_type"
 namespace {
 extern PyTypeObject tuplegetter_type;
 }
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_collectionsmodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* collections module implementation of a deque() datatype
    Written and maintained by Raymond D. Hettinger <python@rcn.com>

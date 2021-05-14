@@ -1,17 +1,88 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /*
  * This file includes functions to transform a concrete syntax tree (CST) to
  * an abstract syntax tree (AST). The main function is PyAST_FromNode().
  *
  */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python-ast.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "node.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "ast.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "token.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pythonrun.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <assert.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdbool.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define MAXLEVEL 200    /* Max parentheses level */
 
@@ -579,9 +650,33 @@ PyAST_Validate(mod_ty mod)
 }
 
 /* This is done here, so defines like "test" don't interfere with AST use above. */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "grammar.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "parsetok.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "graminit.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* Data structure used internally */
 struct compiling {

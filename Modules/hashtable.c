@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* The implementation of the hash table (_Py_hashtable_t) is based on the
    cfuhash project:
    http://sourceforge.net/projects/libcfu/
@@ -44,8 +51,24 @@
    ----------------------------------
 */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "hashtable.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #define HASHTABLE_MIN_SIZE 16
 #define HASHTABLE_HIGH 0.50

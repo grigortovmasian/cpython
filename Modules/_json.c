@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* JSON accelerator C extensor: _json module.
  *
  * It is built as a built-in module (Py_BUILD_CORE_BUILTIN define) on Windows
@@ -8,9 +15,33 @@
 #  error "Py_BUILD_CORE_BUILTIN or Py_BUILD_CORE_MODULE must be defined"
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_accu.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef __GNUC__
 #define UNUSED __attribute__((__unused__))

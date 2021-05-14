@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 #if defined(__ppc__) || defined(__ppc64__)
 
 /* -----------------------------------------------------------------------
@@ -28,18 +35,82 @@
    OTHER DEALINGS IN THE SOFTWARE.
    ----------------------------------------------------------------------- */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ffi.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ffi_common.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include <stdbool.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdio.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdlib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ppc-darwin.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <architecture/ppc/mode_independent_asm.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #if 0
 #if defined(POWERPC_DARWIN)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <libkern/OSCacheControl.h>	// for sys_icache_invalidate()
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #else

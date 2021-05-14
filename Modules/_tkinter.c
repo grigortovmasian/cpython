@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /***********************************************************
 Copyright (C) 1994 Steen Lumholt.
 
@@ -23,13 +30,45 @@ Copyright (C) 1994 Steen Lumholt.
 
 #define PY_SSIZE_T_CLEAN
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ctype.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
 
 #include "pythread.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef MS_WINDOWS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #define CHECK_SIZE(size, elemsize) \
@@ -41,14 +80,54 @@ Copyright (C) 1994 Steen Lumholt.
 #define TCL_THREADS
 
 #ifdef TK_FRAMEWORK
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <Tcl/tcl.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <Tk/tk.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <tcl.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <tk.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
 #endif
 
 #include "tkinter.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #if TK_HEX_VERSION < 0x08040200
 #error "Tk older than 8.4 not supported"
@@ -57,7 +136,15 @@ Copyright (C) 1994 Steen Lumholt.
 #if TK_HEX_VERSION >= 0x08050208 && TK_HEX_VERSION < 0x08060000 || \
     TK_HEX_VERSION >= 0x08060200
 #define HAVE_LIBTOMMAMTH
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <tclTomMath.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if !(defined(MS_WINDOWS) || defined(__CYGWIN__))
@@ -115,7 +202,15 @@ Copyright (C) 1994 Steen Lumholt.
 #endif
 
 #ifdef MS_WINDOWS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <conio.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #define WAIT_FOR_STDIN
 
 static PyObject *
@@ -3273,7 +3368,15 @@ _tkinter_getbusywaitinterval_impl(PyObject *module)
     return Tkinter_busywaitinterval;
 }
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/_tkinter.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyMethodDef Tktt_methods[] =
 {

@@ -1,7 +1,30 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <Python.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef MS_WIN32
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(MS_WIN32) || defined(__CYGWIN__)
@@ -1046,8 +1069,24 @@ EXPORT(S8I) __stdcall s_ret_8i_func(S8I inp) { return ret_8i_func(inp); }
 
 #ifdef MS_WIN32
 /* Should port this */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdlib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <search.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 EXPORT (HRESULT) KeepObject(IUnknown *punk)
 {

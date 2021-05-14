@@ -1,7 +1,30 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 /* -*- Mode: C; c-file-style: "python" -*- */
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <Python.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <locale.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 /* Case-insensitive string match used for nan and inf detection; t should be
    lower-case.  Returns 1 for a successful match, 0 otherwise. */

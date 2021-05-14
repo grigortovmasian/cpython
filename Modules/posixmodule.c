@@ -1,3 +1,10 @@
+#ifdef USE_IDOUBLE
+#include "idouble.h"
+#include "ibool.h"
+#include "icmath.h"
+#define double idouble
+#endif
+
 
 /* POSIX module implementation */
 
@@ -24,21 +31,69 @@
 
 #define PY_SSIZE_T_CLEAN
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "Python.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifdef MS_WINDOWS
    /* include <windows.h> early to avoid conflict with pycore_condvar.h:
 
         #define WIN32_LEAN_AND_MEAN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
         #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
       FSCTL_GET_REPARSE_POINT is not exported with WIN32_LEAN_AND_MEAN. */
 #  include <windows.h>
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_ceval.h"     /* _PyEval_ReInitThreads() */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pycore_pystate.h"   /* _PyRuntime */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "pythread.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "structmember.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifndef MS_WINDOWS
 #  include "posixmodule.h"
 #else
@@ -51,7 +106,15 @@
 #undef HAVE_FACCESSAT
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stdio.h>  /* needed for ctermid() */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,60 +128,172 @@ corresponding Unix manual entries for more information on calls.");
 
 
 #ifdef HAVE_SYS_UIO_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/uio.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SYS_SYSMACROS_H
 /* GNU C Library: major(), minor(), makedev() */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/sysmacros.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SYS_TYPES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/types.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_SYS_TYPES_H */
 
 #ifdef HAVE_SYS_STAT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/stat.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_SYS_STAT_H */
 
 #ifdef HAVE_SYS_WAIT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/wait.h>           /* For WNOHANG */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SIGNAL_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <signal.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_FCNTL_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <fcntl.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_FCNTL_H */
 
 #ifdef HAVE_GRP_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <grp.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SYSEXITS_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sysexits.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_SYSEXITS_H */
 
 #ifdef HAVE_SYS_LOADAVG_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/loadavg.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SYS_SENDFILE_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/sendfile.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(__APPLE__)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <copyfile.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_SCHED_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sched.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_COPY_FILE_RANGE
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <unistd.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if !defined(CPU_ALLOC) && defined(HAVE_SCHED_SETAFFINITY)
@@ -130,21 +305,53 @@ corresponding Unix manual entries for more information on calls.");
 #endif
 
 #ifdef USE_XATTRS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/xattr.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__)
 #ifdef HAVE_SYS_SOCKET_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/socket.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #endif
 
 #ifdef HAVE_DLFCN_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <dlfcn.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef __hpux
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/mpctl.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #if defined(__DragonFly__) || \
@@ -152,7 +359,15 @@ corresponding Unix manual entries for more information on calls.");
     defined(__FreeBSD__)   || \
     defined(__NetBSD__)    || \
     defined(__APPLE__)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/sysctl.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_LINUX_RANDOM_H
@@ -179,7 +394,15 @@ corresponding Unix manual entries for more information on calls.");
 #if defined(__WATCOMC__) && !defined(__QNX__)           /* Watcom compiler */
 #define HAVE_OPENDIR    1
 #define HAVE_SYSTEM     1
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <process.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
 #ifdef _MSC_VER         /* Microsoft compiler */
 #define HAVE_GETPPID    1
@@ -234,10 +457,42 @@ extern char        *ctermid_r(char *);
 #endif /* !_MSC_VER */
 
 #if defined(__VXWORKS__)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <vxCpuLib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <rtpLib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <wait.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <taskLib.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #ifndef _P_WAIT
 #define _P_WAIT          0
 #define _P_NOWAIT        1
@@ -246,61 +501,173 @@ extern char        *ctermid_r(char *);
 #endif /* __VXWORKS__ */
 
 #ifdef HAVE_POSIX_SPAWN
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <spawn.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef HAVE_UTIME_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <utime.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_UTIME_H */
 
 #ifdef HAVE_SYS_UTIME_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/utime.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #define HAVE_UTIME_H /* pretend we do for the rest of this file */
 #endif /* HAVE_SYS_UTIME_H */
 
 #ifdef HAVE_SYS_TIMES_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/times.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_SYS_TIMES_H */
 
 #ifdef HAVE_SYS_PARAM_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/param.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_SYS_PARAM_H */
 
 #ifdef HAVE_SYS_UTSNAME_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/utsname.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_SYS_UTSNAME_H */
 
 #ifdef HAVE_DIRENT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <dirent.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #define NAMLEN(dirent) strlen((dirent)->d_name)
 #else
 #if defined(__WATCOMC__) && !defined(__QNX__)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <direct.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #define NAMLEN(dirent) strlen((dirent)->d_name)
 #else
 #define dirent direct
 #define NAMLEN(dirent) (dirent)->d_namlen
 #endif
 #ifdef HAVE_SYS_NDIR_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/ndir.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_SYS_DIR_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/dir.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_NDIR_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <ndir.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #endif
 
 #ifdef _MSC_VER
 #ifdef HAVE_DIRECT_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <direct.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_IO_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <io.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_PROCESS_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <process.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifndef IO_REPARSE_TAG_SYMLINK
 #define IO_REPARSE_TAG_SYMLINK (0xA000000CL)
@@ -308,11 +675,51 @@ extern char        *ctermid_r(char *);
 #ifndef IO_REPARSE_TAG_MOUNT_POINT
 #define IO_REPARSE_TAG_MOUNT_POINT (0xA0000003L)
 #endif
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "osdefs.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <malloc.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <windows.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <shellapi.h>   /* for ShellExecute() */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <lmcons.h>     /* for UNLEN */
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #define HAVE_SYMLINK
 #endif /* _MSC_VER */
 
@@ -370,13 +777,37 @@ extern char        *ctermid_r(char *);
 #endif
 
 #if defined(MAJOR_IN_MKDEV)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/mkdev.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
 #if defined(MAJOR_IN_SYSMACROS)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/sysmacros.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #if defined(HAVE_MKNOD) && defined(HAVE_SYS_MKDEV_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/mkdev.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #endif
 
@@ -397,13 +828,37 @@ extern char        *ctermid_r(char *);
  * linux/memfd.h defines additional flags
  */
 #ifdef HAVE_SYS_MMAN_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/mman.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_SYS_MEMFD_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/memfd.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #ifdef HAVE_LINUX_MEMFD_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <linux/memfd.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 #ifdef _Py_MEMORY_SANITIZER
@@ -1371,7 +1826,15 @@ win32_get_reparse_tag(HANDLE reparse_point_handle, ULONG *reparse_tag)
 ** environ directly, we must obtain it with _NSGetEnviron(). See also
 ** man environ(7).
 */
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <crt_externs.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #elif !defined(_MSC_VER) && (!defined(__WATCOMC__) || defined(__QNX__) || defined(__VXWORKS__))
 extern char **environ;
 #endif /* !_MSC_VER */
@@ -4112,7 +4575,15 @@ os_mkdir_impl(PyObject *module, path_t *path, int mode, int dir_fd)
 
 /* sys/resource.h is needed for at least: wait3(), wait4(), broken nice. */
 #if defined(HAVE_SYS_RESOURCE_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/resource.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 
@@ -6638,18 +7109,50 @@ error:
 
 #if defined(HAVE_OPENPTY) || defined(HAVE_FORKPTY) || defined(HAVE_DEV_PTMX)
 #ifdef HAVE_PTY_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <pty.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
 #ifdef HAVE_LIBUTIL_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <libutil.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #else
 #ifdef HAVE_UTIL_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <util.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif /* HAVE_UTIL_H */
 #endif /* HAVE_LIBUTIL_H */
 #endif /* HAVE_PTY_H */
 #ifdef HAVE_STROPTS_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <stropts.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 #endif /* defined(HAVE_OPENPTY) || defined(HAVE_FORKPTY) || defined(HAVE_DEV_PTMX) */
 
@@ -7182,7 +7685,15 @@ os_setpgrp_impl(PyObject *module)
 #ifdef HAVE_GETPPID
 
 #ifdef MS_WINDOWS
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <tlhelp32.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyObject*
 win32_getppid()
@@ -7402,7 +7913,15 @@ os_killpg_impl(PyObject *module, pid_t pgid, int signal)
 
 #ifdef HAVE_PLOCK
 #ifdef HAVE_SYS_LOCK_H
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/lock.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 #endif
 
 /*[clinic input]
@@ -10462,7 +10981,15 @@ os_WSTOPSIG_impl(PyObject *module, int status)
    needed definitions in sys/statvfs.h */
 #define _SVID3
 #endif
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/statvfs.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyObject*
 _pystatvfs_fromstructstatvfs(struct statvfs st) {
@@ -10548,7 +11075,15 @@ os_fstatvfs_impl(PyObject *module, int fd)
 
 
 #if defined(HAVE_STATVFS) && defined(HAVE_SYS_STATVFS_H)
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include <sys/statvfs.h>
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 /*[clinic input]
 os.statvfs
 
@@ -12875,7 +13410,15 @@ static PyMemberDef DirEntry_members[] = {
     {NULL}
 };
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 #include "clinic/posixmodule.c.h"
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 static PyMethodDef DirEntry_methods[] = {
     OS_DIRENTRY_IS_DIR_METHODDEF
