@@ -126,11 +126,19 @@ _Py_HashDouble(double v)
     /* process 28 bits at a time;  this should work well both for binary
        and hexadecimal floating point. */
     x = 0;
+    #ifdef USE_IDOUBLE
+    while (idoubleToBool(m)) {
+    #else
     while (m) {
+    #endif
         x = ((x << 28) & _PyHASH_MODULUS) | x >> (_PyHASH_BITS - 28);
         m *= 268435456.0;  /* 2**28 */
         e -= 28;
+        #ifdef USE_IDOUBLE
+        y = (Py_uhash_t)idoubleToInt(m);  /* pull out integer part */
+        #else
         y = (Py_uhash_t)m;  /* pull out integer part */
+        #endif
         m -= y;
         x += y;
         if (x >= _PyHASH_MODULUS)

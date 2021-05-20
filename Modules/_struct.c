@@ -754,7 +754,11 @@ np_halffloat(char *p, PyObject *v, const formatdef *f)
 static int
 np_float(char *p, PyObject *v, const formatdef *f)
 {
+    #ifdef USE_IDOUBLE
+    float x = idoubleTofloat(PyFloat_AsDouble(v));
+    #else
     float x = (float)PyFloat_AsDouble(v);
+    #endif
     if (x == -1 && PyErr_Occurred()) {
         PyErr_SetString(StructError,
                         "required argument is not a float");

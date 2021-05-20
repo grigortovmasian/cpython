@@ -816,7 +816,7 @@ ast_error(struct compiling *c, const node *n, const char *errmsg, ...)
    small_stmt elements is returned.
 */
 
-static string
+static str
 new_type_comment(const char *s, struct compiling *c)
 {
     PyObject *res = PyUnicode_DecodeUTF8(s, strlen(s), NULL);
@@ -948,7 +948,7 @@ PyAST_FromNodeObject(const node *n, PyCompilerFlags *flags,
                 goto out;
 
             for (i = 0; i < num; i++) {
-                string type_comment = new_type_comment(STR(CHILD(ch, i)), &c);
+                str type_comment = new_type_comment(STR(CHILD(ch, i)), &c);
                 if (!type_comment)
                     goto out;
                 type_ignore_ty ti = TypeIgnore(LINENO(CHILD(ch, i)), type_comment, arena);
@@ -1919,7 +1919,7 @@ ast_for_funcdef_impl(struct compiling *c, const node *n0,
     int name_i = 1;
     int end_lineno, end_col_offset;
     node *tc;
-    string type_comment = NULL;
+    str type_comment = NULL;
 
     if (is_async && c->c_feature_version < 5) {
         ast_error(c, n,
@@ -3535,7 +3535,7 @@ ast_for_expr_stmt(struct compiling *c, const node *n)
         asdl_seq *targets;
         node *value;
         expr_ty expression;
-        string type_comment;
+        str type_comment;
 
         /* a normal assignment */
         REQ(CHILD(n, 1), EQUAL);
@@ -4273,7 +4273,7 @@ ast_for_for_stmt(struct compiling *c, const node *n0, bool is_async)
     const node *node_target;
     int end_lineno, end_col_offset;
     int has_type_comment;
-    string type_comment;
+    str type_comment;
 
     if (is_async && c->c_feature_version < 5) {
         ast_error(c, n,
@@ -4507,7 +4507,7 @@ ast_for_with_stmt(struct compiling *c, const node *n0, bool is_async)
     const node * const n = is_async ? CHILD(n0, 1) : n0;
     int i, n_items, nch_minus_type, has_type_comment, end_lineno, end_col_offset;
     asdl_seq *items, *body;
-    string type_comment;
+    str type_comment;
 
     if (is_async && c->c_feature_version < 5) {
         ast_error(c, n,

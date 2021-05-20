@@ -256,7 +256,11 @@ PyMember_SetOne(char *addr, PyMemberDef *l, PyObject *v)
         double double_val = PyFloat_AsDouble(v);
         if ((double_val == -1) && PyErr_Occurred())
             return -1;
+        #ifdef USE_IDOUBLE
+        *(float*)addr = idoubleTofloat(double_val);
+        #else
         *(float*)addr = (float)double_val;
+        #endif
         break;
         }
     case T_DOUBLE:

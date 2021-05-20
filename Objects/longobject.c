@@ -489,7 +489,11 @@ PyLong_FromDouble(double dval)
         return NULL;
     frac = ldexp(frac, (expo-1) % PyLong_SHIFT + 1);
     for (i = ndig; --i >= 0; ) {
+        #ifdef USE_IDOUBLE
+        digit bits = (digit)idoubleToInt(frac);
+	#else
         digit bits = (digit)frac;
+        #endif
         v->ob_digit[i] = bits;
         frac = frac - (double)bits;
         frac = ldexp(frac, PyLong_SHIFT);
@@ -2555,7 +2559,11 @@ digit beyond the first.
                             "too many digits in integer");
             return NULL;
         }
+        #ifdef USE_IDOUBLE
+        size_z = (Py_ssize_t)idoubleToInt(fsize_z);
+        #else
         size_z = (Py_ssize_t)fsize_z;
+        #endif
         /* Uncomment next line to test exceedingly rare copy code */
         /* size_z = 1; */
         assert(size_z > 0);

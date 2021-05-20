@@ -923,7 +923,11 @@ convertsimple(PyObject *arg, const char **p_format, va_list *p_va, int flags,
         if (dval == -1.0 && PyErr_Occurred())
             RETURN_ERR_OCCURRED;
         else
+	    #ifdef USE_IDOUBLE
+            *p = idoubleTofloat(dval);
+	    #else
             *p = (float) dval;
+	    #endif
         break;
     }
 

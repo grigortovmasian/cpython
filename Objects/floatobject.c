@@ -646,7 +646,11 @@ float_rem(PyObject *v, PyObject *w)
     }
     PyFPE_START_PROTECT("modulo", return 0)
     mod = fmod(vx, wx);
+    #ifdef USE_IDOUBLE
+    if (idoubleToBool(mod)) {
+    #else
     if (mod) {
+    #endif
         /* ensure the remainder has the same sign as the denominator */
         if ((wx < 0) != (mod < 0)) {
             mod += wx;
@@ -682,7 +686,11 @@ float_divmod(PyObject *v, PyObject *w)
        it will always be very close to one.
     */
     div = (vx - mod) / wx;
+    #ifdef USE_IDOUBLE
+    if (idoubleToBool(mod)) {
+    #else
     if (mod) {
+    #endif
         /* ensure the remainder has the same sign as the denominator */
         if ((wx < 0) != (mod < 0)) {
             mod += wx;
@@ -696,7 +704,11 @@ float_divmod(PyObject *v, PyObject *w)
         mod = copysign(0.0, wx);
     }
     /* snap quotient to nearest integral value */
+    #ifdef USE_IDOUBLE
+    if (idoubleToBool(div)) {
+    #else
     if (div) {
+    #endif
         floordiv = floor(div);
         if (div - floordiv > 0.5)
             floordiv += 1.0;
@@ -927,7 +939,11 @@ float___trunc___impl(PyObject *self)
      * that wholepart is actually greater than LONG_MAX.
      */
     if (LONG_MIN < wholepart && wholepart < LONG_MAX) {
+        #ifdef USE_IDOUBLE
+        const long aslong = (long)idoubleToInt(wholepart);
+	#else
         const long aslong = (long)wholepart;
+        #endif
         return PyLong_FromLong(aslong);
     }
     return PyLong_FromDouble(wholepart);
@@ -1247,16 +1263,32 @@ float_hex_impl(PyObject *self)
     e -= shift;
 
     si = 0;
+    #ifdef USE_IDOUBLE
+    s[si] = char_from_hex(idoubleToInt(m));
+    #else
     s[si] = char_from_hex((int)m);
+    #endif
     si++;
+    #ifdef USE_IDOUBLE
+    m -= idoubleToInt(m);
+    #else
     m -= (int)m;
+    #endif
     s[si] = '.';
     si++;
     for (i=0; i < (TOHEX_NBITS-1)/4; i++) {
         m *= 16.0;
+        #ifdef USE_IDOUBLE
+        s[si] = char_from_hex(idoubleToInt(m));
+        #else
         s[si] = char_from_hex((int)m);
+        #endif
         si++;
+        #ifdef USE_IDOUBLE
+        m -= idoubleToInt(m);
+        #else
         m -= (int)m;
+        #endif
     }
     s[si] = '\0';
 
@@ -2138,7 +2170,11 @@ _PyFloat_Pack2(double x, unsigned char *p, int le)
 
         f *= 1024.0; /* 2**10 */
         /* Round to even */
+        #ifdef USE_IDOUBLE
+        bits = (unsigned short)idoubleToInt(f); /* Note the truncation */
+        #else
         bits = (unsigned short)f; /* Note the truncation */
+        #endif
         assert(bits < 1024);
         assert(e < 31);
         if ((f - bits > 0.5) || ((f - bits == 0.5) && (bits % 2 == 1))) {
@@ -2226,7 +2262,11 @@ _PyFloat_Pack4(double x, unsigned char *p, int le)
         }
 
         f *= 8388608.0; /* 2**23 */
+        #ifdef USE_IDOUBLE
+        fbits = (unsigned int)idoubleToInt(f + 0.5); /* Round */
+        #else
         fbits = (unsigned int)(f + 0.5); /* Round */
+        #endif
         assert(fbits <= 8388608);
         if (fbits >> 23) {
             /* The carry propagated out of a string of 23 1 bits. */
@@ -2256,7 +2296,11 @@ _PyFloat_Pack4(double x, unsigned char *p, int le)
 
     }
     else {
+        #ifdef USE_IDOUBLE
+        float y = idoubleTofloat(x);
+        #else
         float y = (float)x;
+        #endif
         int i, incr = 1;
 
         if (Py_IS_INFINITY(y) && !Py_IS_INFINITY(x))
@@ -2334,12 +2378,20 @@ _PyFloat_Pack8(double x, unsigned char *p, int le)
 
         /* fhi receives the high 28 bits; flo the low 24 bits (== 52 bits) */
         f *= 268435456.0; /* 2**28 */
+        #ifdef USE_IDOUBLE
+        fhi = (unsigned int)idoubleToInt(f); /* Truncate */
+        #else
         fhi = (unsigned int)f; /* Truncate */
+        #endif
         assert(fhi < 268435456);
 
         f -= (double)fhi;
         f *= 16777216.0; /* 2**24 */
+        #ifdef USE_IDOUBLE
+        flo = (unsigned int)idoubleToInt(f + 0.5); /* Round */
+        #else
         flo = (unsigned int)(f + 0.5); /* Round */
+        #endif
         assert(flo <= 16777216);
         if (flo >> 24) {
             /* The carry propagated out of a string of 24 1 bits. */

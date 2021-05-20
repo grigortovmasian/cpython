@@ -207,7 +207,16 @@ static double private_mem[PRIVATE_mem], *pmem_next = private_mem;
 extern "C" {
 #endif
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 typedef union { double d; ULong L[2]; } U;
+
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
+
 
 #ifdef IEEE_8087
 #define word0(x) (x)->L[1]
@@ -1138,8 +1147,14 @@ ratio(Bigint *a, Bigint *b)
     U da, db;
     int k, ka, kb;
 
-    dval(&da) = b2d(a, &ka);
-    dval(&db) = b2d(b, &kb);
+    #ifdef USE_IDOUBLE
+    dval(&da) = idoubleTofloat(b2d(a, &ka));
+    dval(&db) = idoubleTofloat(b2d(b, &kb));
+    #else
+    dval(&da) = (b2d(a, &ka));
+    dval(&db) = (b2d(b, &kb));
+    #endif
+
     k = ka - kb + 32*(a->wds - b->wds);
     if (k > 0)
         word0(&da) += k*Exp_msk1;
@@ -1427,7 +1442,12 @@ bigcomp(U *rv, const char *s0, BCinfo *bc)
     Bfree(b);
     Bfree(d);
     if (dd > 0 || (dd == 0 && odd))
+	#ifdef USE_IDOUBLE
+        dval(rv) += idoubleTofloat(sulp(rv, bc));
+        #else
         dval(rv) += sulp(rv, bc);
+        #endif
+
     return 0;
 }
 
@@ -1664,7 +1684,12 @@ _Py_dg_strtod(const char *s00, char **se)
     k = nd < DBL_DIG + 1 ? nd : DBL_DIG + 1;
     dval(&rv) = y;
     if (k > 9) {
+        #ifdef USE_IDOUBLE
+        dval(&rv) = idoubleTofloat(tens[k - 9] * dval(&rv) + z);
+        #else
         dval(&rv) = tens[k - 9] * dval(&rv) + z;
+        #endif
+
     }
     if (nd <= DBL_DIG
         && Flt_Rounds == 1
@@ -1673,7 +1698,11 @@ _Py_dg_strtod(const char *s00, char **se)
             goto ret;
         if (e > 0) {
             if (e <= Ten_pmax) {
+                #ifdef USE_IDOUBLE
+                dval(&rv) *= idoubleTofloat(tens[e]);
+		#else
                 dval(&rv) *= tens[e];
+                #endif
                 goto ret;
             }
             i = DBL_DIG - nd;
@@ -1682,13 +1711,22 @@ _Py_dg_strtod(const char *s00, char **se)
                  * this for larger i values.
                  */
                 e -= i;
+                #ifdef USE_IDOUBLE
+                dval(&rv) *= idoubleTofloat(tens[i]);
+                dval(&rv) *= idoubleTofloat(tens[e]);
+                #else
                 dval(&rv) *= tens[i];
                 dval(&rv) *= tens[e];
+                #endif
                 goto ret;
             }
         }
         else if (e >= -Ten_pmax) {
+            #ifdef USE_IDOUBLE
+            dval(&rv) /= idoubleTofloat(tens[-e]);
+	    #else
             dval(&rv) /= tens[-e];
+            #endif
             goto ret;
         }
     }
@@ -1700,17 +1738,29 @@ _Py_dg_strtod(const char *s00, char **se)
 
     if (e1 > 0) {
         if ((i = e1 & 15))
+            #ifdef USE_IDOUBLE
+            dval(&rv) *= idoubleTofloat(tens[i]);
+            #else
             dval(&rv) *= tens[i];
+            #endif
         if (e1 &= ~15) {
             if (e1 > DBL_MAX_10_EXP)
                 goto ovfl;
             e1 >>= 4;
             for(j = 0; e1 > 1; j++, e1 >>= 1)
                 if (e1 & 1)
+                    #ifdef USE_IDOUBLE
+                    dval(&rv) *= idoubleTofloat(bigtens[j]);
+                    #else
                     dval(&rv) *= bigtens[j];
+	            #endif
             /* The last multiplication could overflow. */
             word0(&rv) -= P*Exp_msk1;
+            #ifdef USE_IDOUBLE
+            dval(&rv) *= idoubleTofloat(bigtens[j]);
+            #else
             dval(&rv) *= bigtens[j];
+            #endif
             if ((z = word0(&rv) & Exp_mask)
                 > Exp_msk1*(DBL_MAX_EXP+Bias-P))
                 goto ovfl;
@@ -1737,7 +1787,11 @@ _Py_dg_strtod(const char *s00, char **se)
 
         e1 = -e1;
         if ((i = e1 & 15))
+            #ifdef USE_IDOUBLE
+            dval(&rv) /= idoubleTofloat(tens[i]);
+	    #else
             dval(&rv) /= tens[i];
+	    #endif
         if (e1 >>= 4) {
             if (e1 >= 1 << n_bigtens)
                 goto undfl;
@@ -1745,7 +1799,11 @@ _Py_dg_strtod(const char *s00, char **se)
                 bc.scale = 2*P;
             for(j = 0; e1 > 0; j++, e1 >>= 1)
                 if (e1 & 1)
+                    #ifdef USE_IDOUBLE
+                    dval(&rv) *= idoubleTofloat(tinytens[j]);
+                    #else
                     dval(&rv) *= tinytens[j];
+	            #endif
             if (bc.scale && (j = 2*P + 1 - ((word0(&rv) & Exp_mask)
                                             >> Exp_shift)) > 0) {
                 /* scaled rv is denormal; clear j low bits */
@@ -1966,7 +2024,11 @@ _Py_dg_strtod(const char *s00, char **se)
                 /* rv / 2^bc.scale = 2^(j - 1023 - bc.scale); use bigcomp if
                    rv / 2^bc.scale >= 2^-1021. */
                 if (j - bc.scale >= 2) {
+		    #ifdef USE_IDOUBLE
+                    dval(&rv) -= 0.5 * idoubleTofloat(sulp(&rv, &bc));
+		    #else
                     dval(&rv) -= 0.5 * sulp(&rv, &bc);
+                    #endif
                     break; /* Use bigcomp. */
                 }
             }
@@ -2039,10 +2101,17 @@ _Py_dg_strtod(const char *s00, char **se)
             }
             if (!odd)
                 break;
+            #ifdef USE_IDOUBLE
+            if (dsign)
+                dval(&rv) += idoubleTofloat(sulp(&rv, &bc));
+            else {
+                dval(&rv) -= idoubleTofloat(sulp(&rv, &bc));
+            #else
             if (dsign)
                 dval(&rv) += sulp(&rv, &bc);
             else {
                 dval(&rv) -= sulp(&rv, &bc);
+	    #endif
                 if (!dval(&rv)) {
                     if (bc.nd >nd)
                         break;
@@ -2088,7 +2157,11 @@ _Py_dg_strtod(const char *s00, char **se)
         if (y == Exp_msk1*(DBL_MAX_EXP+Bias-1)) {
             dval(&rv0) = dval(&rv);
             word0(&rv) -= P*Exp_msk1;
+            #ifdef USE_IDOUBLE
+            adj.d = idoubleTofloat(aadj1 * ulp(&rv));
+            #else
             adj.d = aadj1 * ulp(&rv);
+            #endif
             dval(&rv) += adj.d;
             if ((word0(&rv) & Exp_mask) >=
                 Exp_msk1*(DBL_MAX_EXP+Bias-P)) {
@@ -2105,16 +2178,28 @@ _Py_dg_strtod(const char *s00, char **se)
         else {
             if (bc.scale && y <= 2*P*Exp_msk1) {
                 if (aadj <= 0x7fffffff) {
+		    #ifdef USE_IDOUBLE
+                    if ((z = (ULong) idoubleToInt(aadj)) <= 0)
+		    #else
                     if ((z = (ULong)aadj) <= 0)
+	            #endif
                         z = 1;
                     aadj = z;
                     aadj1 = dsign ? aadj : -aadj;
                 }
+                #ifdef USE_IDOUBLE
+                dval(&aadj2) = idoubleTofloat(aadj1);
+                #else
                 dval(&aadj2) = aadj1;
+                #endif
                 word0(&aadj2) += (2*P+1)*Exp_msk1 - y;
                 aadj1 = dval(&aadj2);
             }
+            #ifdef USE_IDOUBLE
+            adj.d = idoubleTofloat(aadj1 * ulp(&rv));
+            #else
             adj.d = aadj1 * ulp(&rv);
+            #endif
             dval(&rv) += adj.d;
         }
         z = word0(&rv) & Exp_mask;
@@ -2122,7 +2207,11 @@ _Py_dg_strtod(const char *s00, char **se)
             if (!bc.scale)
                 if (y == z) {
                     /* Can we stop now? */
+		    #ifdef USE_IDOUBLE
+                    L = (Long) idoubleToInt(aadj);
+		    #else
                     L = (Long)aadj;
+                    #endif
                     aadj -= L;
                     /* The tolerances below are conservative. */
                     if (dsign || word1(&rv) || word0(&rv) & Bndry_mask) {
@@ -2324,7 +2413,11 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
     mlo = mhi = S = 0;
     s0 = 0;
 
+    #ifdef USE_IDOUBLE
+    u.d = idoubleTofloat(dd);
+    #else
     u.d = dd;
+    #endif
     if (word0(&u) & Sign_bit) {
         /* set sign for everything, including 0's and NaNs */
         *sign = 1;
@@ -2395,7 +2488,11 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
     }
     ds = (dval(&d2)-1.5)*0.289529654602168 + 0.1760912590558 +
         i*0.301029995663981;
+    #ifdef USE_IDOUBLE
+    k = idoubleToInt(ds);
+    #else
     k = (int)ds;
+    #endif
     if (ds < 0. && ds != k)
         k--;    /* want k = floor(ds) */
     k_check = 1;
@@ -2480,7 +2577,11 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
             if (j & Bletch) {
                 /* prevent overflows */
                 j &= Bletch - 1;
+                #ifdef USE_IDOUBLE
+                dval(&u) /= idoubleToInt(bigtens[n_bigtens-1]);
+                #else
                 dval(&u) /= bigtens[n_bigtens-1];
+                #endif
                 ieps++;
             }
             for(; j; j >>= 1, i++)
@@ -2488,14 +2589,26 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
                     ieps++;
                     ds *= bigtens[i];
                 }
+            #ifdef USE_IDOUBLE
+            dval(&u) /= idoubleTofloat(ds);
+            #else
             dval(&u) /= ds;
+            #endif
         }
         else if ((j1 = -k)) {
+            #ifdef USE_IDOUBLE
+            dval(&u) *= idoubleTofloat(tens[j1 & 0xf]);
+   	    #else
             dval(&u) *= tens[j1 & 0xf];
+            #endif
             for(j = j1 >> 4; j; j >>= 1, i++)
                 if (j & 1) {
                     ieps++;
+                    #ifdef USE_IDOUBLE
+                    dval(&u) *= idoubleTofloat(bigtens[i]);
+                    #else
                     dval(&u) *= bigtens[i];
+                    #endif
                 }
         }
         if (k_check && dval(&u) < 1. && ilim > 0) {
@@ -2521,7 +2634,11 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
             /* Use Steele & White method of only
              * generating digits needed.
              */
+	    #ifdef USE_IDOUBLE
+            dval(&eps) =  idoubleTofloat(0.5/tens[ilim-1] - dval(&eps));
+	    #else
             dval(&eps) = 0.5/tens[ilim-1] - dval(&eps);
+            #endif
             for(i = 0;;) {
                 L = (Long)dval(&u);
                 dval(&u) -= L;
@@ -2538,7 +2655,11 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
         }
         else {
             /* Generate ilim digits, then fix them up. */
+	    #ifdef USE_IDOUBLE
+            dval(&eps) *=  idoubleTofloat(tens[ilim-1]);
+	    #else
             dval(&eps) *= tens[ilim-1];
+            #endif
             for(i = 1;; i++, dval(&u) *= 10.) {
                 L = (Long)(dval(&u));
                 if (!(dval(&u) -= L))
@@ -2575,8 +2696,13 @@ _Py_dg_dtoa(double dd, int mode, int ndigits,
             goto one_digit;
         }
         for(i = 1;; i++, dval(&u) *= 10.) {
+	    #ifdef USE_IDOUBLE
+            L = (Long)idoubleToInt(dval(&u) / ds);
+            dval(&u) -= idoubleTofloat(L*ds);
+	    #else
             L = (Long)(dval(&u) / ds);
             dval(&u) -= L*ds;
+            #endif
             *s++ = '0' + (int)L;
             if (!dval(&u)) {
                 break;

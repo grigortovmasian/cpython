@@ -581,7 +581,13 @@ complex_pow(PyObject *v, PyObject *w, PyObject *z)
     PyFPE_START_PROTECT("complex_pow", return 0)
     errno = 0;
     exponent = b;
+    
+    #ifdef USE_IDOUBLE
+       int_exponent = idoubleToInt(exponent.real);
+    #else
     int_exponent = (long)exponent.real;
+    #endif
+
     if (exponent.imag == 0. && exponent.real == int_exponent)
         p = c_powi(a, int_exponent);
     else

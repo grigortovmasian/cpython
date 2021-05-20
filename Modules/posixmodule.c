@@ -12338,6 +12338,10 @@ the last 1, 5, and 15 minutes as a tuple of three floats.
 Raises OSError if the load average was unobtainable.
 [clinic start generated code]*/
 
+#ifdef USE_IDOUBLE
+#undef double
+#endif
+
 static PyObject *
 os_getloadavg_impl(PyObject *module)
 /*[clinic end generated code: output=9ad3a11bfb4f4bd2 input=3d6d826b76d8a34e]*/
@@ -12350,6 +12354,10 @@ os_getloadavg_impl(PyObject *module)
         return Py_BuildValue("ddd", loadavg[0], loadavg[1], loadavg[2]);
 }
 #endif /* HAVE_GETLOADAVG */
+
+#ifdef USE_IDOUBLE
+#define double idouble
+#endif
 
 
 /*[clinic input]

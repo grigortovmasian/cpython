@@ -311,8 +311,14 @@ semlock_acquire(SemLockObject *self, PyObject *args, PyObject *kwds)
             PyErr_SetFromErrno(PyExc_OSError);
             return NULL;
         }
-        sec = (long) timeout;
-        nsec = (long) (1e9 * (timeout - sec) + 0.5);
+
+	#ifdef USE_IDOUBLE
+        long sec = (long)idoubleToInt(timeout);
+        long nsec = (long)idoubleToInt(1e9 * (timeout - sec) + 0.5);
+        #else
+        long sec = (long) timeout;
+        long nsec = (long) (1e9 * (timeout - sec) + 0.5);
+        #endif
         deadline.tv_sec = now.tv_sec + sec;
         deadline.tv_nsec = now.tv_usec * 1000 + nsec;
         deadline.tv_sec += (deadline.tv_nsec / 1000000000);

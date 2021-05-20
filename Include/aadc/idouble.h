@@ -276,6 +276,7 @@ public:
         val = other.val;
         return *this;
     }
+
     idouble& operator += (const idouble& other) {
         idouble tmp;
         // TODO: Implement += more efficiently

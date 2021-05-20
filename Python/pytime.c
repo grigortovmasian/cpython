@@ -140,7 +140,11 @@ static double
 _PyTime_Round(double x, _PyTime_round_t round)
 {
     /* volatile avoids optimization changing how numbers are rounded */
+    #ifdef USE_IDOUBLE
+    double d;
+    #else
     volatile double d;
+    #endif
 
     d = x;
     if (round == _PyTime_ROUND_HALF_EVEN) {
@@ -166,7 +170,11 @@ _PyTime_DoubleToDenominator(double d, time_t *sec, long *numerator,
     double denominator = (double)idenominator;
     double intpart;
     /* volatile avoids optimization changing how numbers are rounded */
+    #ifdef USE_IDOUBLE
+    double floatpart;
+    #else
     volatile double floatpart;
+    #endif
 
     floatpart = modf(d, &intpart);
 
@@ -186,8 +194,13 @@ _PyTime_DoubleToDenominator(double d, time_t *sec, long *numerator,
         error_time_t_overflow();
         return -1;
     }
+    #ifdef USE_IDOUBLE 
+    *sec = (time_t)idoubleToInt(intpart);
+    *numerator = (long)idoubleToInt(floatpart);
+    #else
     *sec = (time_t)intpart;
     *numerator = (long)floatpart;
+    #endif
     assert(0 <= *numerator && *numerator < idenominator);
     return 0;
 }
@@ -224,7 +237,11 @@ _PyTime_ObjectToTime_t(PyObject *obj, time_t *sec, _PyTime_round_t round)
     if (PyFloat_Check(obj)) {
         double intpart;
         /* volatile avoids optimization changing how numbers are rounded */
-        volatile double d;
+        #ifdef USE_IDOUBLE
+	double d;
+        #else
+	volatile double d;
+        #endif
 
         d = PyFloat_AsDouble(obj);
         if (Py_IS_NAN(d)) {
@@ -239,7 +256,11 @@ _PyTime_ObjectToTime_t(PyObject *obj, time_t *sec, _PyTime_round_t round)
             error_time_t_overflow();
             return -1;
         }
+        #ifdef USE_IDOUBLE
+        *sec = (time_t)idoubleToInt(intpart);
+        #else
         *sec = (time_t)intpart;
+        #endif
         return 0;
     }
     else {
@@ -413,7 +434,11 @@ _PyTime_FromDouble(_PyTime_t *t, double value, _PyTime_round_t round,
                    long unit_to_ns)
 {
     /* volatile avoids optimization changing how numbers are rounded */
+    #ifdef USE_IDOUBLE
+    double d;
+    #else
     volatile double d;
+    #endif
 
     /* convert to a number of nanoseconds */
     d = value;
@@ -424,7 +449,11 @@ _PyTime_FromDouble(_PyTime_t *t, double value, _PyTime_round_t round,
         _PyTime_overflow();
         return -1;
     }
+    #ifdef USE_IDOUBLE
+    *t = (_PyTime_t)idoubleToInt(d);
+    #else
     *t = (_PyTime_t)d;
+    #endif
     return 0;
 }
 
@@ -478,7 +507,11 @@ double
 _PyTime_AsSecondsDouble(_PyTime_t t)
 {
     /* volatile avoids optimization changing how numbers are rounded */
+    #ifdef USE_IDOUBLE
+    double d;
+    #else
     volatile double d;
+    #endif
 
     if (t % SEC_TO_NS == 0) {
         _PyTime_t secs;

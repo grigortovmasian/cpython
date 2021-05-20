@@ -4315,7 +4315,11 @@ _mpd_get_exp_iterations(const mpd_t *r, mpd_ssize_t p)
      *    2) exp-iter-approx-upper-bound: The term below is less than
      *       or equal to 3/2 * p <= 3/2 * 2**52.
      */
+    #ifdef USE_IDOUBLE
+    n = (mpd_ssize_t)idoubleToInt(ceil((1.43503*(double)p - 1.182) / (double)log10pbyr));
+    #else
     n = (mpd_ssize_t)ceil((1.43503*(double)p - 1.182) / (double)log10pbyr);
+    #endif
     return n >= 3 ? n : 3;
 }
 
@@ -7999,7 +8003,11 @@ mpd_sizeinbase(const mpd_t *a, uint32_t base)
 #endif
 
     x = (double)digits / log10(base);
+    #ifdef USE_IDOUBLE
+    return (x > SIZE_MAX-1) ? SIZE_MAX : (size_t)idoubleToInt(x) + 1;
+    #else
     return (x > SIZE_MAX-1) ? SIZE_MAX : (size_t)x + 1;
+    #endif
 }
 
 /* Space needed to import a base 'base' integer of length 'srclen'. */
@@ -8018,7 +8026,11 @@ _mpd_importsize(size_t srclen, uint32_t base)
 #endif
 
     x = (double)srclen * (log10(base)/MPD_RDIGITS);
+    #ifdef USE_IDOUBLE
+    return (x >= MPD_MAXIMPORT) ? MPD_SSIZE_MAX : (mpd_ssize_t)idoubleToInt(x) + 1;
+    #else
     return (x >= MPD_MAXIMPORT) ? MPD_SSIZE_MAX : (mpd_ssize_t)x + 1;
+    #endif
 }
 
 static uint8_t

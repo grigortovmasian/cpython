@@ -46,7 +46,11 @@ fbound(double val, double minval, double maxval)
     val = floor(val);
 
     /* Cast double to integer: round towards zero */
+    #ifdef USE_IDOUBLE
+    return (int)idoubleToInt(val);
+    #else
     return (int)val;
+    #endif
 }
 
 
@@ -529,7 +533,11 @@ audioop_avg_impl(PyObject *module, Py_buffer *fragment, int width)
     if (fragment->len == 0)
         avg = 0;
     else
+        #ifdef USE_IDOUBLE
+        avg = (int)idoubleToInt(floor(sum / (double)(fragment->len/width)));
+        #else
         avg = (int)floor(sum / (double)(fragment->len/width));
+        #endif
     return PyLong_FromLong(avg);
 }
 
@@ -560,7 +568,11 @@ audioop_rms_impl(PyObject *module, Py_buffer *fragment, int width)
     if (fragment->len == 0)
         res = 0;
     else
+	#ifdef USE_IDOUBLE
+        res = (unsigned int)idoubleToInt(sqrt(sum_squares / (double)(fragment->len/width)));
+        #else
         res = (unsigned int)sqrt(sum_squares / (double)(fragment->len/width));
+        #endif
     return PyLong_FromUnsignedLong(res);
 }
 
@@ -825,7 +837,11 @@ audioop_avgpp_impl(PyObject *module, Py_buffer *fragment, int width)
     if ( nextreme == 0 )
         avg = 0;
     else
+        #ifdef USE_IDOUBLE
+        avg = (unsigned int)idoubleToInt(sum / (double)nextreme);
+        #else
         avg = (unsigned int)(sum / (double)nextreme);
+        #endif
     return PyLong_FromUnsignedLong(avg);
 }
 
@@ -1463,7 +1479,11 @@ audioop_ratecv_impl(PyObject *module, Py_buffer *fragment, int width,
                 cur_i[chan] = GETSAMPLE32(width, cp, 0);
                 cp += width;
                 /* implements a simple digital filter */
+		#ifdef USE_IDOUBLE
+                cur_i[chan] = (int)idoubleToInt(
+                #else
                 cur_i[chan] = (int)(
+                #endif
                     ((double)weightA * (double)cur_i[chan] +
                      (double)weightB * (double)prev_i[chan]) /
                     ((double)weightA + (double)weightB));
@@ -1473,7 +1493,11 @@ audioop_ratecv_impl(PyObject *module, Py_buffer *fragment, int width,
         }
         while (d >= 0) {
             for (chan = 0; chan < nchannels; chan++) {
+	        #ifdef USE_IDOUBLE
+                cur_o = (int)idoubleToInt(((double)prev_i[chan] * (double)d +
+                #else
                 cur_o = (int)(((double)prev_i[chan] * (double)d +
+                #endif
                          (double)cur_i[chan] * (double)(outrate - d)) /
                     (double)outrate);
                 SETSAMPLE32(width, ncp, 0, cur_o);

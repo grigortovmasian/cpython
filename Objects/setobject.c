@@ -2053,16 +2053,20 @@ static PyMethodDef set_methods[] = {
      remove_doc},
     {"__sizeof__",      (PyCFunction)set_sizeof,        METH_NOARGS,
      sizeof_doc},
+#ifndef USE_IDOUBLE
     {"symmetric_difference",(PyCFunction)set_symmetric_difference,      METH_O,
      symmetric_difference_doc},
+#endif
     {"symmetric_difference_update",(PyCFunction)set_symmetric_difference_update,        METH_O,
      symmetric_difference_update_doc},
 #ifdef Py_DEBUG
     {"test_c_api",      (PyCFunction)test_c_api,        METH_NOARGS,
      test_c_api_doc},
 #endif
+#ifndef USE_IDOUBLE
     {"union",           (PyCFunction)set_union,         METH_VARARGS,
      union_doc},
+#endif
     {"update",          (PyCFunction)set_update,        METH_VARARGS,
      update_doc},
     {NULL,              NULL}   /* sentinel */
@@ -2172,10 +2176,12 @@ static PyMethodDef frozenset_methods[] = {
      reduce_doc},
     {"__sizeof__",      (PyCFunction)set_sizeof,        METH_NOARGS,
      sizeof_doc},
+#ifndef USE_IDOUBLE
     {"symmetric_difference",(PyCFunction)set_symmetric_difference,      METH_O,
      symmetric_difference_doc},
     {"union",           (PyCFunction)set_union,         METH_VARARGS,
      union_doc},
+#endif
     {NULL,              NULL}   /* sentinel */
 };
 

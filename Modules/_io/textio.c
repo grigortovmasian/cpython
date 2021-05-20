@@ -1842,7 +1842,11 @@ textiowrapper_read_chunk(textio *self, Py_ssize_t size_hint)
 
     /* Read a chunk, decode it, and put the result in self._decoded_chars. */
     if (size_hint > 0) {
-        size_hint = (Py_ssize_t)(Py_MAX(self->b2cratio, 1.0) * size_hint);
+        #ifdef USE_IDOUBLE
+        size_hint = (Py_ssize_t)idoubleToInt(Py_MAX(self->b2cratio, (double)1.0) * size_hint);
+        #else
+        size_hint = (Py_ssize_t)(Py_MAX(self->b2cratio, (double)1.0) * size_hint);
+        #endif
     }
     chunk_size = PyLong_FromSsize_t(Py_MAX(self->chunk_size, size_hint));
     if (chunk_size == NULL)
@@ -2746,7 +2750,12 @@ _io_TextIOWrapper_tell_impl(textio *self)
 
     /* Fast search for an acceptable start point, close to our
        current pos */
+    #ifdef USE_IDOUBLE
+    skip_bytes = (Py_ssize_t)idoubleToInt(self->b2cratio * chars_to_skip);
+    #else
     skip_bytes = (Py_ssize_t) (self->b2cratio * chars_to_skip);
+    #endif
+
     skip_back = 1;
     assert(skip_back <= PyBytes_GET_SIZE(next_input));
     input = PyBytes_AS_STRING(next_input);

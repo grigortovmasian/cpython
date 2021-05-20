@@ -1915,7 +1915,11 @@ pack_single(char *ptr, PyObject *item, const char *fmt)
         if (d == -1.0 && PyErr_Occurred())
             goto err_occurred;
         if (fmt[0] == 'f') {
+	    #ifdef USE_IDOUBLE
+            PACK_SINGLE(ptr, idoubleTofloat(d), float);
+            #else
             PACK_SINGLE(ptr, d, float);
+            #endif
         }
         else {
             PACK_SINGLE(ptr, d, double);

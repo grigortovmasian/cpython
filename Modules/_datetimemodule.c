@@ -2534,7 +2534,11 @@ delta_new(PyTypeObject *type, PyObject *args, PyObject *kw)
         y = accum("weeks", x, week, us_per_week, &leftover_us);
         CLEANUP;
     }
+    #ifdef USE_IDOUBLE
+    if (idoubleToBool(leftover_us)) {
+    #else
     if (leftover_us) {
+    #endif
         /* Round to nearest whole # of us, and add into x. */
         double whole_us = round(leftover_us);
         int x_is_odd;
@@ -2561,7 +2565,11 @@ delta_new(PyTypeObject *type, PyObject *args, PyObject *kw)
             whole_us = 2.0 * round((leftover_us + x_is_odd) * 0.5) - x_is_odd;
         }
 
+	#ifdef USE_IDOUBLE
+        temp = PyLong_FromLong((long)idoubleToInt(whole_us));
+        #else
         temp = PyLong_FromLong((long)whole_us);
+        #endif
 
         if (temp == NULL) {
             Py_DECREF(x);

@@ -138,7 +138,11 @@ m_sinpi(double x)
     /* this function should only ever be called for finite arguments */
     assert(Py_IS_FINITE(x));
     y = fmod(fabs(x), 2.0);
+    #ifdef USE_IDOUBLE
+    n = idoubleToInt(round(2.0*y));
+    #else
     n = (int)round(2.0*y);
+    #endif
     assert(0 <= n && n <= 4);
     switch (n) {
     case 0:
@@ -342,7 +346,11 @@ m_tgamma(double x)
             return Py_NAN; /* negative integers n */
         }
         if (x <= NGAMMA_INTEGRAL)
+            #ifdef USE_IDOUBLE
+            return gamma_integral[idoubleToInt(x) - 1];
+            #else
             return gamma_integral[(int)x - 1];
+            #endif
     }
     absx = fabs(x);
 
@@ -1105,6 +1113,7 @@ math_2(PyObject *const *args, Py_ssize_t nargs,
     }\
     PyDoc_STRVAR(math_##funcname##_doc, docstring);
 
+/*
 FUNC1(acos, acos, 0,
       "acos($module, x, /)\n--\n\n"
       "Return the arc cosine (measured in radians) of x.")
@@ -1127,6 +1136,7 @@ FUNC2(atan2, m_atan2,
 FUNC1(atanh, m_atanh, 0,
       "atanh($module, x, /)\n--\n\n"
       "Return the inverse hyperbolic tangent of x.")
+*/
 
 /*[clinic input]
 math.ceil
@@ -1139,10 +1149,11 @@ Return the ceiling of x as an Integral.
 This is the smallest integer >= x.
 [clinic start generated code]*/
 
+/*
 static PyObject *
-math_ceil(PyObject *module, PyObject *number)
+math_ceil(PyObject *module, PyObject *number) */
 /*[clinic end generated code: output=6c3b8a78bc201c67 input=2725352806399cab]*/
-{
+/*{
     _Py_IDENTIFIER(__ceil__);
     PyObject *method, *result;
 
@@ -1155,8 +1166,9 @@ math_ceil(PyObject *module, PyObject *number)
     result = _PyObject_CallNoArg(method);
     Py_DECREF(method);
     return result;
-}
+} */
 
+/*
 FUNC2(copysign, copysign,
       "copysign($module, x, y, /)\n--\n\n"
        "Return a float with the magnitude (absolute value) of x but the sign of y.\n\n"
@@ -1186,6 +1198,8 @@ FUNC1(fabs, fabs, 0,
       "fabs($module, x, /)\n--\n\n"
       "Return the absolute value of the float x.")
 
+*/
+
 /*[clinic input]
 math.floor
 
@@ -1197,10 +1211,13 @@ Return the floor of x as an Integral.
 This is the largest integer <= x.
 [clinic start generated code]*/
 
+/*
 static PyObject *
 math_floor(PyObject *module, PyObject *number)
+*/
 /*[clinic end generated code: output=c6a65c4884884b8a input=63af6b5d7ebcc3d6]*/
-{
+
+/*{
     _Py_IDENTIFIER(__floor__);
     PyObject *method, *result;
 
@@ -1214,6 +1231,8 @@ math_floor(PyObject *module, PyObject *number)
     Py_DECREF(method);
     return result;
 }
+*/
+
 
 FUNC1A(gamma, m_tgamma,
       "gamma($module, x, /)\n--\n\n"
@@ -1231,6 +1250,7 @@ FUNC2(remainder, m_remainder,
       "Return x - n*y where n*y is the closest integer multiple of y.\n"
       "In the case where x is exactly halfway between two multiples of\n"
       "y, the nearest even value of n is used. The result is always exact.")
+/*
 FUNC1(sin, sin, 0,
       "sin($module, x, /)\n--\n\n"
       "Return the sine of x (measured in radians).")
@@ -1247,6 +1267,7 @@ FUNC1(tanh, tanh, 0,
       "tanh($module, x, /)\n--\n\n"
       "Return the hyperbolic tangent of x.")
 
+      */
 /* Precision summation function as msum() by Raymond Hettinger in
    <http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/393090>,
    enhanced with the exact partials sum and roundoff from Mark
@@ -1362,7 +1383,11 @@ math_fsum(PyObject *module, PyObject *seq)
     Py_ssize_t i, j, n = 0, m = NUM_PARTIALS;
     double x, y, t, ps[NUM_PARTIALS], *p = ps;
     double xsave, special_sum = 0.0, inf_sum = 0.0;
+    #ifdef USE_IDOUBLE
+    double hi, yr, lo;
+    #else
     volatile double hi, yr, lo;
+    #endif
 
     iter = PyObject_GetIter(seq);
     if (iter == NULL)
@@ -2125,7 +2150,11 @@ math_frexp_impl(PyObject *module, double x)
     int i;
     /* deal with special cases directly, to sidestep platform
        differences */
+    #ifdef USE_IDOUBLE
+    if (Py_IS_NAN(x) || Py_IS_INFINITY(x) || !idoubleToBool(x)) {
+    #else
     if (Py_IS_NAN(x) || Py_IS_INFINITY(x) || !x) {
+    #endif
         i = 0;
     }
     else {
@@ -3333,6 +3362,7 @@ error:
 
 
 static PyMethodDef math_methods[] = {
+/*   	
     {"acos",            math_acos,      METH_O,         math_acos_doc},
     {"acosh",           math_acosh,     METH_O,         math_acosh_doc},
     {"asin",            math_asin,      METH_O,         math_asin_doc},
@@ -3344,15 +3374,18 @@ static PyMethodDef math_methods[] = {
     {"copysign",        (PyCFunction)(void(*)(void))math_copysign,  METH_FASTCALL,  math_copysign_doc},
     {"cos",             math_cos,       METH_O,         math_cos_doc},
     {"cosh",            math_cosh,      METH_O,         math_cosh_doc},
+*/
     MATH_DEGREES_METHODDEF
     MATH_DIST_METHODDEF
+/*
     {"erf",             math_erf,       METH_O,         math_erf_doc},
     {"erfc",            math_erfc,      METH_O,         math_erfc_doc},
     {"exp",             math_exp,       METH_O,         math_exp_doc},
     {"expm1",           math_expm1,     METH_O,         math_expm1_doc},
     {"fabs",            math_fabs,      METH_O,         math_fabs_doc},
-    MATH_FACTORIAL_METHODDEF
     MATH_FLOOR_METHODDEF
+*/
+    MATH_FACTORIAL_METHODDEF
     MATH_FMOD_METHODDEF
     MATH_FREXP_METHODDEF
     MATH_FSUM_METHODDEF
@@ -3374,11 +3407,13 @@ static PyMethodDef math_methods[] = {
     MATH_POW_METHODDEF
     MATH_RADIANS_METHODDEF
     {"remainder",       (PyCFunction)(void(*)(void))math_remainder, METH_FASTCALL,  math_remainder_doc},
+/*
     {"sin",             math_sin,       METH_O,         math_sin_doc},
     {"sinh",            math_sinh,      METH_O,         math_sinh_doc},
     {"sqrt",            math_sqrt,      METH_O,         math_sqrt_doc},
     {"tan",             math_tan,       METH_O,         math_tan_doc},
     {"tanh",            math_tanh,      METH_O,         math_tanh_doc},
+*/
     MATH_TRUNC_METHODDEF
     MATH_PROD_METHODDEF
     MATH_PERM_METHODDEF
